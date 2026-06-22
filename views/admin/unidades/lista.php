@@ -84,77 +84,79 @@ function rotuloBadgeStatus(string $status): string {
       $nomeProprietario = $u->exibirProprietario();
       $nomeInquilino    = $u->estaAlugada() ? $u->exibirInquilino() : null;
       $alugada          = $u->estaAlugada();
+      $inicialProp      = $nomeProprietario ? mb_strtoupper(mb_substr(explode(' ', $nomeProprietario)[0], 0, 1)) : '?';
+      $inicialInq       = $nomeInquilino    ? mb_strtoupper(mb_substr(explode(' ', $nomeInquilino)[0],    0, 1)) : '?';
     ?>
     <div class="col-sm-6 col-md-4 col-xl-3">
       <button type="button"
-              class="card border-0 shadow-sm w-100 text-start btn-unidade p-0 <?= $alugada ? 'card-alugada' : '' ?>"
+              class="card border-0 shadow-sm w-100 text-start btn-unidade p-0"
               data-bs-toggle="modal"
               data-bs-target="#modal-unidade-<?= $uid ?>">
 
         <!-- Faixa colorida no topo -->
         <div class="card-ocupacao-faixa <?= $alugada ? 'faixa-alugada' : 'faixa-propria' ?>"></div>
 
-        <div class="card-body p-3">
+        <div class="card-body p-3 d-flex flex-column gap-0">
 
-          <!-- Cabeçalho: número + badge status -->
-          <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-            <div class="fw-bold" style="font-size:1rem; line-height:1.2;">
-              <?php if ($u->bloco): ?>
-                <span class="text-body-secondary fw-normal" style="font-size:.8rem;">Apto</span>
+          <!-- Número + metadados -->
+          <div class="mb-3">
+            <div class="d-flex align-items-baseline gap-2">
+              <span class="fw-black" style="font-size:1.45rem; line-height:1;"><?= htmlspecialchars($u->numero) ?></span>
+              <?php if ($alugada): ?>
+                <span class="badge bg-warning-subtle text-warning-emphasis" style="font-size:.65rem;">
+                  <i class="bi bi-key"></i> Alugado
+                </span>
+              <?php else: ?>
+                <span class="badge bg-success-subtle text-success-emphasis" style="font-size:.65rem;">
+                  <i class="bi bi-house-check"></i> Próprio
+                </span>
               <?php endif; ?>
-              <?= htmlspecialchars($u->numero) ?>
             </div>
-            <span class="badge rounded-pill badge-<?= $status ?> flex-shrink-0" style="font-size:.68rem;">
-              <?= rotuloBadgeStatus($status) ?>
-            </span>
-          </div>
-
-          <!-- Andar -->
-          <?php if ($u->andar): ?>
-            <div class="text-body-secondary mb-2" style="font-size:.78rem;">
-              <i class="bi bi-layers me-1"></i><?= $u->andar ?>º andar
-            </div>
-          <?php endif; ?>
-
-          <!-- Tipo de ocupação -->
-          <div class="mb-3" style="font-size:.78rem;">
-            <?php if ($alugada): ?>
-              <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-2">
-                <i class="bi bi-key me-1"></i>Alugado
-              </span>
-            <?php else: ?>
-              <span class="badge bg-success-subtle text-success-emphasis rounded-pill px-2">
-                <i class="bi bi-house-check me-1"></i>Próprio
-              </span>
+            <?php $meta = array_filter([$u->andar ? $u->andar.'º andar' : null, $u->descricao]); ?>
+            <?php if ($meta): ?>
+              <div class="text-body-secondary mt-1" style="font-size:.75rem;">
+                <?= htmlspecialchars(implode(' · ', $meta)) ?>
+              </div>
             <?php endif; ?>
           </div>
 
-          <!-- Proprietário -->
-          <div class="d-flex align-items-center gap-1 mb-1" style="font-size:.78rem; min-width:0;">
-            <i class="bi bi-person-badge text-body-secondary flex-shrink-0"></i>
-            <span class="text-body-secondary flex-shrink-0">Dono</span>
-            <span class="fw-semibold text-truncate ms-1">
-              <?= $nomeProprietario ? htmlspecialchars($nomeProprietario) : '<span class="opacity-40">—</span>' ?>
-            </span>
+          <!-- Pessoas -->
+          <div class="d-flex flex-column gap-2 mb-3">
+            <!-- Proprietário -->
+            <div class="d-flex align-items-center gap-2" style="min-width:0;">
+              <div class="avatar-unidade avatar-prop flex-shrink-0"><?= $inicialProp ?></div>
+              <div style="min-width:0;">
+                <div class="text-body-secondary" style="font-size:.68rem; line-height:1;">Proprietário</div>
+                <div class="fw-semibold text-truncate" style="font-size:.82rem;">
+                  <?= $nomeProprietario ? htmlspecialchars($nomeProprietario) : '<span class="opacity-40">Não definido</span>' ?>
+                </div>
+              </div>
+            </div>
+
+            <?php if ($alugada): ?>
+            <!-- Inquilino -->
+            <div class="d-flex align-items-center gap-2" style="min-width:0;">
+              <div class="avatar-unidade avatar-inq flex-shrink-0"><?= $inicialInq ?></div>
+              <div style="min-width:0;">
+                <div class="text-body-secondary" style="font-size:.68rem; line-height:1;">Inquilino</div>
+                <div class="fw-semibold text-truncate" style="font-size:.82rem;">
+                  <?= $nomeInquilino ? htmlspecialchars($nomeInquilino) : '<span class="opacity-40">Não definido</span>' ?>
+                </div>
+              </div>
+            </div>
+            <?php endif; ?>
           </div>
 
-          <!-- Inquilino (só se alugada) -->
-          <?php if ($alugada): ?>
-          <div class="d-flex align-items-center gap-1 mb-1" style="font-size:.78rem; min-width:0;">
-            <i class="bi bi-key text-warning-emphasis flex-shrink-0"></i>
-            <span class="text-body-secondary flex-shrink-0">Inquilino</span>
-            <span class="fw-semibold text-truncate ms-1">
-              <?= $nomeInquilino ? htmlspecialchars($nomeInquilino) : '<span class="opacity-40">—</span>' ?>
+          <!-- Rodapé: moradores + status financeiro -->
+          <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top">
+            <span class="text-body-secondary" style="font-size:.73rem;">
+              <i class="bi bi-people me-1"></i>
+              <?= $qtdMoradores ?> morador<?= $qtdMoradores !== 1 ? 'es' : '' ?>
+            </span>
+            <span class="badge rounded-pill badge-<?= $status ?>" style="font-size:.65rem;">
+              <?= rotuloBadgeStatus($status) ?>
             </span>
           </div>
-          <?php endif; ?>
-
-          <!-- Moradores -->
-          <?php if ($qtdMoradores > 0): ?>
-          <div class="text-body-secondary mt-2" style="font-size:.75rem;">
-            <i class="bi bi-people me-1"></i><?= $qtdMoradores ?> morador<?= $qtdMoradores !== 1 ? 'es' : '' ?>
-          </div>
-          <?php endif; ?>
 
         </div>
       </button>
@@ -384,22 +386,31 @@ function rotuloBadgeStatus(string $status): string {
 <style>
 .btn-unidade {
   cursor: pointer;
-  transition: transform .12s ease, box-shadow .12s ease;
-  border-radius: .5rem !important;
+  transition: transform .13s ease, box-shadow .13s ease;
+  border-radius: .6rem !important;
   text-align: left;
   overflow: hidden;
 }
 .btn-unidade:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.1) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.13) !important;
 }
 .card-ocupacao-faixa {
-  height: 4px;
+  height: 5px;
   width: 100%;
 }
-.faixa-propria  { background: var(--bs-success); }
-.faixa-alugada  { background: var(--bs-warning); }
-.card-alugada   { border-left: 3px solid var(--bs-warning) !important; }
+.faixa-propria { background: linear-gradient(90deg, var(--bs-success), #34d399); }
+.faixa-alugada { background: linear-gradient(90deg, var(--bs-warning), #fcd34d); }
+
+/* Avatares de pessoa no card */
+.avatar-unidade {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700; line-height: 1;
+}
+.avatar-prop { background: rgba(var(--bs-primary-rgb), .12); color: var(--bs-primary); }
+.avatar-inq  { background: rgba(var(--bs-warning-rgb), .18); color: var(--bs-warning-emphasis); }
 </style>
 
 <script>
