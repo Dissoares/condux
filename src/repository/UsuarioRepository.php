@@ -107,7 +107,7 @@ class UsuarioRepository
                     m.responsavel,
                     m.data_entrada,
                     un.id AS unidade_id_vinculo,
-                    CONCAT("Apto ", un.numero, IF(un.bloco IS NOT NULL, CONCAT(" \xe2\x80\x94 Bloco ", un.bloco), "")) AS identificacao_unidade
+                    CONCAT("Apto ", un.numero, IF(un.bloco IS NOT NULL, CONCAT(" — Bloco ", un.bloco), "")) AS identificacao_unidade
              FROM usuarios u
              LEFT JOIN moradores m ON m.usuario_id = u.id AND m.ativo = 1
              LEFT JOIN unidades un ON un.id = m.unidade_id
@@ -124,7 +124,7 @@ class UsuarioRepository
             'SELECT u.*,
                     m.id AS morador_id,
                     un.id AS unidade_id_vinculo,
-                    CONCAT("Apto ", un.numero, IF(un.bloco IS NOT NULL, CONCAT(" \xe2\x80\x94 Bloco ", un.bloco), "")) AS identificacao_unidade
+                    CONCAT("Apto ", un.numero, IF(un.bloco IS NOT NULL, CONCAT(" — Bloco ", un.bloco), "")) AS identificacao_unidade
              FROM usuarios u
              LEFT JOIN moradores m ON m.usuario_id = u.id AND m.ativo = 1
              LEFT JOIN unidades un ON un.id = m.unidade_id
