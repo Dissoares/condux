@@ -1,0 +1,9 @@
+CREATE TABLE unidades (
+    id        INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    bloco     VARCHAR(10)  NULL,
+    numero    VARCHAR(20)  NOT NULL,
+    andar     SMALLINT     NULL,
+    descricao VARCHAR(255) NULL,
+    ativo     TINYINT(1)   NOT NULL DEFAULT 1,
+    criado_em DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

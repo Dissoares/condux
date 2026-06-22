@@ -15,6 +15,18 @@ class Roteador
         $metodo = $_SERVER['REQUEST_METHOD'];
         $seg    = self::segmentosUri();   // array indexado de 0 a 4
 
+        // ── Setup (sem autenticação, sem acesso ao banco pelo roteador) ──
+        if ($seg[0] === 'setup') {
+            require_once RAIZ . '/src/controllers/SetupController.php';
+            $ctrl = new SetupController();
+            match ($seg[1]) {
+                'criar-banco' => $ctrl->criarBanco(),
+                'executar'    => $ctrl->executarMigracoes(),
+                default       => $ctrl->exibir(),
+            };
+            return;
+        }
+
         // ── Rotas públicas ──────────────────────────────────────────────
         if ($seg[0] === 'login') {
             require_once RAIZ . '/src/controllers/AutenticacaoController.php';

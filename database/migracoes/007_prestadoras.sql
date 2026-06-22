@@ -1,0 +1,10 @@
+CREATE TABLE prestadoras (
+    id        INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nome      VARCHAR(150) NOT NULL,
+    cnpj      VARCHAR(18)  NULL,
+    contato   VARCHAR(100) NULL,
+    telefone  VARCHAR(20)  NULL,
+    email     VARCHAR(180) NULL,
+    ativo     TINYINT(1)   NOT NULL DEFAULT 1,
+    criado_em DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
