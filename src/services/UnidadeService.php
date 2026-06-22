@@ -204,7 +204,7 @@ class UnidadeService
         return $this->moradorRepository->listarAtivosPorUnidade($unidadeId);
     }
 
-    private function garantirInquilinoComoResponsavel(int $unidadeId, int $inquilinoId): void
+    public function garantirInquilinoComoResponsavel(int $unidadeId, int $inquilinoId): void
     {
         $moradores = $this->moradorRepository->listarAtivosPorUnidade($unidadeId);
 

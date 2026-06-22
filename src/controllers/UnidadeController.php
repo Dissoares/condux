@@ -23,12 +23,28 @@ class UnidadeController
 
     public function listar(): void
     {
-        $unidades          = $this->unidadeService->listarUnidades();
-        $todosCondominios  = $this->unidadeService->listarCondominios();
+        $unidades            = $this->unidadeService->listarUnidades();
+        $todosCondominios    = $this->unidadeService->listarCondominios();
         $moradoresPorUnidade = $this->unidadeService->listarMoradoresAgrupados();
-        $mensagem          = Sessao::lerFlash('sucesso');
-        $erroMensagem      = Sessao::lerFlash('erro');
-        $abrirModalId      = (int) ($_GET['abrir'] ?? 0);
+
+        // Sincronizar inquilinos que ainda não estão como moradores (dados legados)
+        $precisaRecarregar = false;
+        foreach ($unidades as $u) {
+            if ($u->tipoOcupacao === 'alugado' && $u->inquilinoId !== null) {
+                $ids = array_map(fn($m) => $m->usuarioId, $moradoresPorUnidade[$u->id] ?? []);
+                if (!in_array($u->inquilinoId, $ids, true)) {
+                    $this->unidadeService->garantirInquilinoComoResponsavel($u->id, $u->inquilinoId);
+                    $precisaRecarregar = true;
+                }
+            }
+        }
+        if ($precisaRecarregar) {
+            $moradoresPorUnidade = $this->unidadeService->listarMoradoresAgrupados();
+        }
+
+        $mensagem     = Sessao::lerFlash('sucesso');
+        $erroMensagem = Sessao::lerFlash('erro');
+        $abrirModalId = (int) ($_GET['abrir'] ?? 0);
         require_once RAIZ . '/views/admin/unidades/lista.php';
     }
 
