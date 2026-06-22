@@ -62,6 +62,7 @@ class Roteador
             'condominios'  => self::rotasCondominios($seg, $metodo, $ehAdmin),
             'taxas'        => self::rotasTaxas($seg, $metodo, $ehAdmin),
             'taxas-extra'  => self::rotasTaxasExtra($seg, $metodo, $ehAdmin),
+            'vistorias'    => self::rotasVistorias($seg, $metodo, $ehAdmin),
             'projetos'     => self::rotasProjetos($seg, $metodo, $ehAdmin),
             'minhas-taxas' => self::rotasMinhasTaxas($seg, $metodo),
             'transparencia'=> self::rotasTransparencia($seg),
@@ -186,6 +187,40 @@ class Roteador
         if ($seg[1] === 'gerar' && $metodo === 'POST')     { $ctrl->gerar(); return; }
 
         $id = (int) $seg[1];
+        if ($id > 0) { $_GET['id'] = $id; $ctrl->ver(); return; }
+
+        self::naoEncontrado();
+    }
+
+    // ── Vistorias ────────────────────────────────────────────────────────
+
+    private static function rotasVistorias(array $seg, string $metodo, bool $ehAdmin): void
+    {
+        if (!$ehAdmin) { self::naoAutorizado(); return; }
+
+        require_once RAIZ . '/src/controllers/VistoriaController.php';
+        $ctrl = new VistoriaController();
+
+        if ($seg[1] === null)                              { $ctrl->listar();    return; }
+        if ($seg[1] === 'nova')                            { $ctrl->formulario(); return; }
+        if ($seg[1] === 'salvar' && $metodo === 'POST')    { $ctrl->salvar();    return; }
+
+        $id = (int) $seg[1];
+
+        if ($seg[2] === 'editar')  { $_GET['id'] = $id; $ctrl->formulario(); return; }
+        if ($seg[2] === 'excluir') { $_GET['id'] = $id; $ctrl->excluir();    return; }
+
+        if ($seg[2] === 'anexos' && $metodo === 'POST') {
+            $ctrl->adicionarAnexo();
+            return;
+        }
+        if ($seg[2] === 'anexos' && $seg[4] === 'remover') {
+            $_GET['vistoria_id'] = $id;
+            $_GET['anexo_id']    = (int) $seg[3];
+            $ctrl->removerAnexo();
+            return;
+        }
+
         if ($id > 0) { $_GET['id'] = $id; $ctrl->ver(); return; }
 
         self::naoEncontrado();
