@@ -283,31 +283,31 @@ function rotuloBadgeStatus(string $status): string {
                 <p class="fw-semibold mb-2" style="font-size:.88rem;">
                   <i class="bi bi-person-badge text-warning me-1"></i>Proprietário
                 </p>
-                <?php if ($u->proprietarioId && $u->nomeProprietarioVinc): ?>
-                <div class="d-flex align-items-center gap-3 p-3 rounded-2 mb-2" style="background:var(--bs-tertiary-bg);">
-                  <div class="avatar-unidade avatar-prop flex-shrink-0">
-                    <?= mb_strtoupper(mb_substr($u->nomeProprietarioVinc, 0, 1)) ?>
-                  </div>
-                  <div class="flex-grow-1 min-w-0">
-                    <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($u->nomeProprietarioVinc) ?></div>
-                    <div class="text-body-secondary" style="font-size:.78rem;"><?= htmlspecialchars($u->emailProprietarioVinc ?? '') ?></div>
-                  </div>
-                  <span class="badge bg-warning-subtle text-warning-emphasis flex-shrink-0" style="font-size:.68rem;">
-                    <i class="bi bi-person-badge me-1"></i>Proprietário
-                  </span>
-                  <button type="button" class="btn btn-outline-danger btn-sm flex-shrink-0 btn-limpar-picker"
-                          data-target="proprietario_id" data-modal="<?= $uid ?>">
-                    <i class="bi bi-x-lg"></i>
-                  </button>
-                </div>
-                <?php endif; ?>
                 <?php if (empty($todosCondominios)): ?>
                   <p class="text-body-secondary mb-0" style="font-size:.85rem;">
                     <a href="<?= url('condominios/novo') ?>">Cadastre um condômino</a> para vincular.
                   </p>
                 <?php else: ?>
                   <?php renderPicker('proprietario_id', $todosCondominios, $u->proprietarioId,
-                    $u->proprietarioId ? 'Alterar proprietário...' : 'Buscar proprietário...', '— Sem proprietário —') ?>
+                    'Buscar proprietário...', '— Sem proprietário —', [], true) ?>
+                  <?php if ($u->proprietarioId && $u->nomeProprietarioVinc): ?>
+                  <div class="d-flex align-items-center gap-3 p-3 rounded-2 mt-2" style="background:var(--bs-tertiary-bg);">
+                    <div class="avatar-unidade avatar-prop flex-shrink-0">
+                      <?= mb_strtoupper(mb_substr($u->nomeProprietarioVinc, 0, 1)) ?>
+                    </div>
+                    <div class="flex-grow-1 min-w-0">
+                      <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($u->nomeProprietarioVinc) ?></div>
+                      <div class="text-body-secondary" style="font-size:.78rem;"><?= htmlspecialchars($u->emailProprietarioVinc ?? '') ?></div>
+                    </div>
+                    <span class="badge bg-warning-subtle text-warning-emphasis flex-shrink-0" style="font-size:.68rem;">
+                      <i class="bi bi-person-badge me-1"></i>Proprietário
+                    </span>
+                    <button type="button" class="btn btn-outline-danger btn-sm flex-shrink-0 btn-limpar-picker"
+                            data-target="proprietario_id">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                  <?php endif; ?>
                 <?php endif; ?>
               </div>
 
@@ -316,27 +316,27 @@ function rotuloBadgeStatus(string $status): string {
                 <p class="fw-semibold mb-2" style="font-size:.88rem;">
                   <i class="bi bi-key text-warning-emphasis me-1"></i>Inquilino
                 </p>
-                <?php if ($u->inquilinoId && $u->nomeInquilinoVinc): ?>
-                <div class="d-flex align-items-center gap-3 p-3 rounded-2 mb-2" style="background:var(--bs-tertiary-bg);">
-                  <div class="avatar-unidade avatar-inq flex-shrink-0">
-                    <?= mb_strtoupper(mb_substr($u->nomeInquilinoVinc, 0, 1)) ?>
-                  </div>
-                  <div class="flex-grow-1 min-w-0">
-                    <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($u->nomeInquilinoVinc) ?></div>
-                    <div class="text-body-secondary" style="font-size:.78rem;"><?= htmlspecialchars($u->emailInquilinoVinc ?? '') ?></div>
-                  </div>
-                  <span class="badge bg-info-subtle text-info-emphasis flex-shrink-0" style="font-size:.68rem;">
-                    <i class="bi bi-key me-1"></i>Inquilino
-                  </span>
-                  <button type="button" class="btn btn-outline-danger btn-sm flex-shrink-0 btn-limpar-picker"
-                          data-target="inquilino_id" data-modal="<?= $uid ?>">
-                    <i class="bi bi-x-lg"></i>
-                  </button>
-                </div>
-                <?php endif; ?>
                 <?php if (!empty($todosCondominios)): ?>
                   <?php renderPicker('inquilino_id', $todosCondominios, $u->inquilinoId,
-                    $u->inquilinoId ? 'Alterar inquilino...' : 'Buscar inquilino...', '— Sem inquilino —') ?>
+                    'Buscar inquilino...', '— Sem inquilino —', [], true) ?>
+                  <?php if ($u->inquilinoId && $u->nomeInquilinoVinc): ?>
+                  <div class="d-flex align-items-center gap-3 p-3 rounded-2 mt-2" style="background:var(--bs-tertiary-bg);">
+                    <div class="avatar-unidade avatar-inq flex-shrink-0">
+                      <?= mb_strtoupper(mb_substr($u->nomeInquilinoVinc, 0, 1)) ?>
+                    </div>
+                    <div class="flex-grow-1 min-w-0">
+                      <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($u->nomeInquilinoVinc) ?></div>
+                      <div class="text-body-secondary" style="font-size:.78rem;"><?= htmlspecialchars($u->emailInquilinoVinc ?? '') ?></div>
+                    </div>
+                    <span class="badge bg-info-subtle text-info-emphasis flex-shrink-0" style="font-size:.68rem;">
+                      <i class="bi bi-key me-1"></i>Inquilino
+                    </span>
+                    <button type="button" class="btn btn-outline-danger btn-sm flex-shrink-0 btn-limpar-picker"
+                            data-target="inquilino_id">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                  <?php endif; ?>
                 <?php endif; ?>
               </div>
 

@@ -16,9 +16,10 @@ function renderPicker(
     string  $placeholder  = 'Buscar...',
     string  $labelVazia   = '— Nenhum —',
     array   $excluir      = [],
+    bool    $ocultarTexto = false,
 ): void {
     $textoSelecionado = '';
-    if ($selecionado) {
+    if ($selecionado && !$ocultarTexto) {
         foreach ($opcoes as $o) {
             if ((int)$o['id'] === $selecionado) {
                 $textoSelecionado = $o['nome'];
