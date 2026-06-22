@@ -13,10 +13,15 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
 ?>
 
 <div class="d-flex align-items-center justify-content-between mb-4">
-  <h4 class="fw-semibold mb-0">
-    <i class="bi bi-person-<?= $editando ? 'gear' : 'plus' ?>"></i>
-    <?= $editando ? 'Editar condômino' : 'Novo condômino' ?>
-  </h4>
+  <div>
+    <h4 class="fw-semibold mb-0">
+      <i class="bi bi-person-<?= $editando ? 'gear' : 'plus' ?> text-primary"></i>
+      <?= $editando ? 'Editar condômino' : 'Novo condômino' ?>
+    </h4>
+    <p class="text-body-secondary mb-0 mt-1" style="font-size:.85rem;">
+      <?= $editando ? 'Atualize os dados e as unidades vinculadas.' : 'Preencha os dados de contato e vincule às unidades.' ?>
+    </p>
+  </div>
   <a href="<?= $retornarUnidade ? url("unidades/{$retornarUnidade}") : url('condominios') ?>"
      class="btn btn-outline-secondary">
     <i class="bi bi-arrow-left"></i> Voltar
@@ -42,8 +47,10 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
     <!-- Dados pessoais e acesso -->
     <div class="col-lg-6">
       <div class="card border-0 shadow-sm h-100">
-        <div class="card-header bg-transparent fw-semibold py-3">
-          <i class="bi bi-person"></i> Dados pessoais
+        <div class="card-header bg-transparent d-flex align-items-center gap-2 py-3">
+          <span class="d-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary flex-shrink-0"
+                style="width:32px;height:32px;font-size:.9rem;"><i class="bi bi-person"></i></span>
+          <span class="fw-semibold">Dados pessoais</span>
         </div>
         <div class="card-body">
 
@@ -85,8 +92,10 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
     <!-- Acesso ao sistema -->
     <div class="col-lg-6">
       <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-transparent fw-semibold py-3">
-          <i class="bi bi-key"></i> Acesso ao sistema
+        <div class="card-header bg-transparent d-flex align-items-center gap-2 py-3">
+          <span class="d-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10 text-warning flex-shrink-0"
+                style="width:32px;height:32px;font-size:.9rem;"><i class="bi bi-key"></i></span>
+          <span class="fw-semibold">Acesso ao sistema</span>
         </div>
         <div class="card-body">
 
@@ -117,25 +126,33 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
 
       <!-- Unidades vinculadas -->
       <div class="card border-0 shadow-sm">
-        <div class="card-header bg-transparent fw-semibold py-3">
-          <i class="bi bi-building"></i> Unidades vinculadas
+        <div class="card-header bg-transparent d-flex align-items-center gap-2 py-3">
+          <span class="d-flex align-items-center justify-content-center rounded-circle bg-secondary bg-opacity-10 text-secondary flex-shrink-0"
+                style="width:32px;height:32px;font-size:.9rem;"><i class="bi bi-building"></i></span>
+          <span class="fw-semibold">Unidades vinculadas</span>
         </div>
         <div class="card-body">
           <?php if (empty($todasUnidades)): ?>
             <p class="text-body-secondary mb-0" style="font-size:.875rem;">Nenhuma unidade cadastrada.</p>
           <?php else: ?>
-            <div style="max-height:220px; overflow-y:auto;">
+            <div class="d-flex flex-column gap-2">
               <?php foreach ($todasUnidades as $unidade): ?>
-              <div class="form-check mb-1">
-                <input type="checkbox" class="form-check-input"
+              <?php $marcado = in_array($unidade->id, $unidadesVinculadas, true); ?>
+              <label class="d-flex align-items-center gap-2 p-2 rounded border
+                            <?= $marcado ? 'border-primary bg-primary bg-opacity-10' : 'border-0 bg-body-secondary' ?>"
+                     for="unidade-<?= $unidade->id ?>" style="cursor:pointer;">
+                <input type="checkbox" class="form-check-input flex-shrink-0 m-0"
                        id="unidade-<?= $unidade->id ?>"
                        name="unidades[]"
                        value="<?= $unidade->id ?>"
-                       <?= in_array($unidade->id, $unidadesVinculadas, true) ? 'checked' : '' ?>>
-                <label class="form-check-label" for="unidade-<?= $unidade->id ?>" style="font-size:.9rem;">
-                  <?= htmlspecialchars($unidade->identificacao()) ?>
-                </label>
-              </div>
+                       <?= $marcado ? 'checked' : '' ?>
+                       onchange="this.closest('label').classList.toggle('border-primary', this.checked);
+                                 this.closest('label').classList.toggle('bg-primary', this.checked);
+                                 this.closest('label').classList.toggle('bg-opacity-10', this.checked);
+                                 this.closest('label').classList.toggle('border-0', !this.checked);
+                                 this.closest('label').classList.toggle('bg-body-secondary', !this.checked);">
+                <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($unidade->identificacao()) ?></div>
+              </label>
               <?php endforeach; ?>
             </div>
             <div class="form-text mt-2">Marque as unidades onde este condômino mora.</div>
