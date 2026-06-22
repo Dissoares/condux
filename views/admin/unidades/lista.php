@@ -281,7 +281,11 @@ function rotuloBadgeStatus(string $status): string {
                     <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($m->nomeUsuario ?? '—') ?></div>
                     <div class="text-body-secondary" style="font-size:.78rem;"><?= htmlspecialchars($m->emailUsuario ?? '') ?></div>
                   </div>
-                  <?php if ($m->responsavel): ?>
+                  <?php if ($m->usuarioId === $u->inquilinoId): ?>
+                    <span class="badge bg-info-subtle text-info-emphasis flex-shrink-0" style="font-size:.68rem;">
+                      <i class="bi bi-key me-1"></i>Inquilino
+                    </span>
+                  <?php elseif ($m->responsavel): ?>
                     <span class="badge badge-pago flex-shrink-0" style="font-size:.68rem;">Responsável</span>
                   <?php endif; ?>
                   <a href="<?= url("unidades/{$uid}/desvincular-morador/{$m->id}?retornar=lista") ?>"
