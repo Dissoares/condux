@@ -26,13 +26,13 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
         <label for="campo-nome-projeto" class="form-label">Nome do projeto *</label>
         <input type="text" id="campo-nome-projeto" name="nome" class="form-control" required
                placeholder="Ex: Reforma da garagem"
-               value="<?= htmlspecialchars($projeto->nome ?? '') ?>">
+               value="<?= htmlspecialchars($projeto?->nome ?? '') ?>">
       </div>
 
       <div class="mb-3">
         <label for="campo-descricao-projeto" class="form-label">Descrição</label>
         <textarea id="campo-descricao-projeto" name="descricao" class="form-control" rows="4"
-                  placeholder="Descreva o projeto, objetivos e escopo..."><?= htmlspecialchars($projeto->descricao ?? '') ?></textarea>
+                  placeholder="Descreva o projeto, objetivos e escopo..."><?= htmlspecialchars($projeto?->descricao ?? '') ?></textarea>
       </div>
 
       <div class="row g-3 mb-3">
@@ -40,7 +40,7 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           <label for="campo-idealizador" class="form-label">Idealizador</label>
           <input type="text" id="campo-idealizador" name="idealizador" class="form-control"
                  placeholder="Nome do morador ou conselho"
-                 value="<?= htmlspecialchars($projeto->idealizador ?? '') ?>">
+                 value="<?= htmlspecialchars($projeto?->idealizador ?? '') ?>">
         </div>
         <div class="col-6">
           <label for="campo-responsavel" class="form-label">Responsável</label>
@@ -48,7 +48,7 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
             <option value="">— Selecione —</option>
             <?php foreach ($responsaveis as $resp): ?>
               <option value="<?= $resp->id ?>"
-                <?= ($projeto->responsavelId ?? null) == $resp->id ? 'selected' : '' ?>>
+                <?= ($projeto?->responsavelId ?? null) == $resp->id ? 'selected' : '' ?>>
                 <?= htmlspecialchars($resp->nome) ?> (<?= $resp->perfil ?>)
               </option>
             <?php endforeach; ?>
@@ -61,13 +61,13 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           <label for="campo-valor-estimado" class="form-label">Valor estimado (R$)</label>
           <input type="text" id="campo-valor-estimado" name="valor_estimado" class="form-control"
                  placeholder="0,00"
-                 value="<?= $projeto->valorEstimado ? number_format($projeto->valorEstimado, 2, ',', '.') : '' ?>">
+                 value="<?= $projeto?->valorEstimado ? number_format($projeto->valorEstimado, 2, ',', '.') : '' ?>">
         </div>
         <div class="col-6">
           <label for="campo-valor-realizado" class="form-label">Valor realizado (R$)</label>
           <input type="text" id="campo-valor-realizado" name="valor_realizado" class="form-control"
                  placeholder="0,00"
-                 value="<?= $projeto->valorRealizado ? number_format($projeto->valorRealizado, 2, ',', '.') : '' ?>">
+                 value="<?= $projeto?->valorRealizado ? number_format($projeto->valorRealizado, 2, ',', '.') : '' ?>">
         </div>
       </div>
 
@@ -75,12 +75,12 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
         <div class="col-6">
           <label for="campo-data-inicio" class="form-label">Data de início</label>
           <input type="date" id="campo-data-inicio" name="data_inicio" class="form-control"
-                 value="<?= htmlspecialchars($projeto->dataInicio ?? '') ?>">
+                 value="<?= htmlspecialchars($projeto?->dataInicio ?? '') ?>">
         </div>
         <div class="col-6">
           <label for="campo-data-conclusao" class="form-label">Previsão de conclusão</label>
           <input type="date" id="campo-data-conclusao" name="data_conclusao" class="form-control"
-                 value="<?= htmlspecialchars($projeto->dataConclusao ?? '') ?>">
+                 value="<?= htmlspecialchars($projeto?->dataConclusao ?? '') ?>">
         </div>
       </div>
 
@@ -89,7 +89,7 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
         <select id="campo-status-projeto" name="status" class="form-select">
           <?php foreach (Projeto::$rotulosStatus as $chave => $rotulo): ?>
             <option value="<?= $chave ?>"
-              <?= ($projeto->status ?? 'pendente') === $chave ? 'selected' : '' ?>>
+              <?= ($projeto?->status ?? 'pendente') === $chave ? 'selected' : '' ?>>
               <?= htmlspecialchars($rotulo) ?>
             </option>
           <?php endforeach; ?>
