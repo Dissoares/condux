@@ -12,16 +12,21 @@ class UnidadeRepository
     {
         $stmt = $this->conexao->prepare(
             'SELECT u.*,
-                    m_usr.nome AS nome_responsavel,
-                    tc.status  AS status_taxa_atual
+                    m_usr.nome  AS nome_responsavel,
+                    tc.status   AS status_taxa_atual,
+                    prop.nome   AS nome_prop_vinc,
+                    prop.email  AS email_prop_vinc,
+                    inq.nome    AS nome_inq_vinc,
+                    inq.email   AS email_inq_vinc
              FROM unidades u
              LEFT JOIN moradores m
                     ON m.unidade_id = u.id AND m.responsavel = 1 AND m.ativo = 1
-             LEFT JOIN usuarios m_usr
-                    ON m_usr.id = m.usuario_id
+             LEFT JOIN usuarios m_usr ON m_usr.id = m.usuario_id
              LEFT JOIN taxas_condominiais tc
                     ON tc.unidade_id = u.id
                    AND tc.competencia = DATE_FORMAT(NOW(), "%Y-%m")
+             LEFT JOIN usuarios prop ON prop.id = u.proprietario_id
+             LEFT JOIN usuarios inq  ON inq.id  = u.inquilino_id
              WHERE u.id = :id LIMIT 1'
         );
         $stmt->execute([':id' => $id]);
@@ -35,16 +40,21 @@ class UnidadeRepository
     {
         $stmt = $this->conexao->query(
             'SELECT u.*,
-                    m_usr.nome AS nome_responsavel,
-                    tc.status  AS status_taxa_atual
+                    m_usr.nome  AS nome_responsavel,
+                    tc.status   AS status_taxa_atual,
+                    prop.nome   AS nome_prop_vinc,
+                    prop.email  AS email_prop_vinc,
+                    inq.nome    AS nome_inq_vinc,
+                    inq.email   AS email_inq_vinc
              FROM unidades u
              LEFT JOIN moradores m
                     ON m.unidade_id = u.id AND m.responsavel = 1 AND m.ativo = 1
-             LEFT JOIN usuarios m_usr
-                    ON m_usr.id = m.usuario_id
+             LEFT JOIN usuarios m_usr ON m_usr.id = m.usuario_id
              LEFT JOIN taxas_condominiais tc
                     ON tc.unidade_id = u.id
                    AND tc.competencia = DATE_FORMAT(NOW(), "%Y-%m")
+             LEFT JOIN usuarios prop ON prop.id = u.proprietario_id
+             LEFT JOIN usuarios inq  ON inq.id  = u.inquilino_id
              WHERE u.ativo = 1
              ORDER BY u.bloco, u.numero'
         );
@@ -76,11 +86,13 @@ class UnidadeRepository
         $stmt = $this->conexao->prepare(
             'INSERT INTO unidades
                 (numero, bloco, andar, descricao,
-                 tipo_ocupacao, nome_proprietario, telefone_proprietario, email_proprietario,
+                 tipo_ocupacao, proprietario_id, inquilino_id,
+                 nome_proprietario, telefone_proprietario, email_proprietario,
                  nome_inquilino, telefone_inquilino, email_inquilino, ativo)
              VALUES
                 (:numero, :bloco, :andar, :descricao,
-                 :tipo_ocupacao, :nome_proprietario, :telefone_proprietario, :email_proprietario,
+                 :tipo_ocupacao, :proprietario_id, :inquilino_id,
+                 :nome_proprietario, :telefone_proprietario, :email_proprietario,
                  :nome_inquilino, :telefone_inquilino, :email_inquilino, :ativo)'
         );
         $stmt->execute($this->parametros($unidade));
@@ -93,6 +105,8 @@ class UnidadeRepository
             'UPDATE unidades
              SET numero = :numero, bloco = :bloco, andar = :andar, descricao = :descricao,
                  tipo_ocupacao = :tipo_ocupacao,
+                 proprietario_id = :proprietario_id,
+                 inquilino_id = :inquilino_id,
                  nome_proprietario = :nome_proprietario,
                  telefone_proprietario = :telefone_proprietario,
                  email_proprietario = :email_proprietario,
@@ -113,6 +127,8 @@ class UnidadeRepository
             ':andar'                 => $unidade->andar,
             ':descricao'             => $unidade->descricao,
             ':tipo_ocupacao'         => $unidade->tipoOcupacao,
+            ':proprietario_id'       => $unidade->proprietarioId ?: null,
+            ':inquilino_id'          => $unidade->inquilinoId    ?: null,
             ':nome_proprietario'     => $unidade->nomeProprietario     ?: null,
             ':telefone_proprietario' => $unidade->telefoneProprietario ?: null,
             ':email_proprietario'    => $unidade->emailProprietario    ?: null,

@@ -38,12 +38,6 @@ class UnidadeController
 
         $todosCondominios = $this->unidadeService->listarCondominios();
 
-        $condominosSelecionados = [];
-        if ($unidade !== null) {
-            $vinculos = $this->unidadeService->listarMoradoresDaUnidade($unidade->id);
-            $condominosSelecionados = array_map(fn($m) => $m->usuarioId, $vinculos);
-        }
-
         require_once RAIZ . '/views/admin/unidades/formulario.php';
     }
 
@@ -51,11 +45,6 @@ class UnidadeController
     {
         try {
             $id = $this->unidadeService->salvarUnidade($_POST);
-
-            // Sincronizar condôminos selecionados no formulário
-            $condominoIds = array_map('intval', $_POST['condominos'] ?? []);
-            $this->unidadeService->sincronizarMoradoresDaUnidade($id, $condominoIds);
-
             Sessao::flash('sucesso', 'Unidade salva com sucesso.');
             Roteador::redirecionar("/unidades/{$id}");
         } catch (InvalidArgumentException $e) {

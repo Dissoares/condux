@@ -37,18 +37,14 @@ class UnidadeService
             : 'proprio';
 
         $unidade = new Unidade(
-            id:                   isset($dados['id']) && $dados['id'] ? (int) $dados['id'] : null,
-            numero:               trim($dados['numero']),
-            bloco:                !empty($dados['bloco'])                 ? trim($dados['bloco'])                 : null,
-            andar:                !empty($dados['andar'])                 ? (int) $dados['andar']                 : null,
-            descricao:            !empty($dados['descricao'])             ? trim($dados['descricao'])             : null,
-            tipoOcupacao:         $tipoOcupacao,
-            nomeProprietario:     !empty($dados['nome_proprietario'])     ? trim($dados['nome_proprietario'])     : null,
-            telefoneProprietario: !empty($dados['telefone_proprietario']) ? trim($dados['telefone_proprietario']) : null,
-            emailProprietario:    !empty($dados['email_proprietario'])    ? trim($dados['email_proprietario'])    : null,
-            nomeInquilino:        !empty($dados['nome_inquilino'])        ? trim($dados['nome_inquilino'])        : null,
-            telefoneInquilino:    !empty($dados['telefone_inquilino'])    ? trim($dados['telefone_inquilino'])    : null,
-            emailInquilino:       !empty($dados['email_inquilino'])       ? trim($dados['email_inquilino'])       : null,
+            id:             isset($dados['id']) && $dados['id'] ? (int) $dados['id'] : null,
+            numero:         trim($dados['numero']),
+            bloco:          !empty($dados['bloco'])      ? trim($dados['bloco'])  : null,
+            andar:          !empty($dados['andar'])      ? (int) $dados['andar']  : null,
+            descricao:      !empty($dados['descricao'])  ? trim($dados['descricao']) : null,
+            tipoOcupacao:   $tipoOcupacao,
+            proprietarioId: !empty($dados['proprietario_id']) ? (int) $dados['proprietario_id'] : null,
+            inquilinoId:    !empty($dados['inquilino_id'])    ? (int) $dados['inquilino_id']    : null,
         );
 
         return $this->unidadeRepository->salvar($unidade);

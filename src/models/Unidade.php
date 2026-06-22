@@ -14,6 +14,9 @@ class Unidade
         public ?int          $andar                = null,
         public ?string       $descricao            = null,
         public string        $tipoOcupacao         = 'proprio',
+        public ?int          $proprietarioId       = null,
+        public ?int          $inquilinoId          = null,
+        // Campos legados (texto livre) — mantidos para backward compat
         public ?string       $nomeProprietario     = null,
         public ?string       $telefoneProprietario = null,
         public ?string       $emailProprietario    = null,
@@ -25,28 +28,53 @@ class Unidade
         // Dados extras via JOIN — não pertencem à tabela
         public ?string       $nomeResponsavel      = null,
         public ?string       $statusTaxaAtual      = null,
+        // Nomes vindos do JOIN com usuarios (proprietario_id / inquilino_id)
+        public ?string       $nomeProprietarioVinc = null,
+        public ?string       $emailProprietarioVinc= null,
+        public ?string       $nomeInquilinoVinc    = null,
+        public ?string       $emailInquilinoVinc   = null,
     ) {}
 
     public static function fromArray(array $dados): self
     {
         return new self(
-            id:                   isset($dados['id']) ? (int) $dados['id'] : null,
-            numero:               $dados['numero'],
-            bloco:                $dados['bloco']                ?? null,
-            andar:                isset($dados['andar']) ? (int) $dados['andar'] : null,
-            descricao:            $dados['descricao']            ?? null,
-            tipoOcupacao:         $dados['tipo_ocupacao']        ?? 'proprio',
-            nomeProprietario:     $dados['nome_proprietario']    ?? null,
-            telefoneProprietario: $dados['telefone_proprietario'] ?? null,
-            emailProprietario:    $dados['email_proprietario']   ?? null,
-            nomeInquilino:        $dados['nome_inquilino']       ?? null,
-            telefoneInquilino:    $dados['telefone_inquilino']   ?? null,
-            emailInquilino:       $dados['email_inquilino']      ?? null,
-            ativo:                (bool) ($dados['ativo']        ?? true),
-            criadoEm:             $dados['criado_em']            ?? null,
-            nomeResponsavel:      $dados['nome_responsavel']     ?? null,
-            statusTaxaAtual:      $dados['status_taxa_atual']    ?? null,
+            id:                    isset($dados['id']) ? (int) $dados['id'] : null,
+            numero:                $dados['numero'],
+            bloco:                 $dados['bloco']                 ?? null,
+            andar:                 isset($dados['andar']) ? (int) $dados['andar'] : null,
+            descricao:             $dados['descricao']             ?? null,
+            tipoOcupacao:          $dados['tipo_ocupacao']         ?? 'proprio',
+            proprietarioId:        isset($dados['proprietario_id']) && $dados['proprietario_id']
+                                       ? (int) $dados['proprietario_id'] : null,
+            inquilinoId:           isset($dados['inquilino_id']) && $dados['inquilino_id']
+                                       ? (int) $dados['inquilino_id'] : null,
+            nomeProprietario:      $dados['nome_proprietario']     ?? null,
+            telefoneProprietario:  $dados['telefone_proprietario'] ?? null,
+            emailProprietario:     $dados['email_proprietario']    ?? null,
+            nomeInquilino:         $dados['nome_inquilino']        ?? null,
+            telefoneInquilino:     $dados['telefone_inquilino']    ?? null,
+            emailInquilino:        $dados['email_inquilino']       ?? null,
+            ativo:                 (bool) ($dados['ativo']         ?? true),
+            criadoEm:              $dados['criado_em']             ?? null,
+            nomeResponsavel:       $dados['nome_responsavel']      ?? null,
+            statusTaxaAtual:       $dados['status_taxa_atual']     ?? null,
+            nomeProprietarioVinc:  $dados['nome_prop_vinc']        ?? null,
+            emailProprietarioVinc: $dados['email_prop_vinc']       ?? null,
+            nomeInquilinoVinc:     $dados['nome_inq_vinc']         ?? null,
+            emailInquilinoVinc:    $dados['email_inq_vinc']        ?? null,
         );
+    }
+
+    /** Nome do proprietário preferindo o vínculo por FK sobre texto livre */
+    public function exibirProprietario(): ?string
+    {
+        return $this->nomeProprietarioVinc ?? $this->nomeProprietario;
+    }
+
+    /** Nome do inquilino preferindo o vínculo por FK sobre texto livre */
+    public function exibirInquilino(): ?string
+    {
+        return $this->nomeInquilinoVinc ?? $this->nomeInquilino;
     }
 
     public function toArray(): array
