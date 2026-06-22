@@ -6,10 +6,14 @@ require_once __DIR__ . '/../services/UnidadeService.php';
 require_once __DIR__ . '/../repository/UnidadeRepository.php';
 require_once __DIR__ . '/../repository/MoradorRepository.php';
 require_once __DIR__ . '/../repository/UsuarioRepository.php';
+require_once __DIR__ . '/../repository/TaxaCondominialRepository.php';
+require_once __DIR__ . '/../repository/TaxaExtraRepository.php';
 
 class UnidadeController
 {
-    private UnidadeService $unidadeService;
+    private UnidadeService             $unidadeService;
+    private TaxaCondominialRepository  $taxaCondRepo;
+    private TaxaExtraRepository        $taxaExtraRepo;
 
     public function __construct()
     {
@@ -19,6 +23,8 @@ class UnidadeController
             new MoradorRepository($conexao),
             new UsuarioRepository($conexao),
         );
+        $this->taxaCondRepo  = new TaxaCondominialRepository($conexao);
+        $this->taxaExtraRepo = new TaxaExtraRepository($conexao);
     }
 
     public function listar(): void
@@ -41,6 +47,9 @@ class UnidadeController
         if ($precisaRecarregar) {
             $moradoresPorUnidade = $this->unidadeService->listarMoradoresAgrupados();
         }
+
+        $taxasCondPorUnidade  = $this->taxaCondRepo->listarTodasAgrupadasPorUnidade();
+        $taxasExtrasPorUnidade = $this->taxaExtraRepo->listarTodasPorUnidadesAgrupadas();
 
         $mensagem     = Sessao::lerFlash('sucesso');
         $erroMensagem = Sessao::lerFlash('erro');

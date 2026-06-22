@@ -154,6 +154,24 @@ class TaxaCondominialRepository
         return $inseridas;
     }
 
+    /** @return array<int, TaxaCondominial[]> indexado por unidade_id */
+    public function listarTodasAgrupadasPorUnidade(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT tc.*,
+                    CONCAT("Apto ", u.numero, IF(u.bloco IS NOT NULL, CONCAT(" — Bloco ", u.bloco), "")) AS identificacao_unidade
+             FROM taxas_condominiais tc
+             JOIN unidades u ON u.id = tc.unidade_id
+             ORDER BY tc.competencia DESC'
+        );
+        $agrupadas = [];
+        foreach ($stmt->fetchAll() as $linha) {
+            $t = TaxaCondominial::fromArray($linha);
+            $agrupadas[$t->unidadeId][] = $t;
+        }
+        return $agrupadas;
+    }
+
     public function resumoMesAtual(): array
     {
         $stmt = $this->conexao->query(

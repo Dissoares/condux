@@ -82,6 +82,25 @@ class TaxaExtraRepository
         return $stmt->fetchAll();
     }
 
+    /** @return array<int, array[]> indexado por unidade_id */
+    public function listarTodasPorUnidadesAgrupadas(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT teu.*, te.nome, te.descricao, te.parcela, te.total_parcelas, te.projeto_id,
+                    te.vencimento, te.valor AS valor_original,
+                    p.nome AS nome_projeto
+             FROM taxas_extras_unidades teu
+             JOIN taxas_extras te ON te.id = teu.taxa_extra_id
+             LEFT JOIN projetos p ON p.id = te.projeto_id
+             ORDER BY te.vencimento DESC'
+        );
+        $agrupadas = [];
+        foreach ($stmt->fetchAll() as $linha) {
+            $agrupadas[(int)$linha['unidade_id']][] = $linha;
+        }
+        return $agrupadas;
+    }
+
     public function inserir(array $dados): int
     {
         $stmt = $this->conexao->prepare(

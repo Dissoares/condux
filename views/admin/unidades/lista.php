@@ -205,6 +205,12 @@ function rotuloBadgeStatus(string $status): string {
 
       <!-- Tabs -->
       <div class="modal-body pt-2">
+        <?php
+          $taxasCond   = $taxasCondPorUnidade[$uid]   ?? [];
+          $taxasExtras = $taxasExtrasPorUnidade[$uid]  ?? [];
+          $pendCond    = count(array_filter($taxasCond,   fn($t) => in_array($t->status, ['pendente','vencido'])));
+          $pendExtra   = count(array_filter($taxasExtras, fn($t) => in_array($t['status'] ?? 'pendente', ['pendente','vencido'])));
+        ?>
         <ul class="nav nav-tabs mb-4" role="tablist">
           <li class="nav-item">
             <button class="nav-link active" data-bs-toggle="tab"
@@ -216,8 +222,26 @@ function rotuloBadgeStatus(string $status): string {
             <button class="nav-link" data-bs-toggle="tab"
                     data-bs-target="#tab-moradores-<?= $uid ?>" type="button">
               <i class="bi bi-people me-1"></i>Moradores
-              <?php if ($qtdMoradores = count($moradores)): ?>
-                <span class="badge bg-secondary bg-opacity-10 text-body ms-1"><?= $qtdMoradores ?></span>
+              <?php if (count($moradores)): ?>
+                <span class="badge bg-secondary bg-opacity-10 text-body ms-1"><?= count($moradores) ?></span>
+              <?php endif; ?>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab"
+                    data-bs-target="#tab-taxas-<?= $uid ?>" type="button">
+              <i class="bi bi-receipt me-1"></i>Taxas
+              <?php if ($pendCond): ?>
+                <span class="badge bg-danger bg-opacity-75 ms-1"><?= $pendCond ?></span>
+              <?php endif; ?>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab"
+                    data-bs-target="#tab-extras-<?= $uid ?>" type="button">
+              <i class="bi bi-plus-square me-1"></i>Extras
+              <?php if ($pendExtra): ?>
+                <span class="badge bg-danger bg-opacity-75 ms-1"><?= $pendExtra ?></span>
               <?php endif; ?>
             </button>
           </li>
@@ -401,6 +425,138 @@ function rotuloBadgeStatus(string $status): string {
             </div>
 
           </div><!-- /tab-moradores -->
+
+          <!-- ── Tab Taxas Condominiais ── -->
+          <div class="tab-pane fade" id="tab-taxas-<?= $uid ?>" role="tabpanel">
+            <?php if (empty($taxasCond)): ?>
+              <p class="text-body-secondary" style="font-size:.88rem;">
+                <i class="bi bi-receipt me-1"></i>Nenhuma taxa condominial registrada.
+              </p>
+            <?php else: ?>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0" style="font-size:.82rem;">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Competência</th>
+                      <th class="text-end">Valor</th>
+                      <th>Vencimento</th>
+                      <th>Status</th>
+                      <th>Pagamento</th>
+                      <th>Anexo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($taxasCond as $t): ?>
+                    <?php
+                      $badgeClass = match($t->status) {
+                        'pago'    => 'badge-pago',
+                        'vencido' => 'bg-danger text-white',
+                        'isento'  => 'bg-secondary-subtle text-secondary-emphasis',
+                        default   => 'bg-warning-subtle text-warning-emphasis',
+                      };
+                      $rotulo = match($t->status) {
+                        'pago'    => 'Pago',
+                        'vencido' => 'Vencido',
+                        'isento'  => 'Isento',
+                        default   => 'Pendente',
+                      };
+                    ?>
+                    <tr>
+                      <td class="fw-semibold"><?= htmlspecialchars($t->competenciaFormatada()) ?></td>
+                      <td class="text-end">R$ <?= number_format($t->valor, 2, ',', '.') ?></td>
+                      <td><?= date('d/m/Y', strtotime($t->vencimento)) ?></td>
+                      <td><span class="badge <?= $badgeClass ?>"><?= $rotulo ?></span></td>
+                      <td class="text-body-secondary">
+                        <?= $t->dataPagamento ? date('d/m/Y', strtotime($t->dataPagamento)) : '—' ?>
+                      </td>
+                      <td>
+                        <?php if ($t->comprovante): ?>
+                          <a href="/<?= htmlspecialchars($t->comprovante) ?>" target="_blank"
+                             class="btn btn-outline-secondary btn-sm py-0 px-1" title="Ver comprovante">
+                            <i class="bi bi-paperclip"></i>
+                          </a>
+                        <?php else: ?>
+                          <span class="text-body-tertiary">—</span>
+                        <?php endif; ?>
+                      </td>
+                    </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              </div>
+            <?php endif; ?>
+          </div><!-- /tab-taxas -->
+
+          <!-- ── Tab Taxas Extras ── -->
+          <div class="tab-pane fade" id="tab-extras-<?= $uid ?>" role="tabpanel">
+            <?php if (empty($taxasExtras)): ?>
+              <p class="text-body-secondary" style="font-size:.88rem;">
+                <i class="bi bi-plus-square me-1"></i>Nenhuma taxa extra atribuída.
+              </p>
+            <?php else: ?>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0" style="font-size:.82rem;">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Descrição</th>
+                      <th class="text-end">Valor</th>
+                      <th>Vencimento</th>
+                      <th>Status</th>
+                      <th>Pagamento</th>
+                      <th>Anexo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($taxasExtras as $te): ?>
+                    <?php
+                      $stExtra = $te['status'] ?? 'pendente';
+                      $badgeExtra = match($stExtra) {
+                        'pago'    => 'badge-pago',
+                        'vencido' => 'bg-danger text-white',
+                        'isento'  => 'bg-secondary-subtle text-secondary-emphasis',
+                        default   => 'bg-warning-subtle text-warning-emphasis',
+                      };
+                      $rotuloExtra = match($stExtra) {
+                        'pago'    => 'Pago',
+                        'vencido' => 'Vencido',
+                        'isento'  => 'Isento',
+                        default   => 'Pendente',
+                      };
+                      $parcela = ($te['parcela'] && $te['total_parcelas'])
+                        ? " ({$te['parcela']}/{$te['total_parcelas']})" : '';
+                    ?>
+                    <tr>
+                      <td>
+                        <div class="fw-semibold"><?= htmlspecialchars($te['nome'] . $parcela) ?></div>
+                        <?php if ($te['nome_projeto']): ?>
+                          <div class="text-body-secondary" style="font-size:.75rem;">
+                            <i class="bi bi-folder2 me-1"></i><?= htmlspecialchars($te['nome_projeto']) ?>
+                          </div>
+                        <?php endif; ?>
+                      </td>
+                      <td class="text-end">R$ <?= number_format((float)($te['valor'] ?? $te['valor_original']), 2, ',', '.') ?></td>
+                      <td><?= date('d/m/Y', strtotime($te['vencimento'])) ?></td>
+                      <td><span class="badge <?= $badgeExtra ?>"><?= $rotuloExtra ?></span></td>
+                      <td class="text-body-secondary">
+                        <?= !empty($te['data_pagamento']) ? date('d/m/Y', strtotime($te['data_pagamento'])) : '—' ?>
+                      </td>
+                      <td>
+                        <?php if (!empty($te['comprovante'])): ?>
+                          <a href="/<?= htmlspecialchars($te['comprovante']) ?>" target="_blank"
+                             class="btn btn-outline-secondary btn-sm py-0 px-1" title="Ver comprovante">
+                            <i class="bi bi-paperclip"></i>
+                          </a>
+                        <?php else: ?>
+                          <span class="text-body-tertiary">—</span>
+                        <?php endif; ?>
+                      </td>
+                    </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              </div>
+            <?php endif; ?>
+          </div><!-- /tab-extras -->
 
         </div><!-- /tab-content -->
       </div><!-- /modal-body -->
