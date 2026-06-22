@@ -28,7 +28,7 @@ class GestaoController
     public function formulario(): void
     {
         $gestao   = null;
-        $usuarios = $this->usuarioRepo->listarTodos();
+        $usuarios = $this->usuarioRepo->listarTodosComPapeis();
 
         if (!empty($_GET['id'])) {
             $gestao = $this->repo->buscarPorId((int) $_GET['id']);

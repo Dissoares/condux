@@ -99,14 +99,24 @@ $cargosOrdem = ['sindico', 'subsindico', 'conselheiro', 'suplente'];
             $membrosExistentes = $editando ? $gestao->membros : [];
             $indiceMembro = 0;
             ?>
+            <?php
+            // Helper: label de opção com papel
+            function labelMembroOpcao(array $u): string {
+                $papeis = [];
+                if ($u['eh_proprietario']) $papeis[] = 'Proprietário';
+                if ($u['eh_inquilino'])    $papeis[] = 'Inquilino';
+                $sufixo = $papeis ? ' (' . implode(', ', $papeis) . ')' : '';
+                return htmlspecialchars($u['nome'] . $sufixo);
+            }
+            ?>
             <?php if (!empty($membrosExistentes)): ?>
               <?php foreach ($membrosExistentes as $m): ?>
               <div class="linha-membro d-flex align-items-center gap-2">
                 <select name="membro_usuario[]" class="form-select select-membro" required>
                   <option value="">— Selecione —</option>
                   <?php foreach ($usuarios as $u): ?>
-                    <option value="<?= $u->id ?>" <?= $u->id == $m['id'] ? 'selected' : '' ?>>
-                      <?= htmlspecialchars($u->nome) ?>
+                    <option value="<?= $u['id'] ?>" <?= $u['id'] == $m['id'] ? 'selected' : '' ?>>
+                      <?= labelMembroOpcao($u) ?>
                     </option>
                   <?php endforeach; ?>
                 </select>
@@ -123,12 +133,11 @@ $cargosOrdem = ['sindico', 'subsindico', 'conselheiro', 'suplente'];
               </div>
               <?php endforeach; ?>
             <?php else: ?>
-              <!-- Linha vazia inicial -->
               <div class="linha-membro d-flex align-items-center gap-2">
                 <select name="membro_usuario[]" class="form-select select-membro">
                   <option value="">— Selecione o membro —</option>
                   <?php foreach ($usuarios as $u): ?>
-                    <option value="<?= $u->id ?>"><?= htmlspecialchars($u->nome) ?></option>
+                    <option value="<?= $u['id'] ?>"><?= labelMembroOpcao($u) ?></option>
                   <?php endforeach; ?>
                 </select>
                 <select name="membro_cargo[]" class="form-select select-cargo" style="width:160px;min-width:160px;">
@@ -170,7 +179,7 @@ $cargosOrdem = ['sindico', 'subsindico', 'conselheiro', 'suplente'];
     <select name="membro_usuario[]" class="form-select select-membro">
       <option value="">— Selecione o membro —</option>
       <?php foreach ($usuarios as $u): ?>
-        <option value="<?= $u->id ?>"><?= htmlspecialchars($u->nome) ?></option>
+        <option value="<?= $u['id'] ?>"><?= labelMembroOpcao($u) ?></option>
       <?php endforeach; ?>
     </select>
     <select name="membro_cargo[]" class="form-select select-cargo" style="width:160px;min-width:160px;">

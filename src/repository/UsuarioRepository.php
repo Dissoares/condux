@@ -39,6 +39,23 @@ class UsuarioRepository
         return array_map(fn($l) => Usuario::fromArray($l), $stmt->fetchAll());
     }
 
+    /**
+     * Lista todos os usuários ativos com flags de papel (proprietário / inquilino).
+     * @return array[] Cada item: id, nome, email, eh_proprietario (0|1), eh_inquilino (0|1)
+     */
+    public function listarTodosComPapeis(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT u.id, u.nome, u.email,
+                    (SELECT COUNT(*) FROM unidades WHERE proprietario_id = u.id) AS eh_proprietario,
+                    (SELECT COUNT(*) FROM unidades WHERE inquilino_id    = u.id) AS eh_inquilino
+             FROM usuarios u
+             WHERE u.ativo = 1
+             ORDER BY u.nome'
+        );
+        return $stmt->fetchAll();
+    }
+
     /** @return Usuario[] Apenas usuários que são proprietários de alguma unidade */
     public function listarProprietarios(): array
     {
