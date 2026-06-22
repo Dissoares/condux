@@ -697,3 +697,50 @@ body {
     background: #60a5fa;
   }
 }
+
+/* ── Picker pesquisável (substitui select[size]) ─────────────────────── */
+.condux-picker { position: relative; }
+
+.condux-picker-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0; right: 0;
+  z-index: 1055;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: .5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  overscroll-behavior: contain;
+}
+.condux-picker-dropdown.aberto { display: block; }
+
+.condux-picker-opt {
+  padding: .45rem .75rem;
+  font-size: .875rem;
+  cursor: pointer;
+  transition: background .1s;
+  line-height: 1.35;
+}
+.condux-picker-opt:first-child {
+  color: var(--bs-secondary-color);
+  font-style: italic;
+}
+.condux-picker-opt:hover { background: var(--bs-primary-bg-subtle); }
+.condux-picker-opt.selecionado { background: var(--bs-primary-bg-subtle); color: var(--bs-primary); font-weight: 600; }
+.condux-picker-opt[hidden] { display: none; }
+
+.condux-picker-vazio {
+  padding: .5rem .75rem;
+  font-size: .8rem;
+  color: var(--bs-secondary-color);
+  font-style: italic;
+  display: none;
+}
+.condux-picker-vazio.visivel { display: block; }
+
+[data-bs-theme="dark"] .condux-picker-dropdown {
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}

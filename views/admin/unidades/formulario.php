@@ -3,6 +3,7 @@
 $editando     = $unidade !== null;
 $tituloPagina = $editando ? 'Editar Unidade' : 'Nova Unidade';
 require_once RAIZ . '/views/layouts/cabecalho.php';
+require_once RAIZ . '/views/partials/picker.php';
 ?>
 
 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -103,23 +104,9 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
               <a href="<?= url('condominios/novo') ?>">Cadastre o primeiro</a> e volte aqui.
             </p>
           <?php else: ?>
-            <div class="condux-select-search mb-1">
-              <input type="text" class="form-control form-control-sm condux-search-input mb-2"
-                     placeholder="Buscar condômino pelo nome..." autocomplete="off">
-              <select name="proprietario_id" class="form-select condux-searchable-select" size="5">
-                <option value="">— Nenhum proprietário vinculado —</option>
-                <?php foreach ($todosCondominios as $c): ?>
-                  <option value="<?= $c['id'] ?>"
-                    <?= ($unidade?->proprietarioId ?? null) == $c['id'] ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($c['nome']) ?>
-                    <?php if (!empty($c['email'])): ?>— <?= htmlspecialchars($c['email']) ?><?php endif; ?>
-                  </option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-            <div class="form-text">
-              Selecione o proprietário da unidade. Para cadastrar um novo condômino,
-              <a href="<?= url('condominios/novo') ?>">clique aqui</a>.
+            <?php renderPicker('proprietario_id', $todosCondominios, $unidade?->proprietarioId, 'Buscar proprietário pelo nome...', '— Nenhum proprietário —') ?>
+            <div class="form-text mt-1">
+              Para cadastrar um novo condômino, <a href="<?= url('condominios/novo') ?>">clique aqui</a>.
             </div>
           <?php endif; ?>
         </div>
@@ -135,21 +122,8 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           <?php if (empty($todosCondominios)): ?>
             <p class="text-body-secondary mb-0" style="font-size:.875rem;">Nenhum condômino cadastrado.</p>
           <?php else: ?>
-            <div class="condux-select-search mb-1">
-              <input type="text" class="form-control form-control-sm condux-search-input mb-2"
-                     placeholder="Buscar condômino pelo nome..." autocomplete="off">
-              <select name="inquilino_id" class="form-select condux-searchable-select" size="5">
-                <option value="">— Nenhum inquilino vinculado —</option>
-                <?php foreach ($todosCondominios as $c): ?>
-                  <option value="<?= $c['id'] ?>"
-                    <?= ($unidade?->inquilinoId ?? null) == $c['id'] ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($c['nome']) ?>
-                    <?php if (!empty($c['email'])): ?>— <?= htmlspecialchars($c['email']) ?><?php endif; ?>
-                  </option>
-                <?php endforeach; ?>
-              </select>
-            </div>
-            <div class="form-text">O inquilino deve ser um condômino já cadastrado no sistema.</div>
+            <?php renderPicker('inquilino_id', $todosCondominios, $unidade?->inquilinoId, 'Buscar inquilino pelo nome...', '— Nenhum inquilino —') ?>
+            <div class="form-text mt-1">O inquilino deve ser um condômino já cadastrado no sistema.</div>
           <?php endif; ?>
         </div>
       </div>
@@ -167,20 +141,8 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
 
 </form>
 
-<style>
-.condux-searchable-select {
-  max-height: 200px;
-  border-radius: .375rem;
-}
-.condux-searchable-select option {
-  padding: .4rem .6rem;
-  border-radius: .25rem;
-}
-</style>
-
 <script>
 (function () {
-  /* Mostrar/ocultar inquilino */
   var selectOcupacao = document.getElementById('campo-tipo-ocupacao');
   var secaoInquilino = document.getElementById('secao-inquilino');
   function atualizarInquilino() {
@@ -188,28 +150,6 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
   }
   selectOcupacao.addEventListener('change', atualizarInquilino);
   atualizarInquilino();
-
-  /* Filtro de busca para cada select pesquisável */
-  document.querySelectorAll('.condux-select-search').forEach(function (bloco) {
-    var input  = bloco.querySelector('.condux-search-input');
-    var select = bloco.querySelector('.condux-searchable-select');
-    var opcoes = Array.from(select.options);
-
-    input.addEventListener('input', function () {
-      var termo = this.value.toLowerCase().trim();
-      opcoes.forEach(function (opt) {
-        var texto = opt.textContent.toLowerCase();
-        opt.hidden = termo !== '' && !texto.includes(termo);
-      });
-      /* Garante que a opção vazia só fica oculta se há filtro digitado */
-      opcoes[0].hidden = false;
-    });
-
-    /* Clicar na opção limpa o filtro */
-    select.addEventListener('change', function () {
-      if (this.value) input.value = '';
-    });
-  });
 }());
 </script>
 

@@ -7,6 +7,7 @@
  */
 $tituloPagina = 'Unidades';
 require_once RAIZ . '/views/layouts/cabecalho.php';
+require_once RAIZ . '/views/partials/picker.php';
 
 // Agrupar por bloco
 $porBloco = [];
@@ -235,20 +236,7 @@ function rotuloBadgeStatus(string $status): string {
                     <a href="<?= url('condominios/novo') ?>">Cadastre um condômino</a> para vincular.
                   </p>
                 <?php else: ?>
-                  <div class="condux-select-search">
-                    <input type="text" class="form-control form-control-sm condux-search-input mb-1"
-                           placeholder="Buscar pelo nome..." autocomplete="off">
-                    <select name="proprietario_id" class="form-select condux-searchable-select" size="4">
-                      <option value="">— Sem proprietário —</option>
-                      <?php foreach ($todosCondominios as $c): ?>
-                        <option value="<?= $c['id'] ?>"
-                          <?= $u->proprietarioId == $c['id'] ? 'selected' : '' ?>>
-                          <?= htmlspecialchars($c['nome']) ?>
-                          <?php if (!empty($c['email'])): ?>— <?= htmlspecialchars($c['email']) ?><?php endif; ?>
-                        </option>
-                      <?php endforeach; ?>
-                    </select>
-                  </div>
+                  <?php renderPicker('proprietario_id', $todosCondominios, $u->proprietarioId, 'Buscar proprietário pelo nome...', '— Sem proprietário —') ?>
                 <?php endif; ?>
               </div>
 
@@ -258,20 +246,7 @@ function rotuloBadgeStatus(string $status): string {
                   <i class="bi bi-person-check text-info me-1"></i>Inquilino
                 </label>
                 <?php if (!empty($todosCondominios)): ?>
-                  <div class="condux-select-search">
-                    <input type="text" class="form-control form-control-sm condux-search-input mb-1"
-                           placeholder="Buscar pelo nome..." autocomplete="off">
-                    <select name="inquilino_id" class="form-select condux-searchable-select" size="4">
-                      <option value="">— Sem inquilino —</option>
-                      <?php foreach ($todosCondominios as $c): ?>
-                        <option value="<?= $c['id'] ?>"
-                          <?= $u->inquilinoId == $c['id'] ? 'selected' : '' ?>>
-                          <?= htmlspecialchars($c['nome']) ?>
-                          <?php if (!empty($c['email'])): ?>— <?= htmlspecialchars($c['email']) ?><?php endif; ?>
-                        </option>
-                      <?php endforeach; ?>
-                    </select>
-                  </div>
+                  <?php renderPicker('inquilino_id', $todosCondominios, $u->inquilinoId, 'Buscar inquilino pelo nome...', '— Sem inquilino —') ?>
                 <?php endif; ?>
               </div>
 
@@ -329,27 +304,14 @@ function rotuloBadgeStatus(string $status): string {
                   <a href="<?= url('condominios/novo') ?>">Cadastre condôminos</a> para vincular.
                 </p>
               <?php else: ?>
+                <?php $idsJaVinculados = array_map(fn($m) => $m->usuarioId, $moradores); ?>
                 <form action="<?= url("unidades/{$uid}/vincular-existente") ?>" method="POST">
                   <input type="hidden" name="unidade_id"  value="<?= $uid ?>">
                   <input type="hidden" name="data_entrada" value="<?= date('Y-m-d') ?>">
                   <input type="hidden" name="_retornar"   value="lista">
 
-                  <div class="condux-select-search mb-3">
-                    <input type="text" class="form-control form-control-sm condux-search-input mb-1"
-                           placeholder="Buscar condômino pelo nome..." autocomplete="off">
-                    <select name="usuario_id" class="form-select condux-searchable-select" size="5" required>
-                      <option value="">— Selecione o morador —</option>
-                      <?php
-                      $idsJaVinculados = array_map(fn($m) => $m->usuarioId, $moradores);
-                      foreach ($todosCondominios as $c):
-                        if (in_array((int)$c['id'], $idsJaVinculados, true)) continue;
-                      ?>
-                        <option value="<?= $c['id'] ?>">
-                          <?= htmlspecialchars($c['nome']) ?>
-                          <?php if (!empty($c['email'])): ?>— <?= htmlspecialchars($c['email']) ?><?php endif; ?>
-                        </option>
-                      <?php endforeach; ?>
-                    </select>
+                  <div class="mb-3">
+                    <?php renderPicker('usuario_id', $todosCondominios, null, 'Buscar condômino pelo nome...', '— Selecione o morador —', $idsJaVinculados) ?>
                   </div>
 
                   <div class="d-flex align-items-center gap-3">
@@ -392,28 +354,10 @@ function rotuloBadgeStatus(string $status): string {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,.1) !important;
 }
-.condux-searchable-select { max-height: 160px; }
 </style>
 
 <script>
 (function () {
-  /* Filtro de busca nos selects */
-  document.querySelectorAll('.condux-select-search').forEach(function (bloco) {
-    var input  = bloco.querySelector('.condux-search-input');
-    var select = bloco.querySelector('.condux-searchable-select');
-    if (!input || !select) return;
-    var opcoes = Array.from(select.options);
-
-    input.addEventListener('input', function () {
-      var termo = this.value.toLowerCase().trim();
-      opcoes.forEach(function (opt, i) {
-        if (i === 0) { opt.hidden = false; return; }
-        opt.hidden = termo !== '' && !opt.textContent.toLowerCase().includes(termo);
-      });
-    });
-    select.addEventListener('change', function () { if (this.value) input.value = ''; });
-  });
-
   /* Mostrar/ocultar campo de inquilino conforme tipo_ocupacao */
   document.querySelectorAll('[name="tipo_ocupacao"]').forEach(function (radio) {
     radio.addEventListener('change', function () {
