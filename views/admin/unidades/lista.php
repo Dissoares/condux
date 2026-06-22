@@ -220,10 +220,11 @@ function rotuloBadgeStatus(string $status): string {
       <!-- Tabs -->
       <div class="modal-body pt-2">
         <?php
-          $taxasCond   = $taxasCondPorUnidade[$uid]   ?? [];
-          $taxasExtras = $taxasExtrasPorUnidade[$uid]  ?? [];
-          $pendCond    = count(array_filter($taxasCond,   fn($t) => in_array($t->status, ['pendente','vencido'])));
-          $pendExtra   = count(array_filter($taxasExtras, fn($t) => in_array($t['status'] ?? 'pendente', ['pendente','vencido'])));
+          $taxasCond      = $taxasCondPorUnidade[$uid]   ?? [];
+          $taxasExtras    = $taxasExtrasPorUnidade[$uid]  ?? [];
+          $atrasadasCond  = count(array_filter($taxasCond, fn($t) => $t->estaVencido()));
+          $pendentesCond  = count(array_filter($taxasCond, fn($t) => !$t->estaVencido() && $t->status === 'pendente'));
+          $pendExtra      = count(array_filter($taxasExtras, fn($t) => in_array($t['status'] ?? 'pendente', ['pendente','vencido'])));
         ?>
         <ul class="nav nav-tabs mb-4" role="tablist">
           <li class="nav-item">
@@ -245,8 +246,10 @@ function rotuloBadgeStatus(string $status): string {
             <button class="nav-link" data-bs-toggle="tab"
                     data-bs-target="#tab-taxas-<?= $uid ?>" type="button">
               <i class="bi bi-receipt me-1"></i>Taxas
-              <?php if ($pendCond): ?>
-                <span class="badge bg-danger bg-opacity-75 ms-1"><?= $pendCond ?></span>
+              <?php if ($atrasadasCond): ?>
+                <span class="badge bg-danger bg-opacity-75 ms-1"><?= $atrasadasCond ?></span>
+              <?php elseif ($pendentesCond): ?>
+                <span class="badge bg-warning bg-opacity-75 ms-1 text-dark"><?= $pendentesCond ?></span>
               <?php endif; ?>
             </button>
           </li>
