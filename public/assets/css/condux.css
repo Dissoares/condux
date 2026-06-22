@@ -397,9 +397,78 @@ body {
   margin: 0;
 }
 
-/* ---- Responsivo (menu colapsado em telas pequenas) ---- */
+/* ---- Botão hamburguer (visível só no mobile) ---- */
+.botao-menu-mobile {
+  display: none;
+  position: fixed;
+  top: .85rem;
+  left: .85rem;
+  z-index: 200;
+  background: var(--cor-primaria);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: .45rem .6rem;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* ---- Overlay que fecha o menu ao clicar fora ---- */
+.overlay-menu {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 99;
+}
+
+.overlay-menu.visivel { display: block; }
+
+/* ---- Tabelas com scroll horizontal no mobile ---- */
+.tabela-responsiva {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--raio-borda);
+}
+
+/* ---- Responsivo ---- */
 @media (max-width: 768px) {
-  .barra-lateral { transform: translateX(-100%); transition: transform .25s; }
+  .botao-menu-mobile { display: block; }
+
+  .barra-lateral {
+    transform: translateX(-100%);
+    transition: transform .25s;
+    z-index: 150;
+  }
+
   .barra-lateral.aberta { transform: translateX(0); }
-  .conteudo-principal { margin-left: 0; padding: 1rem; }
+
+  .conteudo-principal {
+    margin-left: 0;
+    padding: 1rem;
+    padding-top: 3.5rem; /* espaço para o botão hamburguer */
+  }
+
+  .cabecalho-pagina {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .75rem;
+  }
+
+  /* Cards de resumo em coluna única */
+  .grade-resumo-mobile {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Formulários em coluna única */
+  .grade-formulario {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .grade-resumo-mobile {
+    grid-template-columns: 1fr !important;
+  }
 }

@@ -18,8 +18,8 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
   <div class="alerta-flash erro"><i class="bi bi-exclamation-circle-fill"></i> <?= htmlspecialchars($erroMensagem) ?></div>
 <?php endif; ?>
 
-<div class="card-conteudo" style="padding:0; overflow:hidden;">
-  <table class="tabela-condux">
+<div class="tabela-responsiva">
+<table class="tabela-condux">
     <thead>
       <tr>
         <th>Unidade</th>
@@ -67,7 +67,7 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
         <?php endforeach; ?>
       <?php endif; ?>
     </tbody>
-  </table>
+</table>
 </div>
 
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>

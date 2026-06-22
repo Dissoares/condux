@@ -99,5 +99,13 @@ $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
   </div>
 </aside>
 
+<!-- Overlay para fechar menu no mobile -->
+<div class="overlay-menu" id="overlayMenu"></div>
+
+<!-- Botão hamburguer (mobile) -->
+<button class="botao-menu-mobile" id="botaoToggleMenu" aria-label="Abrir menu">
+  <i class="bi bi-list"></i>
+</button>
+
 <!-- Conteúdo da página -->
 <main class="conteudo-principal">

@@ -57,8 +57,8 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
 </div>
 
 <!-- Tabela -->
-<div class="card-conteudo" style="padding:0; overflow:hidden;">
-  <table class="tabela-condux">
+<div class="tabela-responsiva">
+<table class="tabela-condux">
     <thead>
       <tr>
         <th>Unidade</th>
