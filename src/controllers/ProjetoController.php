@@ -46,8 +46,10 @@ class ProjetoController
             return;
         }
 
-        $ehAdmin = $this->ehAdmin;
-        $view    = $this->ehAdmin
+        $ehAdmin      = $this->ehAdmin;
+        $mensagem     = Sessao::lerFlash('sucesso');
+        $erroMensagem = Sessao::lerFlash('erro');
+        $view         = $this->ehAdmin
             ? RAIZ . '/views/admin/projetos/detalhe.php'
             : RAIZ . '/views/transparencia/detalhe.php';
 
