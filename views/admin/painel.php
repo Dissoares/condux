@@ -4,7 +4,7 @@ $tituloPagina = 'Painel';
 require_once RAIZ . '/views/layouts/cabecalho.php';
 
 $nomeAdmin    = explode(' ', Sessao::usuarioAtual()['nome'] ?? 'Administrador')[0];
-$mesAtual     = strftime('%B de %Y') ?: date('m/Y');
+$mesAtual     = date('m/Y');
 $totalPagas   = (int)($resumoFinanceiro['total_pagas']    ?? 0);
 $totalPendentes = (int)($resumoFinanceiro['total_pendentes'] ?? 0);
 $valorArrecadado = (float)($resumoFinanceiro['valor_arrecadado'] ?? 0);
