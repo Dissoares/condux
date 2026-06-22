@@ -58,29 +58,77 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
   </div>
 </div>
 
-<script>
-document.querySelectorAll('.btn-desbloq').forEach(btn => {
-  btn.addEventListener('click', function () {
-    const campo = document.getElementById(this.dataset.alvo);
-    const ico   = document.getElementById(this.dataset.ico);
-    const bloq  = campo.hasAttribute('readonly');
+<!-- Modal de confirmação -->
+<div class="modal fade" id="modalConfirmarAlteracao" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h6 class="modal-title fw-semibold">
+          <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Confirmar alteração
+        </h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modal-confirmar-texto"></div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-warning" id="modal-confirmar-btn">Sim, alterar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-    if (bloq) {
-      campo.removeAttribute('readonly');
-      campo.classList.remove('bg-body-secondary');
-      campo.focus();
-      ico.className  = 'bi bi-unlock-fill text-warning';
-      this.innerHTML = '<i class="bi bi-lock"></i>';
-      this.title     = 'Bloquear';
-    } else {
-      campo.setAttribute('readonly', '');
-      campo.classList.add('bg-body-secondary');
-      ico.className  = 'bi bi-lock-fill';
-      this.innerHTML = '<i class="bi bi-pencil"></i>';
-      this.title     = 'Editar';
-    }
+<script>
+(function () {
+  const modal      = new bootstrap.Modal(document.getElementById('modalConfirmarAlteracao'));
+  const modalTexto = document.getElementById('modal-confirmar-texto');
+  const modalBtn   = document.getElementById('modal-confirmar-btn');
+
+  function desbloquear(campo, ico, btn) {
+    campo.removeAttribute('readonly');
+    campo.classList.remove('bg-body-secondary');
+    campo.focus();
+    ico.className = 'bi bi-unlock-fill text-warning';
+    btn.innerHTML = '<i class="bi bi-lock"></i>';
+    btn.title     = 'Bloquear';
+  }
+
+  function bloquear(campo, ico, btn) {
+    campo.setAttribute('readonly', '');
+    campo.classList.add('bg-body-secondary');
+    ico.className = 'bi bi-lock-fill';
+    btn.innerHTML = '<i class="bi bi-pencil"></i>';
+    btn.title     = 'Editar';
+  }
+
+  document.querySelectorAll('.btn-desbloq').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const campo = document.getElementById(this.dataset.alvo);
+      const ico   = document.getElementById(this.dataset.ico);
+
+      if (!campo.hasAttribute('readonly')) {
+        bloquear(campo, ico, this);
+        return;
+      }
+
+      const isDia    = this.dataset.alvo === 'campo-dia-vencimento';
+      const diaAtual = document.getElementById('campo-dia-vencimento').value;
+      const valAtual = document.getElementById('campo-valor').value;
+
+      modalTexto.innerHTML = isDia
+        ? `O dia de vencimento padrão é <strong>dia ${diaAtual}</strong>. Tem certeza que quer alterar?`
+        : `O valor padrão da taxa condominial é de <strong>R$ ${valAtual}</strong>. Tem certeza que quer alterar?`;
+
+      const btnRef  = this;
+      const handler = () => {
+        desbloquear(campo, ico, btnRef);
+        modal.hide();
+        modalBtn.removeEventListener('click', handler);
+      };
+      modalBtn.addEventListener('click', handler);
+      modal.show();
+    });
   });
-});
+}());
 </script>
 
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>
