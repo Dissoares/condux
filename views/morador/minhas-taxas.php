@@ -54,7 +54,8 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
             <td><?= htmlspecialchars($taxa->competenciaFormatada()) ?></td>
             <td><?= dinheiro($taxa->valor) ?></td>
             <td><?= dataBR($taxa->vencimento) ?></td>
-            <td><span class="badge rounded-pill badge-<?= $taxa->status ?>"><?= ucfirst($taxa->status) ?></span></td>
+            <?php $statusEf = $taxa->estaVencido() ? 'vencido' : $taxa->status; ?>
+            <td><span class="badge rounded-pill badge-<?= $statusEf ?>"><?= ['pago'=>'Pago','vencido'=>'Atrasado','isento'=>'Isento'][$statusEf] ?? 'Pendente' ?></span></td>
             <td><?= dataBR($taxa->dataPagamento) ?></td>
             <td>
               <?php if ($taxa->comprovante): ?>

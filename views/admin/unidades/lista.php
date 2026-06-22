@@ -462,15 +462,16 @@ function rotuloBadgeStatus(string $status): string {
                   <tbody>
                     <?php foreach ($taxasCond as $t): ?>
                     <?php
-                      $badgeClass = match($t->status) {
+                      $statusEfetivo = $t->estaVencido() ? 'vencido' : $t->status;
+                      $badgeClass = match($statusEfetivo) {
                         'pago'    => 'badge-pago',
                         'vencido' => 'bg-danger text-white',
                         'isento'  => 'bg-secondary-subtle text-secondary-emphasis',
                         default   => 'bg-warning-subtle text-warning-emphasis',
                       };
-                      $rotulo = match($t->status) {
+                      $rotulo = match($statusEfetivo) {
                         'pago'    => 'Pago',
-                        'vencido' => 'Vencido',
+                        'vencido' => 'Atrasado',
                         'isento'  => 'Isento',
                         default   => 'Pendente',
                       };

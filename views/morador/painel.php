@@ -32,7 +32,8 @@ $primeiroNome = explode(' ', Sessao::usuarioAtual()['nome'] ?? 'Morador')[0];
       </div>
     </div>
     <?php if ($taxaMesAtual): ?>
-    <?php $corIcone = match($taxaMesAtual->status) { 'pago' => 'success', 'vencido' => 'danger', default => 'warning' }; ?>
+    <?php $statusEfAtual = $taxaMesAtual->estaVencido() ? 'vencido' : $taxaMesAtual->status; ?>
+    <?php $corIcone = match($statusEfAtual) { 'pago' => 'success', 'vencido' => 'danger', default => 'warning' }; ?>
     <div class="col-sm-6 col-md-4">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-body d-flex align-items-center gap-3">
@@ -43,7 +44,7 @@ $primeiroNome = explode(' ', Sessao::usuarioAtual()['nome'] ?? 'Morador')[0];
             <div class="fw-bold lh-1"><?= dinheiro($taxaMesAtual->valor) ?></div>
             <div class="text-body-secondary" style="font-size:.8rem;">
               Taxa <?= htmlspecialchars($taxaMesAtual->competenciaFormatada()) ?>
-              — <span class="badge rounded-pill badge-<?= $taxaMesAtual->status ?>"><?= ucfirst($taxaMesAtual->status) ?></span>
+              — <span class="badge rounded-pill badge-<?= $statusEfAtual ?>"><?= ['pago'=>'Pago','vencido'=>'Atrasado','isento'=>'Isento'][$statusEfAtual] ?? 'Pendente' ?></span>
             </div>
           </div>
         </div>

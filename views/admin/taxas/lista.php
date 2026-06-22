@@ -97,7 +97,8 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
             <td class="d-none d-sm-table-cell"><?= htmlspecialchars($taxa->competenciaFormatada()) ?></td>
             <td><?= dinheiro($taxa->valor) ?></td>
             <td class="d-none d-md-table-cell"><?= dataBR($taxa->vencimento) ?></td>
-            <td><span class="badge rounded-pill badge-<?= $taxa->status ?>"><?= ucfirst($taxa->status) ?></span></td>
+            <?php $statusEf = $taxa->estaVencido() ? 'vencido' : $taxa->status; ?>
+            <td><span class="badge rounded-pill badge-<?= $statusEf ?>"><?= ['pago'=>'Pago','vencido'=>'Atrasado','isento'=>'Isento'][$statusEf] ?? 'Pendente' ?></span></td>
             <td class="d-none d-md-table-cell">
               <?php if ($taxa->comprovante): ?>
                 <a href="<?= url('uploads/' . $taxa->comprovante) ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
