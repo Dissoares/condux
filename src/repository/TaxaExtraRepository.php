@@ -21,19 +21,15 @@ class TaxaExtraRepository
         return $linha ? TaxaExtra::fromArray($linha) : null;
     }
 
-    /** @return TaxaExtra[] — uma entrada por projeto/avulso agrupado (primeira parcela) */
+    /** @return TaxaExtra[] — primeira parcela de cada grupo (ou taxa avulsa) */
     public function listarGrupos(): array
     {
         $stmt = $this->conexao->query(
-            'SELECT te.*,
-                    p.nome AS nome_projeto,
-                    MIN(te.vencimento) AS primeira_vencimento,
-                    MAX(te.vencimento) AS ultima_vencimento,
-                    COUNT(te.id)       AS qtd_parcelas_geradas
+            'SELECT te.*, p.nome AS nome_projeto
              FROM taxas_extras te
              LEFT JOIN projetos p ON p.id = te.projeto_id
-             GROUP BY COALESCE(te.projeto_id, te.id)
-             ORDER BY MIN(te.vencimento) DESC'
+             WHERE te.parcela IS NULL OR te.parcela = 1
+             ORDER BY te.vencimento DESC'
         );
         return array_map(fn($l) => TaxaExtra::fromArray($l), $stmt->fetchAll());
     }
