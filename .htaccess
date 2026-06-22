@@ -1,0 +1,3 @@
+# Bloqueia acesso direto a tudo fora de /public
+RewriteEngine On
+RewriteRule ^(?!public/)(.*)$ public/$1 [L]
