@@ -14,44 +14,35 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
   <div class="card-header bg-transparent fw-semibold py-3">Parâmetros de geração</div>
   <div class="card-body">
     <form action="<?= url('taxas/gerar-lote') ?>" method="POST">
-      <div class="mb-3">
+
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label for="campo-dia-vencimento" class="form-label">Dia de vencimento</label>
+          <div class="input-group">
+            <span class="input-group-text">Dia</span>
+            <input type="number" id="campo-dia-vencimento" name="dia_vencimento"
+                   class="form-control" min="1" max="31" value="10" required>
+          </div>
+        </div>
+        <div class="col-6">
+          <label for="campo-valor" class="form-label">Valor mensal (R$)</label>
+          <input type="text" id="campo-valor" name="valor" class="form-control"
+                 placeholder="500,00" required>
+        </div>
+      </div>
+
+      <div class="mb-4">
         <label for="campo-competencia" class="form-label">Competência</label>
         <input type="month" id="campo-competencia" name="competencia" class="form-control"
                value="<?= date('Y-m') ?>" required>
         <div class="form-text">Mês/ano de referência da cobrança.</div>
       </div>
-      <div class="mb-3">
-        <label for="campo-valor" class="form-label">Valor (R$)</label>
-        <input type="text" id="campo-valor" name="valor" class="form-control"
-               placeholder="350,00" required pattern="[\d]+([,.][\d]{1,2})?">
-        <div class="form-text">Use vírgula ou ponto como separador decimal.</div>
-      </div>
-      <div class="mb-4">
-        <label for="campo-vencimento" class="form-label">Data de vencimento</label>
-        <input type="date" id="campo-vencimento" name="vencimento" class="form-control" required>
-        <div class="form-text">Preenchido automaticamente com o dia 10 da competência selecionada.</div>
-      </div>
-      <button type="submit" class="btn btn-primary">
+
+      <button type="submit" class="btn btn-primary w-100">
         <i class="bi bi-lightning-fill"></i> Gerar taxas para todas as unidades
       </button>
     </form>
   </div>
 </div>
-
-<script>
-(function () {
-  const comp = document.getElementById('campo-competencia');
-  const venc = document.getElementById('campo-vencimento');
-
-  function sugerirVencimento() {
-    if (comp.value) {
-      venc.value = comp.value + '-10';
-    }
-  }
-
-  comp.addEventListener('change', sugerirVencimento);
-  sugerirVencimento();
-}());
-</script>
 
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>

@@ -40,10 +40,14 @@ class TaxaCondominialController
     public function gerarEmLote(): void
     {
         try {
+            $competencia   = $_POST['competencia'] ?? '';
+            $dia           = max(1, min(31, (int) ($_POST['dia_vencimento'] ?? 10)));
+            $vencimento    = $competencia . '-' . str_pad((string) $dia, 2, '0', STR_PAD_LEFT);
+
             $total = $this->taxaService->gerarEmLote(
-                $_POST['competencia'],
-                (float) str_replace(',', '.', $_POST['valor']),
-                $_POST['vencimento'],
+                $competencia,
+                parseDinheiro($_POST['valor'] ?? null) ?? 0.0,
+                $vencimento,
             );
             Sessao::flash('sucesso', "{$total} taxas geradas com sucesso.");
         } catch (InvalidArgumentException $e) {
