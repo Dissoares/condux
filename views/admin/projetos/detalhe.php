@@ -175,17 +175,22 @@ $docs     = array_merge(
       </div>
       <div class="card-body">
         <div class="row g-2">
-          <?php foreach ($fotsGrupo as $a): ?>
+          <?php foreach ($fotsGrupo as $idx => $a): ?>
           <div class="col-6">
             <div class="position-relative">
-              <a href="<?= url('uploads/' . $a['caminho']) ?>" target="_blank">
+              <a href="#" class="condux-foto-thumb"
+                 data-grupo="grupo-<?= $tipo ?>"
+                 data-idx="<?= $idx ?>"
+                 data-src="<?= htmlspecialchars(url('uploads/' . $a['caminho'])) ?>"
+                 data-desc="<?= htmlspecialchars($a['descricao'] ?? '') ?>"
+                 data-nome="<?= htmlspecialchars($a['nome_original']) ?>">
                 <img src="<?= url('uploads/' . $a['caminho']) ?>"
-                     class="img-fluid rounded-2 w-100" style="height:130px;object-fit:cover;"
+                     class="img-fluid rounded-2 w-100" style="height:130px;object-fit:cover;cursor:zoom-in;"
                      alt="<?= htmlspecialchars($a['nome_original']) ?>">
               </a>
               <?php if (!empty($a['descricao'])): ?>
                 <div class="position-absolute bottom-0 start-0 end-0 p-1 rounded-bottom-2"
-                     style="background:rgba(0,0,0,.5);font-size:.7rem;color:#fff;">
+                     style="background:rgba(0,0,0,.5);font-size:.7rem;color:#fff;pointer-events:none;">
                   <?= htmlspecialchars($a['descricao']) ?>
                 </div>
               <?php endif; ?>
@@ -214,17 +219,22 @@ $docs     = array_merge(
   </div>
   <div class="card-body">
     <div class="row g-2">
-      <?php foreach ($fotos as $a): ?>
+      <?php foreach ($fotos as $idx => $a): ?>
       <div class="col-6 col-md-3 col-lg-2">
         <div class="position-relative">
-          <a href="<?= url('uploads/' . $a['caminho']) ?>" target="_blank">
+          <a href="#" class="condux-foto-thumb"
+             data-grupo="grupo-fotos"
+             data-idx="<?= $idx ?>"
+             data-src="<?= htmlspecialchars(url('uploads/' . $a['caminho'])) ?>"
+             data-desc="<?= htmlspecialchars($a['descricao'] ?? '') ?>"
+             data-nome="<?= htmlspecialchars($a['nome_original']) ?>">
             <img src="<?= url('uploads/' . $a['caminho']) ?>"
-                 class="img-fluid rounded-2 w-100" style="height:100px;object-fit:cover;"
+                 class="img-fluid rounded-2 w-100" style="height:100px;object-fit:cover;cursor:zoom-in;"
                  alt="<?= htmlspecialchars($a['nome_original']) ?>">
           </a>
           <?php if (!empty($a['descricao'])): ?>
             <div class="position-absolute bottom-0 start-0 end-0 p-1 rounded-bottom-2"
-                 style="background:rgba(0,0,0,.5);font-size:.68rem;color:#fff;">
+                 style="background:rgba(0,0,0,.5);font-size:.68rem;color:#fff;pointer-events:none;">
               <?= htmlspecialchars($a['descricao']) ?>
             </div>
           <?php endif; ?>
@@ -240,6 +250,79 @@ $docs     = array_merge(
   </div>
 </div>
 <?php endif; ?>
+
+<!-- ── Lightbox ── -->
+<div class="modal fade" id="conduxLightbox" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-black border-0">
+      <div class="modal-header border-0 pb-0 px-3 pt-2">
+        <div class="d-flex align-items-center gap-2 text-white opacity-75" style="font-size:.82rem;">
+          <span id="lb-counter"></span>
+          <span id="lb-desc" class="ms-2 fst-italic opacity-75"></span>
+        </div>
+        <div class="ms-auto d-flex gap-2">
+          <a id="lb-download" href="#" download class="btn btn-sm btn-outline-light">
+            <i class="bi bi-download"></i> Baixar
+          </a>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+      </div>
+      <div class="modal-body p-2 position-relative text-center" style="min-height:60vh;">
+        <button id="lb-prev" class="btn btn-dark opacity-75 position-absolute start-0 top-50 translate-middle-y ms-2" style="z-index:10;">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <img id="lb-img" src="" alt=""
+             style="max-height:80vh;max-width:100%;object-fit:contain;border-radius:4px;">
+        <button id="lb-next" class="btn btn-dark opacity-75 position-absolute end-0 top-50 translate-middle-y me-2" style="z-index:10;">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  let grupo = [], idx = 0;
+  const modal   = new bootstrap.Modal(document.getElementById('conduxLightbox'));
+  const imgEl   = document.getElementById('lb-img');
+  const counter = document.getElementById('lb-counter');
+  const desc    = document.getElementById('lb-desc');
+  const dlBtn   = document.getElementById('lb-download');
+
+  function atualizar() {
+    const f = grupo[idx];
+    imgEl.src        = f.src;
+    imgEl.alt        = f.nome;
+    dlBtn.href       = f.src;
+    dlBtn.download   = f.nome;
+    counter.textContent = (idx + 1) + ' / ' + grupo.length;
+    desc.textContent    = f.desc || '';
+    document.getElementById('lb-prev').style.display = grupo.length > 1 ? '' : 'none';
+    document.getElementById('lb-next').style.display = grupo.length > 1 ? '' : 'none';
+  }
+
+  document.querySelectorAll('.condux-foto-thumb').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const g = a.dataset.grupo;
+      grupo = Array.from(document.querySelectorAll(`.condux-foto-thumb[data-grupo="${g}"]`))
+                   .map(el => ({ src: el.dataset.src, desc: el.dataset.desc, nome: el.dataset.nome }));
+      idx = parseInt(a.dataset.idx, 10);
+      atualizar();
+      modal.show();
+    });
+  });
+
+  document.getElementById('lb-prev').addEventListener('click', () => { idx = (idx - 1 + grupo.length) % grupo.length; atualizar(); });
+  document.getElementById('lb-next').addEventListener('click', () => { idx = (idx + 1) % grupo.length; atualizar(); });
+
+  document.getElementById('conduxLightbox').addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  { idx = (idx - 1 + grupo.length) % grupo.length; atualizar(); }
+    if (e.key === 'ArrowRight') { idx = (idx + 1) % grupo.length; atualizar(); }
+  });
+}());
+</script>
 
 <!-- ── Documentos / Vídeos / Notas ── -->
 <?php if ($docs): ?>
