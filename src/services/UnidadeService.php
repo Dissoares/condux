@@ -116,6 +116,74 @@ class UnidadeService
         return $this->usuarioRepository->pesquisarMoradores($termo);
     }
 
+    /** @return array[] Todos os moradores cadastrados (para seleção em formulários) */
+    public function listarCondominios(): array
+    {
+        return $this->usuarioRepository->listarMoradoresComUnidade();
+    }
+
+    /**
+     * Sincroniza os condôminos de uma unidade: adiciona os novos, remove os que saíram.
+     * @param int[] $usuarioIds IDs dos usuários que devem estar ativos nesta unidade
+     */
+    public function sincronizarMoradoresDaUnidade(int $unidadeId, array $usuarioIds): void
+    {
+        $atuais    = $this->moradorRepository->listarAtivosPorUnidade($unidadeId);
+        $idsAtuais = array_map(fn($m) => $m->usuarioId, $atuais);
+
+        // Desativar os que não estão mais na lista
+        foreach ($atuais as $morador) {
+            if (!in_array($morador->usuarioId, $usuarioIds, true)) {
+                $this->moradorRepository->desativar($morador->id);
+            }
+        }
+
+        // Adicionar os novos
+        foreach ($usuarioIds as $usuarioId) {
+            if (!in_array($usuarioId, $idsAtuais, true)) {
+                $morador = new Morador(
+                    id:          null,
+                    usuarioId:   $usuarioId,
+                    unidadeId:   $unidadeId,
+                    responsavel: false,
+                    dataEntrada: date('Y-m-d'),
+                );
+                $this->moradorRepository->salvar($morador);
+            }
+        }
+    }
+
+    /**
+     * Sincroniza as unidades de um condômino: adiciona as novas, remove as que saíram.
+     * @param int[] $unidadeIds IDs das unidades em que o condômino deve estar ativo
+     */
+    public function sincronizarUnidadesDoCondomino(int $usuarioId, array $unidadeIds): void
+    {
+        $atuais    = $this->moradorRepository->listarPorUsuario($usuarioId);
+        $idsAtuais = array_map(fn($m) => $m->unidadeId, $atuais);
+
+        // Desativar vínculos removidos
+        foreach ($atuais as $morador) {
+            if (!in_array($morador->unidadeId, $unidadeIds, true)) {
+                $this->moradorRepository->desativar($morador->id);
+            }
+        }
+
+        // Criar vínculos novos
+        foreach ($unidadeIds as $unidadeId) {
+            if (!in_array($unidadeId, $idsAtuais, true)) {
+                $morador = new Morador(
+                    id:          null,
+                    usuarioId:   $usuarioId,
+                    unidadeId:   $unidadeId,
+                    responsavel: false,
+                    dataEntrada: date('Y-m-d'),
+                );
+                $this->moradorRepository->salvar($morador);
+            }
+        }
+    }
+
     public function desvincularMorador(int $moradorId): void
     {
         $this->moradorRepository->desativar($moradorId);

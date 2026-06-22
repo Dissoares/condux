@@ -61,33 +61,37 @@ class UsuarioRepository
     private function inserir(Usuario $usuario): int
     {
         $stmt = $this->conexao->prepare(
-            'INSERT INTO usuarios (nome, email, senha, perfil, ativo)
-             VALUES (:nome, :email, :senha, :perfil, :ativo)'
+            'INSERT INTO usuarios (nome, email, senha, perfil, ativo, telefone, cpf, data_nascimento, observacoes)
+             VALUES (:nome, :email, :senha, :perfil, :ativo, :telefone, :cpf, :data_nascimento, :observacoes)'
         );
-        $stmt->execute([
-            ':nome'   => $usuario->nome,
-            ':email'  => $usuario->email,
-            ':senha'  => $usuario->senha,
-            ':perfil' => $usuario->perfil,
-            ':ativo'  => (int) $usuario->ativo,
-        ]);
+        $stmt->execute($this->parametros($usuario));
         return (int) $this->conexao->lastInsertId();
     }
 
     private function atualizar(Usuario $usuario): void
     {
         $stmt = $this->conexao->prepare(
-            'UPDATE usuarios SET nome = :nome, email = :email, senha = :senha,
-             perfil = :perfil, ativo = :ativo WHERE id = :id'
+            'UPDATE usuarios
+             SET nome = :nome, email = :email, senha = :senha, perfil = :perfil, ativo = :ativo,
+                 telefone = :telefone, cpf = :cpf, data_nascimento = :data_nascimento, observacoes = :observacoes
+             WHERE id = :id'
         );
-        $stmt->execute([
-            ':nome'   => $usuario->nome,
-            ':email'  => $usuario->email,
-            ':senha'  => $usuario->senha,
-            ':perfil' => $usuario->perfil,
-            ':ativo'  => (int) $usuario->ativo,
-            ':id'     => $usuario->id,
-        ]);
+        $stmt->execute([...$this->parametros($usuario), ':id' => $usuario->id]);
+    }
+
+    private function parametros(Usuario $usuario): array
+    {
+        return [
+            ':nome'            => $usuario->nome,
+            ':email'           => $usuario->email,
+            ':senha'           => $usuario->senha,
+            ':perfil'          => $usuario->perfil,
+            ':ativo'           => (int) $usuario->ativo,
+            ':telefone'        => $usuario->telefone       ?: null,
+            ':cpf'             => $usuario->cpf            ?: null,
+            ':data_nascimento' => $usuario->dataNascimento ?: null,
+            ':observacoes'     => $usuario->observacoes    ?: null,
+        ];
     }
 
     public function desativar(int $id): void

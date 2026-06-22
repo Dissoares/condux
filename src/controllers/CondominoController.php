@@ -4,18 +4,26 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../repository/UsuarioRepository.php';
 require_once __DIR__ . '/../repository/MoradorRepository.php';
+require_once __DIR__ . '/../repository/UnidadeRepository.php';
+require_once __DIR__ . '/../services/UnidadeService.php';
 require_once __DIR__ . '/../models/Usuario.php';
 
 class CondominoController
 {
     private UsuarioRepository $usuarioRepo;
     private MoradorRepository $moradorRepo;
+    private UnidadeService    $unidadeService;
 
     public function __construct()
     {
         $conexao = Conexao::obter();
-        $this->usuarioRepo = new UsuarioRepository($conexao);
-        $this->moradorRepo = new MoradorRepository($conexao);
+        $this->usuarioRepo    = new UsuarioRepository($conexao);
+        $this->moradorRepo    = new MoradorRepository($conexao);
+        $this->unidadeService = new UnidadeService(
+            new UnidadeRepository($conexao),
+            $this->moradorRepo,
+            $this->usuarioRepo,
+        );
     }
 
     public function listar(): void
@@ -30,8 +38,16 @@ class CondominoController
     {
         $usuario         = !empty($_GET['id']) ? $this->usuarioRepo->buscarPorId((int) $_GET['id']) : null;
         $retornarUnidade = (int) ($_GET['retornar_unidade'] ?? 0);
-        $mensagem        = Sessao::lerFlash('sucesso');
-        $erroMensagem    = Sessao::lerFlash('erro');
+        $todasUnidades   = $this->unidadeService->listarUnidades();
+
+        $unidadesVinculadas = [];
+        if ($usuario !== null) {
+            $vinculos = $this->moradorRepo->listarPorUsuario($usuario->id);
+            $unidadesVinculadas = array_map(fn($m) => $m->unidadeId, $vinculos);
+        }
+
+        $mensagem     = Sessao::lerFlash('sucesso');
+        $erroMensagem = Sessao::lerFlash('erro');
         require_once RAIZ . '/views/admin/condominios/formulario.php';
     }
 
@@ -42,10 +58,14 @@ class CondominoController
         $nome            = trim($_POST['nome'] ?? '');
         $email           = trim($_POST['email'] ?? '');
         $senha           = $_POST['senha'] ?? '';
+        $telefone        = trim($_POST['telefone'] ?? '') ?: null;
+        $cpf             = trim($_POST['cpf'] ?? '') ?: null;
+        $dataNascimento  = $_POST['data_nascimento'] ?? '';
+        $observacoes     = trim($_POST['observacoes'] ?? '') ?: null;
 
         $urlErro = $id ? "/condominios/{$id}/editar" : '/condominios/novo';
         if ($retornarUnidade) {
-            $urlErro .= ($id ? '' : '') . '?retornar_unidade=' . $retornarUnidade;
+            $urlErro .= '?retornar_unidade=' . $retornarUnidade;
         }
 
         if (empty($nome)) {
@@ -71,12 +91,16 @@ class CondominoController
                 return;
             }
             $usuario = new Usuario(
-                id:     null,
-                nome:   $nome,
-                email:  $email,
-                senha:  password_hash($senha, PASSWORD_BCRYPT, ['cost' => 12]),
-                perfil: 'morador',
-                ativo:  true,
+                id:             null,
+                nome:           $nome,
+                email:          $email,
+                senha:          password_hash($senha, PASSWORD_BCRYPT, ['cost' => 12]),
+                perfil:         'morador',
+                ativo:          true,
+                telefone:       $telefone,
+                cpf:            $cpf,
+                dataNascimento: $dataNascimento ?: null,
+                observacoes:    $observacoes,
             );
         } else {
             $usuario = $this->usuarioRepo->buscarPorId($id);
@@ -85,15 +109,24 @@ class CondominoController
                 Roteador::redirecionar('/condominios');
                 return;
             }
-            $usuario->nome  = $nome;
-            $usuario->email = $email;
-            $usuario->ativo = !empty($_POST['ativo']);
+            $usuario->nome           = $nome;
+            $usuario->email          = $email;
+            $usuario->ativo          = !empty($_POST['ativo']);
+            $usuario->telefone       = $telefone;
+            $usuario->cpf            = $cpf;
+            $usuario->dataNascimento = $dataNascimento ?: null;
+            $usuario->observacoes    = $observacoes;
             if (!empty($senha) && strlen($senha) >= 6) {
                 $usuario->senha = password_hash($senha, PASSWORD_BCRYPT, ['cost' => 12]);
             }
         }
 
-        $this->usuarioRepo->salvar($usuario);
+        $novoId = $this->usuarioRepo->salvar($usuario);
+        $usuarioId = $id ?? $novoId;
+
+        // Sincronizar unidades selecionadas
+        $unidadeIds = array_map('intval', $_POST['unidades'] ?? []);
+        $this->unidadeService->sincronizarUnidadesDoCondomino($usuarioId, $unidadeIds);
 
         Sessao::flash('sucesso', $id ? 'Condômino atualizado.' : 'Condômino cadastrado.');
 

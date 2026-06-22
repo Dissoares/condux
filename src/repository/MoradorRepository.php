@@ -61,6 +61,24 @@ class MoradorRepository
         return array_map(fn($l) => Morador::fromArray($l), $stmt->fetchAll());
     }
 
+    /** @return Morador[] Vínculos ativos do condômino com suas unidades */
+    public function listarPorUsuario(int $usuarioId): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT m.*,
+                    u.nome  AS nome_usuario,
+                    u.email AS email_usuario,
+                    CONCAT("Apto ", un.numero, IF(un.bloco IS NOT NULL, CONCAT(" — Bloco ", un.bloco), "")) AS identificacao_unidade
+             FROM moradores m
+             JOIN usuarios u  ON u.id  = m.usuario_id
+             JOIN unidades un ON un.id = m.unidade_id
+             WHERE m.usuario_id = :usuario_id AND m.ativo = 1
+             ORDER BY un.bloco, un.numero'
+        );
+        $stmt->execute([':usuario_id' => $usuarioId]);
+        return array_map(fn($l) => Morador::fromArray($l), $stmt->fetchAll());
+    }
+
     public function buscarUnidadeDoUsuario(int $usuarioId): ?int
     {
         $stmt = $this->conexao->prepare(

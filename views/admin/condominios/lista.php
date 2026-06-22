@@ -28,9 +28,9 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
       <thead class="table-light">
         <tr>
           <th>Nome</th>
+          <th>Telefone</th>
           <th>E-mail</th>
           <th>Unidade</th>
-          <th>Entrada</th>
           <th>Responsável</th>
           <th></th>
         </tr>
@@ -43,7 +43,21 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
         <?php else: ?>
           <?php foreach ($condominios as $c): ?>
           <tr>
-            <td class="fw-semibold"><?= htmlspecialchars($c['nome']) ?></td>
+            <td>
+              <div class="fw-semibold"><?= htmlspecialchars($c['nome']) ?></div>
+              <?php if (!empty($c['cpf'])): ?>
+                <div class="text-body-secondary" style="font-size:.75rem;">CPF: <?= htmlspecialchars($c['cpf']) ?></div>
+              <?php endif; ?>
+            </td>
+            <td class="text-body-secondary" style="font-size:.875rem;">
+              <?php if (!empty($c['telefone'])): ?>
+                <a href="tel:<?= htmlspecialchars($c['telefone']) ?>" class="text-decoration-none">
+                  <?= htmlspecialchars($c['telefone']) ?>
+                </a>
+              <?php else: ?>
+                <span class="text-body-tertiary">—</span>
+              <?php endif; ?>
+            </td>
             <td class="text-body-secondary" style="font-size:.875rem;"><?= htmlspecialchars($c['email']) ?></td>
             <td>
               <?php if ($c['identificacao_unidade']): ?>
@@ -53,9 +67,6 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
               <?php else: ?>
                 <span class="text-body-tertiary">Sem unidade</span>
               <?php endif; ?>
-            </td>
-            <td class="text-body-secondary" style="font-size:.875rem;">
-              <?= $c['data_entrada'] ? dataBR($c['data_entrada']) : '—' ?>
             </td>
             <td>
               <?php if ($c['responsavel']): ?>

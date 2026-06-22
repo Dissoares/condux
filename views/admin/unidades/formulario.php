@@ -1,5 +1,5 @@
 <?php
-/** @var Unidade|null $unidade */
+/** @var Unidade|null $unidade @var array[] $todosCondominios @var int[] $condominosSelecionados */
 $editando     = $unidade !== null;
 $tituloPagina = $editando ? 'Editar Unidade' : 'Nova Unidade';
 require_once RAIZ . '/views/layouts/cabecalho.php';
@@ -110,6 +110,41 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           </div>
         </div>
       </div>
+
+      <!-- Condôminos vinculados -->
+      <hr class="my-4">
+      <p class="fw-semibold text-body-secondary mb-3" style="font-size:.8rem; text-transform:uppercase; letter-spacing:.05em;">
+        Condôminos
+      </p>
+
+      <?php if (empty($todosCondominios)): ?>
+        <p class="text-body-secondary mb-3" style="font-size:.875rem;">
+          Nenhum condômino cadastrado.
+          <a href="<?= url('condominios/novo') ?>">Cadastrar agora</a>
+        </p>
+      <?php else: ?>
+        <div class="mb-3" style="max-height:200px; overflow-y:auto; border:1px solid var(--bs-border-color); border-radius:.375rem; padding:.75rem;">
+          <?php foreach ($todosCondominios as $c): ?>
+          <div class="form-check mb-1">
+            <input type="checkbox" class="form-check-input"
+                   id="cond-<?= $c['id'] ?>"
+                   name="condominos[]"
+                   value="<?= $c['id'] ?>"
+                   <?= in_array((int)$c['id'], $condominosSelecionados, true) ? 'checked' : '' ?>>
+            <label class="form-check-label" for="cond-<?= $c['id'] ?>" style="font-size:.9rem;">
+              <?= htmlspecialchars($c['nome']) ?>
+              <?php if ($c['telefone']): ?>
+                <span class="text-body-secondary" style="font-size:.78rem;">— <?= htmlspecialchars($c['telefone']) ?></span>
+              <?php endif; ?>
+            </label>
+          </div>
+          <?php endforeach; ?>
+        </div>
+        <div class="form-text mb-4">
+          Marque quem mora nesta unidade. Para cadastrar um novo condômino,
+          <a href="<?= url('condominios/novo') ?>">clique aqui</a>.
+        </div>
+      <?php endif; ?>
 
       <button type="submit" class="btn btn-primary">
         <i class="bi bi-<?= $editando ? 'floppy' : 'plus-lg' ?>"></i>
