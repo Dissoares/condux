@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * Taxa extra cobrada pontualmente (obra, evento, fundo de reserva etc.)
- */
 class TaxaExtra
 {
     public function __construct(
@@ -12,30 +9,37 @@ class TaxaExtra
         public string        $nome,
         public float         $valor,
         public string        $vencimento,
-        public ?string       $descricao  = null,
-        public ?string       $criadoEm  = null,
+        public ?string       $descricao      = null,
+        public ?int          $projetoId      = null,
+        public ?int          $parcela        = null,
+        public ?int          $totalParcelas  = null,
+        public ?float        $valorTotal     = null,
+        public ?string       $nomeProjeto    = null,
+        public ?string       $criadoEm       = null,
     ) {}
 
-    public static function fromArray(array $dados): self
+    public static function fromArray(array $d): self
     {
         return new self(
-            id:         isset($dados['id']) ? (int) $dados['id'] : null,
-            nome:       $dados['nome'],
-            valor:      (float) $dados['valor'],
-            vencimento: $dados['vencimento'],
-            descricao:  $dados['descricao'] ?? null,
-            criadoEm:   $dados['criado_em'] ?? null,
+            id:             isset($d['id'])             ? (int)   $d['id']             : null,
+            nome:           $d['nome'],
+            valor:          (float) $d['valor'],
+            vencimento:     $d['vencimento'],
+            descricao:      $d['descricao']      ?? null,
+            projetoId:      isset($d['projeto_id'])     ? (int)   $d['projeto_id']     : null,
+            parcela:        isset($d['parcela'])         ? (int)   $d['parcela']         : null,
+            totalParcelas:  isset($d['total_parcelas'])  ? (int)   $d['total_parcelas']  : null,
+            valorTotal:     isset($d['valor_total'])     ? (float) $d['valor_total']     : null,
+            nomeProjeto:    $d['nome_projeto']   ?? null,
+            criadoEm:       $d['criado_em']      ?? null,
         );
     }
 
-    public function toArray(): array
+    public function labelParcela(): string
     {
-        return [
-            'id'         => $this->id,
-            'nome'       => $this->nome,
-            'valor'      => $this->valor,
-            'vencimento' => $this->vencimento,
-            'descricao'  => $this->descricao,
-        ];
+        if ($this->parcela && $this->totalParcelas) {
+            return "{$this->parcela}/{$this->totalParcelas}";
+        }
+        return '—';
     }
 }

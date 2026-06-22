@@ -61,6 +61,7 @@ class Roteador
             'unidades'     => self::rotasUnidades($seg, $metodo, $ehAdmin),
             'condominios'  => self::rotasCondominios($seg, $metodo, $ehAdmin),
             'taxas'        => self::rotasTaxas($seg, $metodo, $ehAdmin),
+            'taxas-extra'  => self::rotasTaxasExtra($seg, $metodo, $ehAdmin),
             'projetos'     => self::rotasProjetos($seg, $metodo, $ehAdmin),
             'minhas-taxas' => self::rotasMinhasTaxas($seg, $metodo),
             'transparencia'=> self::rotasTransparencia($seg),
@@ -169,6 +170,25 @@ class Roteador
         }
         // GET /taxas
         $ctrl->listar();
+    }
+
+    // ── Taxas extras ─────────────────────────────────────────────────────
+
+    private static function rotasTaxasExtra(array $seg, string $metodo, bool $ehAdmin): void
+    {
+        if (!$ehAdmin) { self::naoAutorizado(); return; }
+
+        require_once RAIZ . '/src/controllers/TaxaExtraController.php';
+        $ctrl = new TaxaExtraController();
+
+        if ($seg[1] === null)                              { $ctrl->listar(); return; }
+        if ($seg[1] === 'nova')                            { $ctrl->formulario(); return; }
+        if ($seg[1] === 'gerar' && $metodo === 'POST')     { $ctrl->gerar(); return; }
+
+        $id = (int) $seg[1];
+        if ($id > 0) { $_GET['id'] = $id; $ctrl->ver(); return; }
+
+        self::naoEncontrado();
     }
 
     // ── Projetos ─────────────────────────────────────────────────────────
