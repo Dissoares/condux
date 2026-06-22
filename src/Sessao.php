@@ -65,8 +65,8 @@ class Sessao
         self::definir("flash_{$tipo}", $valor);
     }
 
-    /** Retorna e apaga a mensagem flash. */
-    public static function lerFlash(string $tipo): ?string
+    /** Retorna e apaga o valor flash. */
+    public static function lerFlash(string $tipo): mixed
     {
         $mensagem = self::obter("flash_{$tipo}");
         self::remover("flash_{$tipo}");
