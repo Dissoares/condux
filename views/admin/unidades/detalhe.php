@@ -28,7 +28,9 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
   <!-- Informações da unidade -->
   <div class="card-conteudo">
     <h2 class="titulo-card">Dados da unidade</h2>
-    <table style="width:100%; font-size:.9rem; border-collapse:collapse;">
+
+    <p class="rotulo-secao">Identificação</p>
+    <table style="width:100%; font-size:.9rem; border-collapse:collapse; margin-bottom:1.25rem;">
       <tr style="border-bottom:1px solid #f0f0f0;">
         <td style="padding:.5rem; color:#6b7280; width:110px;">Número</td>
         <td style="padding:.5rem;"><strong><?= htmlspecialchars($unidade->numero) ?></strong></td>
@@ -41,11 +43,71 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
         <td style="padding:.5rem; color:#6b7280;">Andar</td>
         <td style="padding:.5rem;"><?= $unidade->andar ? $unidade->andar . 'º' : '—' ?></td>
       </tr>
+      <tr style="border-bottom:1px solid #f0f0f0;">
+        <td style="padding:.5rem; color:#6b7280;">Ocupação</td>
+        <td style="padding:.5rem;">
+          <?php if ($unidade->estaAlugada()): ?>
+            <span class="badge-status pendente">Alugado</span>
+          <?php else: ?>
+            <span class="badge-status pago">Próprio</span>
+          <?php endif; ?>
+        </td>
+      </tr>
       <tr>
-        <td style="padding:.5rem; color:#6b7280;">Descrição</td>
+        <td style="padding:.5rem; color:#6b7280;">Observações</td>
         <td style="padding:.5rem;"><?= htmlspecialchars($unidade->descricao ?? '—') ?></td>
       </tr>
     </table>
+
+    <p class="rotulo-secao">Proprietário</p>
+    <table style="width:100%; font-size:.9rem; border-collapse:collapse; margin-bottom:<?= $unidade->estaAlugada() ? '1.25rem' : '0' ?>;">
+      <tr style="border-bottom:1px solid #f0f0f0;">
+        <td style="padding:.5rem; color:#6b7280; width:110px;">Nome</td>
+        <td style="padding:.5rem;"><?= htmlspecialchars($unidade->nomeProprietario ?? '—') ?></td>
+      </tr>
+      <tr style="border-bottom:1px solid #f0f0f0;">
+        <td style="padding:.5rem; color:#6b7280;">Telefone</td>
+        <td style="padding:.5rem;">
+          <?php if ($unidade->telefoneProprietario): ?>
+            <a href="tel:<?= htmlspecialchars($unidade->telefoneProprietario) ?>"><?= htmlspecialchars($unidade->telefoneProprietario) ?></a>
+          <?php else: ?>—<?php endif; ?>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:.5rem; color:#6b7280;">E-mail</td>
+        <td style="padding:.5rem;">
+          <?php if ($unidade->emailProprietario): ?>
+            <a href="mailto:<?= htmlspecialchars($unidade->emailProprietario) ?>"><?= htmlspecialchars($unidade->emailProprietario) ?></a>
+          <?php else: ?>—<?php endif; ?>
+        </td>
+      </tr>
+    </table>
+
+    <?php if ($unidade->estaAlugada()): ?>
+    <p class="rotulo-secao">Inquilino</p>
+    <table style="width:100%; font-size:.9rem; border-collapse:collapse;">
+      <tr style="border-bottom:1px solid #f0f0f0;">
+        <td style="padding:.5rem; color:#6b7280; width:110px;">Nome</td>
+        <td style="padding:.5rem;"><?= htmlspecialchars($unidade->nomeInquilino ?? '—') ?></td>
+      </tr>
+      <tr style="border-bottom:1px solid #f0f0f0;">
+        <td style="padding:.5rem; color:#6b7280;">Telefone</td>
+        <td style="padding:.5rem;">
+          <?php if ($unidade->telefoneInquilino): ?>
+            <a href="tel:<?= htmlspecialchars($unidade->telefoneInquilino) ?>"><?= htmlspecialchars($unidade->telefoneInquilino) ?></a>
+          <?php else: ?>—<?php endif; ?>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:.5rem; color:#6b7280;">E-mail</td>
+        <td style="padding:.5rem;">
+          <?php if ($unidade->emailInquilino): ?>
+            <a href="mailto:<?= htmlspecialchars($unidade->emailInquilino) ?>"><?= htmlspecialchars($unidade->emailInquilino) ?></a>
+          <?php else: ?>—<?php endif; ?>
+        </td>
+      </tr>
+    </table>
+    <?php endif; ?>
   </div>
 
   <!-- Vincular novo morador -->

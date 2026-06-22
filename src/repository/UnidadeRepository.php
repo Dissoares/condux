@@ -74,32 +74,52 @@ class UnidadeRepository
     private function inserir(Unidade $unidade): int
     {
         $stmt = $this->conexao->prepare(
-            'INSERT INTO unidades (numero, bloco, andar, descricao, ativo)
-             VALUES (:numero, :bloco, :andar, :descricao, :ativo)'
+            'INSERT INTO unidades
+                (numero, bloco, andar, descricao,
+                 tipo_ocupacao, nome_proprietario, telefone_proprietario, email_proprietario,
+                 nome_inquilino, telefone_inquilino, email_inquilino, ativo)
+             VALUES
+                (:numero, :bloco, :andar, :descricao,
+                 :tipo_ocupacao, :nome_proprietario, :telefone_proprietario, :email_proprietario,
+                 :nome_inquilino, :telefone_inquilino, :email_inquilino, :ativo)'
         );
-        $stmt->execute([
-            ':numero'    => $unidade->numero,
-            ':bloco'     => $unidade->bloco,
-            ':andar'     => $unidade->andar,
-            ':descricao' => $unidade->descricao,
-            ':ativo'     => (int) $unidade->ativo,
-        ]);
+        $stmt->execute($this->parametros($unidade));
         return (int) $this->conexao->lastInsertId();
     }
 
     private function atualizar(Unidade $unidade): void
     {
         $stmt = $this->conexao->prepare(
-            'UPDATE unidades SET numero = :numero, bloco = :bloco, andar = :andar,
-             descricao = :descricao, ativo = :ativo WHERE id = :id'
+            'UPDATE unidades
+             SET numero = :numero, bloco = :bloco, andar = :andar, descricao = :descricao,
+                 tipo_ocupacao = :tipo_ocupacao,
+                 nome_proprietario = :nome_proprietario,
+                 telefone_proprietario = :telefone_proprietario,
+                 email_proprietario = :email_proprietario,
+                 nome_inquilino = :nome_inquilino,
+                 telefone_inquilino = :telefone_inquilino,
+                 email_inquilino = :email_inquilino,
+                 ativo = :ativo
+             WHERE id = :id'
         );
-        $stmt->execute([
-            ':numero'    => $unidade->numero,
-            ':bloco'     => $unidade->bloco,
-            ':andar'     => $unidade->andar,
-            ':descricao' => $unidade->descricao,
-            ':ativo'     => (int) $unidade->ativo,
-            ':id'        => $unidade->id,
-        ]);
+        $stmt->execute([...$this->parametros($unidade), ':id' => $unidade->id]);
+    }
+
+    private function parametros(Unidade $unidade): array
+    {
+        return [
+            ':numero'                => $unidade->numero,
+            ':bloco'                 => $unidade->bloco,
+            ':andar'                 => $unidade->andar,
+            ':descricao'             => $unidade->descricao,
+            ':tipo_ocupacao'         => $unidade->tipoOcupacao,
+            ':nome_proprietario'     => $unidade->nomeProprietario     ?: null,
+            ':telefone_proprietario' => $unidade->telefoneProprietario ?: null,
+            ':email_proprietario'    => $unidade->emailProprietario    ?: null,
+            ':nome_inquilino'        => $unidade->nomeInquilino        ?: null,
+            ':telefone_inquilino'    => $unidade->telefoneInquilino    ?: null,
+            ':email_inquilino'       => $unidade->emailInquilino       ?: null,
+            ':ativo'                 => (int) $unidade->ativo,
+        ];
     }
 }
