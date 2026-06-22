@@ -10,7 +10,6 @@ class ProjetoController
 {
     private ProjetoService    $projetoService;
     private UsuarioRepository $usuarioRepository;
-    private string            $urlBase;
     private bool              $ehAdmin;
 
     public function __construct()
@@ -18,8 +17,6 @@ class ProjetoController
         $conexao = Conexao::obter();
         $this->projetoService    = new ProjetoService(new ProjetoRepository($conexao));
         $this->usuarioRepository = new UsuarioRepository($conexao);
-        $app                     = require RAIZ . '/config/app.php';
-        $this->urlBase           = $app['url_base'];
         $this->ehAdmin           = in_array(Sessao::perfilAtual(), ['sindico', 'subsindico'], true);
     }
 
@@ -31,11 +28,11 @@ class ProjetoController
         $erroMensagem = Sessao::lerFlash('erro');
         $ehAdmin      = $this->ehAdmin;
 
-        $viewProjetos = $this->ehAdmin
+        $view = $this->ehAdmin
             ? RAIZ . '/views/admin/projetos/lista.php'
             : RAIZ . '/views/transparencia/lista.php';
 
-        require_once $viewProjetos;
+        require_once $view;
     }
 
     public function ver(): void
@@ -50,12 +47,11 @@ class ProjetoController
         }
 
         $ehAdmin = $this->ehAdmin;
-
-        $viewDetalhe = $this->ehAdmin
+        $view    = $this->ehAdmin
             ? RAIZ . '/views/admin/projetos/detalhe.php'
             : RAIZ . '/views/transparencia/detalhe.php';
 
-        require_once $viewDetalhe;
+        require_once $view;
     }
 
     public function formulario(): void
@@ -63,9 +59,10 @@ class ProjetoController
         $this->exigirAdmin();
 
         $projeto      = null;
-        $responsaveis = $this->usuarioRepository->listarPorPerfil('sindico');
-        $subsindicos  = $this->usuarioRepository->listarPorPerfil('subsindico');
-        $responsaveis = array_merge($responsaveis, $subsindicos);
+        $responsaveis = array_merge(
+            $this->usuarioRepository->listarPorPerfil('sindico'),
+            $this->usuarioRepository->listarPorPerfil('subsindico'),
+        );
 
         if (!empty($_GET['id'])) {
             $projeto = $this->projetoService->buscarProjeto((int) $_GET['id']);
@@ -81,12 +78,11 @@ class ProjetoController
         try {
             $id = $this->projetoService->salvarProjeto($_POST);
             Sessao::flash('sucesso', 'Projeto salvo com sucesso.');
-            header("Location: {$this->urlBase}/index.php?pagina=projetos&acao=ver&id={$id}");
+            Roteador::redirecionar("/projetos/{$id}");
         } catch (InvalidArgumentException $e) {
             Sessao::flash('erro', $e->getMessage());
-            header("Location: {$this->urlBase}/index.php?pagina=projetos&acao=formulario");
+            Roteador::redirecionar('/projetos/novo');
         }
-        exit;
     }
 
     public function atualizarStatus(): void
@@ -103,8 +99,7 @@ class ProjetoController
             Sessao::flash('erro', $e->getMessage());
         }
 
-        header("Location: {$this->urlBase}/index.php?pagina=projetos&acao=ver&id={$projetoId}");
-        exit;
+        Roteador::redirecionar("/projetos/{$projetoId}");
     }
 
     public function adicionarAnexo(): void
@@ -116,8 +111,7 @@ class ProjetoController
 
         if (empty($_FILES['arquivo']) || $_FILES['arquivo']['error'] !== UPLOAD_ERR_OK) {
             Sessao::flash('erro', 'Selecione um arquivo válido.');
-            header("Location: {$this->urlBase}/index.php?pagina=projetos&acao=ver&id={$projetoId}");
-            exit;
+            Roteador::redirecionar("/projetos/{$projetoId}");
         }
 
         try {
@@ -127,21 +121,19 @@ class ProjetoController
             Sessao::flash('erro', $e->getMessage());
         }
 
-        header("Location: {$this->urlBase}/index.php?pagina=projetos&acao=ver&id={$projetoId}");
-        exit;
+        Roteador::redirecionar("/projetos/{$projetoId}");
     }
 
     public function removerAnexo(): void
     {
         $this->exigirAdmin();
 
-        $anexoId   = (int) ($_GET['anexo_id']   ?? 0);
+        $anexoId   = (int) ($_GET['anexo_id']  ?? 0);
         $projetoId = (int) ($_GET['projeto_id'] ?? 0);
 
         $this->projetoService->removerAnexo($anexoId);
         Sessao::flash('sucesso', 'Anexo removido.');
-        header("Location: {$this->urlBase}/index.php?pagina=projetos&acao=ver&id={$projetoId}");
-        exit;
+        Roteador::redirecionar("/projetos/{$projetoId}");
     }
 
     private function exigirAdmin(): void

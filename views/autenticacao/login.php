@@ -1,6 +1,4 @@
-<?php
-/** @var string|null $erroLogin */
-?>
+<?php /** @var string|null $erroLogin */ ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,10 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Entrar — Condux</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <?php
-    $app = require RAIZ . '/config/app.php';
-  ?>
-  <link rel="stylesheet" href="<?= $app['url_base'] ?>/assets/css/condux.css">
+  <link rel="stylesheet" href="<?= url('assets/css/condux.css') ?>">
 </head>
 <body>
 
@@ -30,30 +25,18 @@
       </div>
     <?php endif; ?>
 
-    <form action="<?= $app['url_base'] ?>/index.php?pagina=login" method="POST" novalidate>
+    <form action="<?= url('login') ?>" method="POST" novalidate>
       <div class="campo-formulario" style="margin-bottom:1rem;">
         <label for="campo-email">E-mail</label>
-        <input
-          type="email"
-          id="campo-email"
-          name="email"
-          placeholder="seu@email.com"
-          required
-          autocomplete="email"
-          value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
-        >
+        <input type="email" id="campo-email" name="email" placeholder="seu@email.com"
+               required autocomplete="email"
+               value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
       </div>
 
       <div class="campo-formulario" style="margin-bottom:1.5rem;">
         <label for="campo-senha">Senha</label>
-        <input
-          type="password"
-          id="campo-senha"
-          name="senha"
-          placeholder="••••••••"
-          required
-          autocomplete="current-password"
-        >
+        <input type="password" id="campo-senha" name="senha" placeholder="••••••••"
+               required autocomplete="current-password">
       </div>
 
       <button type="submit" class="botao-primario" style="width:100%; justify-content:center; padding:.65rem;">

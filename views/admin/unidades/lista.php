@@ -6,7 +6,7 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
 
 <div class="cabecalho-pagina">
   <h1 class="titulo-pagina"><i class="bi bi-building"></i> Unidades</h1>
-  <a href="<?= $urlBase ?>/index.php?pagina=unidades&acao=formulario" class="botao-primario">
+  <a href="<?= url('unidades/nova') ?>" class="botao-primario">
     <i class="bi bi-plus-lg"></i> Nova unidade
   </a>
 </div>
@@ -20,53 +20,42 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
 
 <div class="tabela-responsiva">
 <table class="tabela-condux">
-    <thead>
+  <thead>
+    <tr>
+      <th>Unidade</th>
+      <th>Responsável</th>
+      <th>Status mês atual</th>
+      <th style="width:120px;"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php if (empty($unidades)): ?>
+      <tr><td colspan="4" style="text-align:center; color:#6b7280; padding:2rem;">Nenhuma unidade cadastrada.</td></tr>
+    <?php else: ?>
+      <?php foreach ($unidades as $unidade): ?>
       <tr>
-        <th>Unidade</th>
-        <th>Responsável</th>
-        <th>Status mês atual</th>
-        <th style="width:120px;"></th>
+        <td>
+          <strong><?= htmlspecialchars($unidade->identificacao()) ?></strong>
+          <?php if ($unidade->andar): ?>
+            <br><small style="color:#6b7280;"><?= $unidade->andar ?>º andar</small>
+          <?php endif; ?>
+        </td>
+        <td><?= htmlspecialchars($unidade->nomeResponsavel ?? '—') ?></td>
+        <td>
+          <?php $status = $unidade->statusTaxaAtual ?? 'sem_taxa'; ?>
+          <span class="badge-status <?= $status ?>">
+            <?= match($status) { 'pago' => 'Pago', 'vencido' => 'Vencido', 'isento' => 'Isento', 'pendente' => 'Pendente', default => 'Sem taxa' } ?>
+          </span>
+        </td>
+        <td>
+          <a href="<?= url("unidades/{$unidade->id}") ?>" class="botao-secundario">
+            <i class="bi bi-eye"></i> Ver
+          </a>
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      <?php if (empty($unidades)): ?>
-        <tr>
-          <td colspan="4" style="text-align:center; color:#6b7280; padding:2rem;">
-            Nenhuma unidade cadastrada.
-          </td>
-        </tr>
-      <?php else: ?>
-        <?php foreach ($unidades as $unidade): ?>
-        <tr>
-          <td>
-            <strong><?= htmlspecialchars($unidade->identificacao()) ?></strong>
-            <?php if ($unidade->andar): ?>
-              <br><small style="color:#6b7280;"><?= $unidade->andar ?>º andar</small>
-            <?php endif; ?>
-          </td>
-          <td><?= htmlspecialchars($unidade->nomeResponsavel ?? '—') ?></td>
-          <td>
-            <?php $status = $unidade->statusTaxaAtual ?? 'sem_taxa'; ?>
-            <span class="badge-status <?= $status ?>">
-              <?= match($status) {
-                'pago'    => 'Pago',
-                'vencido' => 'Vencido',
-                'isento'  => 'Isento',
-                'pendente'=> 'Pendente',
-                default   => 'Sem taxa',
-              } ?>
-            </span>
-          </td>
-          <td>
-            <a href="<?= $urlBase ?>/index.php?pagina=unidades&acao=ver&id=<?= $unidade->id ?>"
-               class="botao-secundario">
-              <i class="bi bi-eye"></i> Ver
-            </a>
-          </td>
-        </tr>
-        <?php endforeach; ?>
-      <?php endif; ?>
-    </tbody>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </tbody>
 </table>
 </div>
 

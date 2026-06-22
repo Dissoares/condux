@@ -10,7 +10,6 @@ require_once __DIR__ . '/../repository/UsuarioRepository.php';
 class UnidadeController
 {
     private UnidadeService $unidadeService;
-    private string         $urlBase;
 
     public function __construct()
     {
@@ -20,14 +19,12 @@ class UnidadeController
             new MoradorRepository($conexao),
             new UsuarioRepository($conexao),
         );
-        $app           = require RAIZ . '/config/app.php';
-        $this->urlBase = $app['url_base'];
     }
 
     public function listar(): void
     {
-        $unidades  = $this->unidadeService->listarUnidades();
-        $mensagem  = Sessao::lerFlash('sucesso');
+        $unidades     = $this->unidadeService->listarUnidades();
+        $mensagem     = Sessao::lerFlash('sucesso');
         $erroMensagem = Sessao::lerFlash('erro');
         require_once RAIZ . '/views/admin/unidades/lista.php';
     }
@@ -46,12 +43,11 @@ class UnidadeController
         try {
             $id = $this->unidadeService->salvarUnidade($_POST);
             Sessao::flash('sucesso', 'Unidade salva com sucesso.');
-            header("Location: {$this->urlBase}/index.php?pagina=unidades&acao=ver&id={$id}");
+            Roteador::redirecionar("/unidades/{$id}");
         } catch (InvalidArgumentException $e) {
             Sessao::flash('erro', $e->getMessage());
-            header("Location: {$this->urlBase}/index.php?pagina=unidades&acao=formulario");
+            Roteador::redirecionar('/unidades/nova');
         }
-        exit;
     }
 
     public function ver(): void
@@ -82,8 +78,7 @@ class UnidadeController
             Sessao::flash('erro', $e->getMessage());
         }
 
-        header("Location: {$this->urlBase}/index.php?pagina=unidades&acao=ver&id={$unidadeId}");
-        exit;
+        Roteador::redirecionar("/unidades/{$unidadeId}");
     }
 
     public function desvincularMorador(): void
@@ -93,7 +88,6 @@ class UnidadeController
 
         $this->unidadeService->desvincularMorador($moradorId);
         Sessao::flash('sucesso', 'Morador desvinculado.');
-        header("Location: {$this->urlBase}/index.php?pagina=unidades&acao=ver&id={$unidadeId}");
-        exit;
+        Roteador::redirecionar("/unidades/{$unidadeId}");
     }
 }

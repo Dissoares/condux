@@ -11,16 +11,15 @@ class AutenticacaoController
 
     public function __construct()
     {
-        $conexao = Conexao::obter();
         $this->autenticacaoService = new AutenticacaoService(
-            new UsuarioRepository($conexao)
+            new UsuarioRepository(Conexao::obter())
         );
     }
 
     public function exibir(): void
     {
         if (Sessao::estaAutenticado()) {
-            $this->redirecionarParaPainel();
+            Roteador::redirecionar('/painel');
             return;
         }
         $erroLogin = Sessao::lerFlash('erro');
@@ -34,37 +33,22 @@ class AutenticacaoController
 
         if (empty($email) || empty($senha)) {
             Sessao::flash('erro', 'Preencha e-mail e senha.');
-            $this->redirecionarParaLogin();
-            return;
+            Roteador::redirecionar('/login');
         }
 
         $usuario = $this->autenticacaoService->entrar($email, $senha);
 
         if ($usuario === null) {
             Sessao::flash('erro', 'E-mail ou senha incorretos.');
-            $this->redirecionarParaLogin();
-            return;
+            Roteador::redirecionar('/login');
         }
 
-        $this->redirecionarParaPainel();
+        Roteador::redirecionar('/painel');
     }
 
     public function sair(): void
     {
         $this->autenticacaoService->sair();
-        $this->redirecionarParaLogin();
-    }
-
-    private function redirecionarParaLogin(): void
-    {
-        header('Location: ' . Roteador::urlLogin());
-        exit;
-    }
-
-    private function redirecionarParaPainel(): void
-    {
-        $app = require RAIZ . '/config/app.php';
-        header('Location: ' . $app['url_base'] . '/index.php?pagina=painel');
-        exit;
+        Roteador::redirecionar('/login');
     }
 }
