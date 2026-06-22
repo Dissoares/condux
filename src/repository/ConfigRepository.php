@@ -30,8 +30,8 @@ class ConfigRepository
         $stmt = $this->conexao->prepare(
             'INSERT INTO configuracoes (chave, valor)
              VALUES (:chave, :valor)
-             ON DUPLICATE KEY UPDATE valor = :valor'
+             ON DUPLICATE KEY UPDATE valor = :valor_upd'
         );
-        $stmt->execute([':chave' => $chave, ':valor' => $valor]);
+        $stmt->execute([':chave' => $chave, ':valor' => $valor, ':valor_upd' => $valor]);
     }
 }
