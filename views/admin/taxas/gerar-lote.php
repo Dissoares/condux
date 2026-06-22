@@ -29,6 +29,7 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
       <div class="mb-4">
         <label for="campo-vencimento" class="form-label">Data de vencimento</label>
         <input type="date" id="campo-vencimento" name="vencimento" class="form-control" required>
+        <div class="form-text">Preenchido automaticamente com o dia 10 da competência selecionada.</div>
       </div>
       <button type="submit" class="btn btn-primary">
         <i class="bi bi-lightning-fill"></i> Gerar taxas para todas as unidades
@@ -36,5 +37,21 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
     </form>
   </div>
 </div>
+
+<script>
+(function () {
+  const comp = document.getElementById('campo-competencia');
+  const venc = document.getElementById('campo-vencimento');
+
+  function sugerirVencimento() {
+    if (comp.value) {
+      venc.value = comp.value + '-10';
+    }
+  }
+
+  comp.addEventListener('change', sugerirVencimento);
+  sugerirVencimento();
+}());
+</script>
 
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>
