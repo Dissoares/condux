@@ -78,19 +78,25 @@ function rotuloBadgeStatus(string $status): string {
   <div class="row g-3">
     <?php foreach ($unidadesBloco as $u): ?>
     <?php
-      $uid    = (int) $u->id;
-      $status = $u->statusTaxaAtual ?? 'sem_taxa';
-      $qtdMoradores = count($moradoresPorUnidade[$uid] ?? []);
+      $uid              = (int) $u->id;
+      $status           = $u->statusTaxaAtual ?? 'sem_taxa';
+      $qtdMoradores     = count($moradoresPorUnidade[$uid] ?? []);
       $nomeProprietario = $u->exibirProprietario();
+      $nomeInquilino    = $u->estaAlugada() ? $u->exibirInquilino() : null;
+      $alugada          = $u->estaAlugada();
     ?>
     <div class="col-sm-6 col-md-4 col-xl-3">
       <button type="button"
-              class="card border-0 shadow-sm w-100 text-start btn-unidade p-0"
+              class="card border-0 shadow-sm w-100 text-start btn-unidade p-0 <?= $alugada ? 'card-alugada' : '' ?>"
               data-bs-toggle="modal"
               data-bs-target="#modal-unidade-<?= $uid ?>">
+
+        <!-- Faixa colorida no topo -->
+        <div class="card-ocupacao-faixa <?= $alugada ? 'faixa-alugada' : 'faixa-propria' ?>"></div>
+
         <div class="card-body p-3">
 
-          <!-- Cabeçalho do card -->
+          <!-- Cabeçalho: número + badge status -->
           <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
             <div class="fw-bold" style="font-size:1rem; line-height:1.2;">
               <?php if ($u->bloco): ?>
@@ -111,23 +117,41 @@ function rotuloBadgeStatus(string $status): string {
           <?php endif; ?>
 
           <!-- Tipo de ocupação -->
-          <div class="mb-2" style="font-size:.78rem;">
-            <?php if ($u->estaAlugada()): ?>
-              <span class="text-warning-emphasis"><i class="bi bi-key me-1"></i>Alugado</span>
+          <div class="mb-3" style="font-size:.78rem;">
+            <?php if ($alugada): ?>
+              <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-2">
+                <i class="bi bi-key me-1"></i>Alugado
+              </span>
             <?php else: ?>
-              <span class="text-success-emphasis"><i class="bi bi-house-check me-1"></i>Próprio</span>
+              <span class="badge bg-success-subtle text-success-emphasis rounded-pill px-2">
+                <i class="bi bi-house-check me-1"></i>Próprio
+              </span>
             <?php endif; ?>
           </div>
 
           <!-- Proprietário -->
-          <div class="text-body-secondary" style="font-size:.78rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-            <i class="bi bi-person me-1"></i>
-            <?= $nomeProprietario ? htmlspecialchars($nomeProprietario) : '<span class="opacity-50">Sem proprietário</span>' ?>
+          <div class="d-flex align-items-center gap-1 mb-1" style="font-size:.78rem; min-width:0;">
+            <i class="bi bi-person-badge text-body-secondary flex-shrink-0"></i>
+            <span class="text-body-secondary flex-shrink-0">Dono</span>
+            <span class="fw-semibold text-truncate ms-1">
+              <?= $nomeProprietario ? htmlspecialchars($nomeProprietario) : '<span class="opacity-40">—</span>' ?>
+            </span>
           </div>
+
+          <!-- Inquilino (só se alugada) -->
+          <?php if ($alugada): ?>
+          <div class="d-flex align-items-center gap-1 mb-1" style="font-size:.78rem; min-width:0;">
+            <i class="bi bi-key text-warning-emphasis flex-shrink-0"></i>
+            <span class="text-body-secondary flex-shrink-0">Inquilino</span>
+            <span class="fw-semibold text-truncate ms-1">
+              <?= $nomeInquilino ? htmlspecialchars($nomeInquilino) : '<span class="opacity-40">—</span>' ?>
+            </span>
+          </div>
+          <?php endif; ?>
 
           <!-- Moradores -->
           <?php if ($qtdMoradores > 0): ?>
-          <div class="text-body-secondary mt-1" style="font-size:.75rem;">
+          <div class="text-body-secondary mt-2" style="font-size:.75rem;">
             <i class="bi bi-people me-1"></i><?= $qtdMoradores ?> morador<?= $qtdMoradores !== 1 ? 'es' : '' ?>
           </div>
           <?php endif; ?>
@@ -363,11 +387,19 @@ function rotuloBadgeStatus(string $status): string {
   transition: transform .12s ease, box-shadow .12s ease;
   border-radius: .5rem !important;
   text-align: left;
+  overflow: hidden;
 }
 .btn-unidade:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,.1) !important;
 }
+.card-ocupacao-faixa {
+  height: 4px;
+  width: 100%;
+}
+.faixa-propria  { background: var(--bs-success); }
+.faixa-alugada  { background: var(--bs-warning); }
+.card-alugada   { border-left: 3px solid var(--bs-warning) !important; }
 </style>
 
 <script>
