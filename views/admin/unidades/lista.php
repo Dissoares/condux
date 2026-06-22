@@ -51,6 +51,32 @@ function rotuloBadgeStatus(string $status): string {
   </div>
 <?php endif; ?>
 
+<?php if (!empty($unidades)):
+  $qtdAtrasado = count(array_filter($unidades, fn($u) => $u->statusTaxaAtual === 'vencido'));
+  $qtdPendente = count(array_filter($unidades, fn($u) => $u->statusTaxaAtual === 'pendente'));
+?>
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <?php if ($qtdAtrasado === 0 && $qtdPendente === 0): ?>
+    <span class="badge bg-success-subtle text-success-emphasis px-3 py-2" style="font-size:.82rem;">
+      <i class="bi bi-check-circle-fill me-1"></i> Tudo em dia
+    </span>
+  <?php else: ?>
+    <?php if ($qtdAtrasado > 0): ?>
+    <span class="badge bg-danger-subtle text-danger-emphasis px-3 py-2" style="font-size:.82rem;">
+      <i class="bi bi-exclamation-circle-fill me-1"></i>
+      <?= $qtdAtrasado ?> <?= $qtdAtrasado === 1 ? 'unidade atrasada' : 'unidades atrasadas' ?>
+    </span>
+    <?php endif; ?>
+    <?php if ($qtdPendente > 0): ?>
+    <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2" style="font-size:.82rem;">
+      <i class="bi bi-clock-fill me-1"></i>
+      <?= $qtdPendente ?> <?= $qtdPendente === 1 ? 'unidade pendente' : 'unidades pendentes' ?>
+    </span>
+    <?php endif; ?>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
+
 <?php if (empty($unidades)): ?>
   <div class="card border-0 shadow-sm">
     <div class="card-body d-flex flex-column align-items-center justify-content-center py-5 text-center">
