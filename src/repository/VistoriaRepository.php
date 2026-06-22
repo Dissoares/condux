@@ -79,6 +79,24 @@ class VistoriaRepository
         return array_map(fn($l) => Vistoria::fromArray($l), $stmt->fetchAll());
     }
 
+    /** @return Vistoria[] */
+    public function listarPorPrestadora(int $prestadoraId): array
+    {
+        $stmt = $this->conexao->prepare(
+            "SELECT v.*, u.nome AS nome_responsavel,
+                    CASE WHEN un.numero IS NOT NULL
+                         THEN CONCAT('Bloco ', un.bloco, ' — Apto ', un.numero)
+                         ELSE NULL END AS identificacao_unidade
+             FROM vistorias v
+             LEFT JOIN usuarios u  ON u.id  = v.responsavel_id
+             LEFT JOIN unidades un ON un.id = v.unidade_id
+             WHERE v.prestadora_id = :prestadora_id
+             ORDER BY v.data_vistoria DESC"
+        );
+        $stmt->execute([':prestadora_id' => $prestadoraId]);
+        return array_map(fn($l) => Vistoria::fromArray($l), $stmt->fetchAll());
+    }
+
     public function salvar(array $dados): int
     {
         if (!empty($dados['id'])) {

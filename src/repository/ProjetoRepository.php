@@ -58,6 +58,20 @@ class ProjetoRepository
         return array_map(fn($l) => Projeto::fromArray($l), $stmt->fetchAll());
     }
 
+    /** @return Projeto[] */
+    public function listarPorPrestadora(int $prestadoraId): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT p.*, u.nome AS nome_responsavel
+             FROM projetos p
+             LEFT JOIN usuarios u ON u.id = p.responsavel_id
+             WHERE p.prestadora_id = :prestadora_id
+             ORDER BY p.criado_em DESC'
+        );
+        $stmt->execute([':prestadora_id' => $prestadoraId]);
+        return array_map(fn($l) => Projeto::fromArray($l), $stmt->fetchAll());
+    }
+
     public function salvar(Projeto $projeto): int
     {
         if ($projeto->id === null) {

@@ -294,6 +294,7 @@ class Roteador
         $id = (int) $seg[1];
         if ($seg[2] === 'editar')  { $_GET['id'] = $id; $ctrl->formulario(); return; }
         if ($seg[2] === 'excluir') { $_GET['id'] = $id; $ctrl->excluir();    return; }
+        if ($id > 0)               { $_GET['id'] = $id; $ctrl->ver();        return; }
 
         self::naoEncontrado();
     }

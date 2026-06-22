@@ -82,8 +82,11 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
         </div>
       </div>
       <div class="card-footer bg-transparent d-flex gap-2">
-        <a href="<?= url("prestadoras/{$p->id}/editar") ?>" class="btn btn-outline-secondary btn-sm flex-grow-1">
-          <i class="bi bi-pencil"></i> Editar
+        <a href="<?= url("prestadoras/{$p->id}") ?>" class="btn btn-outline-primary btn-sm flex-grow-1">
+          <i class="bi bi-eye"></i> Ver
+        </a>
+        <a href="<?= url("prestadoras/{$p->id}/editar") ?>" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-pencil"></i>
         </a>
         <a href="<?= url("prestadoras/{$p->id}/excluir") ?>"
            onclick="return confirm('Remover empresa <?= htmlspecialchars(addslashes($p->nome)) ?>?')"

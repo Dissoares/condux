@@ -3,18 +3,24 @@
 declare(strict_types=1);
 
 require_once RAIZ . '/src/repository/PrestadoraRepository.php';
-require_once RAIZ . '/src/helpers/Sessao.php';
+require_once RAIZ . '/src/repository/ProjetoRepository.php';
+require_once RAIZ . '/src/repository/VistoriaRepository.php';
+require_once RAIZ . '/src/Sessao.php';
 
 class PrestadoraController
 {
     private PrestadoraRepository $repo;
+    private ProjetoRepository    $projetoRepo;
+    private VistoriaRepository   $vistoriaRepo;
     private bool $ehAdmin;
 
     public function __construct()
     {
         $db = Conexao::obter();
-        $this->repo    = new PrestadoraRepository($db);
-        $this->ehAdmin = in_array(Sessao::perfilAtual(), ['sindico', 'subsindico'], true);
+        $this->repo         = new PrestadoraRepository($db);
+        $this->projetoRepo  = new ProjetoRepository($db);
+        $this->vistoriaRepo = new VistoriaRepository($db);
+        $this->ehAdmin      = in_array(Sessao::perfilAtual(), ['sindico', 'subsindico'], true);
     }
 
     public function listar(): void
@@ -23,6 +29,25 @@ class PrestadoraController
         $mensagem     = Sessao::lerFlash('sucesso');
         $erroMensagem = Sessao::lerFlash('erro');
         require RAIZ . '/views/admin/prestadoras/lista.php';
+    }
+
+    public function ver(): void
+    {
+        $id         = (int) ($_GET['id'] ?? 0);
+        $prestadora = $this->repo->buscarPorId($id);
+
+        if ($prestadora === null) {
+            http_response_code(404);
+            echo 'Prestadora não encontrada.';
+            return;
+        }
+
+        $projetos     = $this->projetoRepo->listarPorPrestadora($id);
+        $vistorias    = $this->vistoriaRepo->listarPorPrestadora($id);
+        $mensagem     = Sessao::lerFlash('sucesso');
+        $erroMensagem = Sessao::lerFlash('erro');
+
+        require RAIZ . '/views/admin/prestadoras/detalhe.php';
     }
 
     public function formulario(): void
@@ -59,7 +84,7 @@ class PrestadoraController
         try {
             $salvoId = $this->repo->salvar($prestadora);
             Sessao::flash('sucesso', 'Empresa salva com sucesso.');
-            Roteador::redirecionar("/prestadoras/{$salvoId}/editar");
+            Roteador::redirecionar("/prestadoras/{$salvoId}");
         } catch (PDOException $e) {
             Sessao::flash('erro', 'Erro ao salvar: ' . $e->getMessage());
             Roteador::redirecionar('/prestadoras');
