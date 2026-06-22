@@ -28,6 +28,8 @@ class Unidade
         // Dados extras via JOIN — não pertencem à tabela
         public ?string       $nomeResponsavel      = null,
         public ?string       $statusTaxaAtual      = null,
+        public int           $qtdAtrasadas         = 0,
+        public int           $qtdPendentes         = 0,
         // Nomes vindos do JOIN com usuarios (proprietario_id / inquilino_id)
         public ?string       $nomeProprietarioVinc = null,
         public ?string       $emailProprietarioVinc= null,
@@ -58,6 +60,8 @@ class Unidade
             criadoEm:              $dados['criado_em']             ?? null,
             nomeResponsavel:       $dados['nome_responsavel']      ?? null,
             statusTaxaAtual:       $dados['status_taxa_atual']     ?? null,
+            qtdAtrasadas:          (int) ($dados['qtd_atrasadas']  ?? 0),
+            qtdPendentes:          (int) ($dados['qtd_pendentes']  ?? 0),
             nomeProprietarioVinc:  $dados['nome_prop_vinc']        ?? null,
             emailProprietarioVinc: $dados['email_prop_vinc']       ?? null,
             nomeInquilinoVinc:     $dados['nome_inq_vinc']         ?? null,

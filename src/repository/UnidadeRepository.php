@@ -20,6 +20,8 @@ class UnidadeRepository
                       WHEN tc.status = \'pendente\' AND tc.vencimento < CURDATE()    THEN \'vencido\'
                       ELSE tc.status
                     END         AS status_taxa_atual,
+                    COALESCE(res.qtd_atrasadas, 0) AS qtd_atrasadas,
+                    COALESCE(res.qtd_pendentes, 0) AS qtd_pendentes,
                     prop.nome   AS nome_prop_vinc,
                     prop.email  AS email_prop_vinc,
                     inq.nome    AS nome_inq_vinc,
@@ -31,6 +33,13 @@ class UnidadeRepository
              LEFT JOIN taxas_condominiais tc
                     ON tc.unidade_id = u.id
                    AND tc.competencia = DATE_FORMAT(NOW(), "%Y-%m")
+             LEFT JOIN (
+                    SELECT unidade_id,
+                           SUM(CASE WHEN (status = \'pendente\' AND vencimento < CURDATE()) OR status = \'vencido\' THEN 1 ELSE 0 END) AS qtd_atrasadas,
+                           SUM(CASE WHEN status = \'pendente\' AND vencimento >= CURDATE() THEN 1 ELSE 0 END) AS qtd_pendentes
+                    FROM taxas_condominiais
+                    GROUP BY unidade_id
+             ) res ON res.unidade_id = u.id
              LEFT JOIN usuarios prop ON prop.id = u.proprietario_id
              LEFT JOIN usuarios inq  ON inq.id  = u.inquilino_id
              WHERE u.id = :id LIMIT 1'
@@ -54,6 +63,8 @@ class UnidadeRepository
                       WHEN tc.status = \'pendente\' AND tc.vencimento < CURDATE()    THEN \'vencido\'
                       ELSE tc.status
                     END         AS status_taxa_atual,
+                    COALESCE(res.qtd_atrasadas, 0) AS qtd_atrasadas,
+                    COALESCE(res.qtd_pendentes, 0) AS qtd_pendentes,
                     prop.nome   AS nome_prop_vinc,
                     prop.email  AS email_prop_vinc,
                     inq.nome    AS nome_inq_vinc,
@@ -65,6 +76,13 @@ class UnidadeRepository
              LEFT JOIN taxas_condominiais tc
                     ON tc.unidade_id = u.id
                    AND tc.competencia = DATE_FORMAT(NOW(), "%Y-%m")
+             LEFT JOIN (
+                    SELECT unidade_id,
+                           SUM(CASE WHEN (status = \'pendente\' AND vencimento < CURDATE()) OR status = \'vencido\' THEN 1 ELSE 0 END) AS qtd_atrasadas,
+                           SUM(CASE WHEN status = \'pendente\' AND vencimento >= CURDATE() THEN 1 ELSE 0 END) AS qtd_pendentes
+                    FROM taxas_condominiais
+                    GROUP BY unidade_id
+             ) res ON res.unidade_id = u.id
              LEFT JOIN usuarios prop ON prop.id = u.proprietario_id
              LEFT JOIN usuarios inq  ON inq.id  = u.inquilino_id
              WHERE u.ativo = 1
