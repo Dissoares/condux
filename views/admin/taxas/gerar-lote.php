@@ -79,9 +79,14 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
 
 <script>
 (function () {
-  const modal      = new bootstrap.Modal(document.getElementById('modalConfirmarAlteracao'));
+  let modal        = null;
   const modalTexto = document.getElementById('modal-confirmar-texto');
   const modalBtn   = document.getElementById('modal-confirmar-btn');
+
+  function getModal() {
+    if (!modal) modal = new bootstrap.Modal(document.getElementById('modalConfirmarAlteracao'));
+    return modal;
+  }
 
   function desbloquear(campo, ico, btn) {
     campo.removeAttribute('readonly');
@@ -118,14 +123,15 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
         ? `O dia de vencimento padrão é <strong>dia ${diaAtual}</strong>. Tem certeza que quer alterar?`
         : `O valor padrão da taxa condominial é de <strong>R$ ${valAtual}</strong>. Tem certeza que quer alterar?`;
 
+      const m       = getModal();
       const btnRef  = this;
       const handler = () => {
         desbloquear(campo, ico, btnRef);
-        modal.hide();
+        m.hide();
         modalBtn.removeEventListener('click', handler);
       };
       modalBtn.addEventListener('click', handler);
-      modal.show();
+      m.show();
     });
   });
 }());
