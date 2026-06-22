@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
-define('RAIZ',     dirname(__DIR__));
-define('BASE_URL', rtrim(dirname($_SERVER['SCRIPT_NAME']), '/'));
+define('RAIZ', dirname(__DIR__));
+
+// dirname() no Windows pode retornar '\' para scripts na raiz do vhost.
+// Normalizamos para '/' e removemos trailing slash, resultando em '' para raiz.
+$_scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+define('BASE_URL', rtrim($_scriptDir, '/'));
+unset($_scriptDir);
 
 date_default_timezone_set('America/Sao_Paulo');
 
