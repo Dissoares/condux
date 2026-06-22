@@ -64,6 +64,11 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
           <i class="bi bi-people"></i> Condôminos
         </a>
       </li>
+      <li class="nav-item">
+        <a href="<?= url('gestoes') ?>" class="nav-link <?= $segAtivo === 'gestoes' ? 'ativo' : '' ?>">
+          <i class="bi bi-person-badge"></i> Gestões
+        </a>
+      </li>
 
       <p class="condux-nav-label">Financeiro</p>
       <li class="nav-item">

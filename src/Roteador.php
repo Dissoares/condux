@@ -63,6 +63,7 @@ class Roteador
             'taxas'        => self::rotasTaxas($seg, $metodo, $ehAdmin),
             'taxas-extra'  => self::rotasTaxasExtra($seg, $metodo, $ehAdmin),
             'vistorias'    => self::rotasVistorias($seg, $metodo, $ehAdmin),
+            'gestoes'      => self::rotasGestoes($seg, $metodo, $ehAdmin),
             'projetos'     => self::rotasProjetos($seg, $metodo, $ehAdmin),
             'minhas-taxas' => self::rotasMinhasTaxas($seg, $metodo),
             'transparencia'=> self::rotasTransparencia($seg),
@@ -222,6 +223,29 @@ class Roteador
         }
 
         if ($id > 0) { $_GET['id'] = $id; $ctrl->ver(); return; }
+
+        self::naoEncontrado();
+    }
+
+    // ── Gestões ──────────────────────────────────────────────────────────
+
+    private static function rotasGestoes(array $seg, string $metodo, bool $ehAdmin): void
+    {
+        if (!$ehAdmin) { self::naoAutorizado(); return; }
+
+        require_once RAIZ . '/src/controllers/GestaoController.php';
+        $ctrl = new GestaoController();
+
+        if ($seg[1] === null)                              { $ctrl->listar();    return; }
+        if ($seg[1] === 'nova')                            { $ctrl->formulario(); return; }
+        if ($seg[1] === 'salvar' && $metodo === 'POST')    { $ctrl->salvar();    return; }
+
+        $id = (int) $seg[1];
+
+        if ($seg[2] === 'editar')   { $_GET['id'] = $id; $ctrl->formulario(); return; }
+        if ($seg[2] === 'encerrar') { $_GET['id'] = $id; $ctrl->encerrar();   return; }
+        if ($seg[2] === 'excluir')  { $_GET['id'] = $id; $ctrl->excluir();    return; }
+        if ($id > 0)                { $_GET['id'] = $id; $ctrl->ver();        return; }
 
         self::naoEncontrado();
     }
