@@ -89,6 +89,11 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
         </a>
       </li>
       <li class="nav-item">
+        <a href="<?= url('prestadoras') ?>" class="nav-link <?= $segAtivo === 'prestadoras' ? 'ativo' : '' ?>">
+          <i class="bi bi-building"></i> Prestadoras
+        </a>
+      </li>
+      <li class="nav-item">
         <a href="<?= url('vistorias') ?>" class="nav-link <?= $segAtivo === 'vistorias' ? 'ativo' : '' ?>">
           <i class="bi bi-clipboard-check"></i> Vistorias
         </a>

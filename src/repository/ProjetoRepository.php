@@ -12,10 +12,14 @@ class ProjetoRepository
     {
         $stmt = $this->conexao->prepare(
             'SELECT p.*,
-                    u.nome AS nome_responsavel,
-                    pr.nome AS nome_prestadora
+                    u.nome      AS nome_responsavel,
+                    pr.nome     AS nome_prestadora,
+                    pr.cnpj     AS prestadora_cnpj,
+                    pr.contato  AS prestadora_contato,
+                    pr.telefone AS prestadora_telefone,
+                    pr.email    AS prestadora_email
              FROM projetos p
-             LEFT JOIN usuarios   u  ON u.id  = p.responsavel_id
+             LEFT JOIN usuarios    u  ON u.id  = p.responsavel_id
              LEFT JOIN prestadoras pr ON pr.id = p.prestadora_id
              WHERE p.id = :id LIMIT 1'
         );
@@ -109,17 +113,18 @@ class ProjetoRepository
         ];
     }
 
-    public function salvarAnexo(int $projetoId, string $tipo, string $caminho, string $nomeOriginal): int
+    public function salvarAnexo(int $projetoId, string $tipo, string $caminho, string $nomeOriginal, ?string $descricao = null): int
     {
         $stmt = $this->conexao->prepare(
-            'INSERT INTO projeto_anexos (projeto_id, tipo, caminho, nome_original)
-             VALUES (:projeto_id, :tipo, :caminho, :nome_original)'
+            'INSERT INTO projeto_anexos (projeto_id, tipo, caminho, nome_original, descricao)
+             VALUES (:projeto_id, :tipo, :caminho, :nome_original, :descricao)'
         );
         $stmt->execute([
             ':projeto_id'    => $projetoId,
             ':tipo'          => $tipo,
             ':caminho'       => $caminho,
             ':nome_original' => $nomeOriginal,
+            ':descricao'     => $descricao,
         ]);
         return (int) $this->conexao->lastInsertId();
     }

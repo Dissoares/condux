@@ -5,19 +5,22 @@ declare(strict_types=1);
 require_once __DIR__ . '/../services/ProjetoService.php';
 require_once __DIR__ . '/../repository/ProjetoRepository.php';
 require_once __DIR__ . '/../repository/UsuarioRepository.php';
+require_once __DIR__ . '/../repository/PrestadoraRepository.php';
 
 class ProjetoController
 {
-    private ProjetoService    $projetoService;
-    private UsuarioRepository $usuarioRepository;
-    private bool              $ehAdmin;
+    private ProjetoService       $projetoService;
+    private UsuarioRepository    $usuarioRepository;
+    private PrestadoraRepository $prestadoraRepository;
+    private bool                 $ehAdmin;
 
     public function __construct()
     {
         $conexao = Conexao::obter();
-        $this->projetoService    = new ProjetoService(new ProjetoRepository($conexao));
-        $this->usuarioRepository = new UsuarioRepository($conexao);
-        $this->ehAdmin           = in_array(Sessao::perfilAtual(), ['sindico', 'subsindico'], true);
+        $this->projetoService       = new ProjetoService(new ProjetoRepository($conexao));
+        $this->usuarioRepository    = new UsuarioRepository($conexao);
+        $this->prestadoraRepository = new PrestadoraRepository($conexao);
+        $this->ehAdmin              = in_array(Sessao::perfilAtual(), ['sindico', 'subsindico'], true);
     }
 
     public function listar(): void
@@ -65,6 +68,7 @@ class ProjetoController
             $this->usuarioRepository->listarPorPerfil('sindico'),
             $this->usuarioRepository->listarPorPerfil('subsindico'),
         );
+        $prestadoras = $this->prestadoraRepository->listarAtivas();
 
         if (!empty($_GET['id'])) {
             $projeto = $this->projetoService->buscarProjeto((int) $_GET['id']);
@@ -110,6 +114,7 @@ class ProjetoController
 
         $projetoId = (int) ($_POST['projeto_id'] ?? 0);
         $tipo      = $_POST['tipo'] ?? '';
+        $descricao = trim($_POST['descricao'] ?? '') ?: null;
 
         if (empty($_FILES['arquivo']) || $_FILES['arquivo']['error'] !== UPLOAD_ERR_OK) {
             Sessao::flash('erro', 'Selecione um arquivo válido.');
@@ -117,7 +122,7 @@ class ProjetoController
         }
 
         try {
-            $this->projetoService->adicionarAnexo($projetoId, $tipo, $_FILES['arquivo']);
+            $this->projetoService->adicionarAnexo($projetoId, $tipo, $_FILES['arquivo'], $descricao);
             Sessao::flash('sucesso', 'Anexo adicionado com sucesso.');
         } catch (InvalidArgumentException|RuntimeException $e) {
             Sessao::flash('erro', $e->getMessage());

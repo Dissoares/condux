@@ -1,8 +1,16 @@
 <?php
-/** @var Projeto|null $projeto @var Usuario[] $responsaveis */
+/** @var Projeto|null $projeto @var Usuario[] $responsaveis @var Prestadora[] $prestadoras */
 $editando     = $projeto !== null;
 $tituloPagina = $editando ? 'Editar Projeto' : 'Novo Projeto';
 require_once RAIZ . '/views/layouts/cabecalho.php';
+require_once RAIZ . '/views/partials/picker.php';
+
+// Montar opções para o picker de prestadora
+$opcoesPrestadora = array_map(fn($p) => [
+    'id'    => $p->id,
+    'nome'  => $p->nome,
+    'email' => $p->cnpj ? 'CNPJ: ' . $p->cnpj : null,
+], $prestadoras);
 ?>
 
 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -82,6 +90,26 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           <input type="date" id="campo-data-conclusao" name="data_conclusao" class="form-control"
                  value="<?= htmlspecialchars($projeto?->dataConclusao ?? '') ?>">
         </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Empresa prestadora</label>
+        <?php if (empty($opcoesPrestadora)): ?>
+          <div class="alert alert-warning py-2" style="font-size:.85rem;">
+            <i class="bi bi-info-circle me-1"></i>
+            Nenhuma prestadora cadastrada.
+            <a href="<?= url('prestadoras/nova') ?>" target="_blank">Cadastrar agora</a>
+          </div>
+          <input type="hidden" name="prestadora_id" value="">
+        <?php else: ?>
+          <?php renderPicker(
+              name:        'prestadora_id',
+              opcoes:      $opcoesPrestadora,
+              selecionado: $projeto?->prestadoraId,
+              placeholder: 'Buscar empresa...',
+              labelVazia:  '— Sem prestadora —',
+          ); ?>
+        <?php endif; ?>
       </div>
 
       <div class="mb-4">

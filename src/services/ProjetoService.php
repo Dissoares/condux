@@ -59,9 +59,9 @@ class ProjetoService
         $this->projetoRepository->salvar($projeto);
     }
 
-    public function adicionarAnexo(int $projetoId, string $tipo, array $arquivoUpload): int
+    public function adicionarAnexo(int $projetoId, string $tipo, array $arquivoUpload, ?string $descricao = null): int
     {
-        $tiposPermitidos = ['foto', 'video', 'nota_fiscal', 'documento'];
+        $tiposPermitidos = ['foto', 'video', 'nota_fiscal', 'documento', 'antes', 'depois'];
 
         if (!in_array($tipo, $tiposPermitidos, true)) {
             throw new InvalidArgumentException("Tipo de anexo inválido: {$tipo}");
@@ -70,7 +70,7 @@ class ProjetoService
         $caminho      = $this->salvarArquivoAnexo($tipo, $arquivoUpload);
         $nomeOriginal = basename($arquivoUpload['name']);
 
-        return $this->projetoRepository->salvarAnexo($projetoId, $tipo, $caminho, $nomeOriginal);
+        return $this->projetoRepository->salvarAnexo($projetoId, $tipo, $caminho, $nomeOriginal, $descricao);
     }
 
     public function removerAnexo(int $anexoId): void

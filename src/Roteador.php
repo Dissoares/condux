@@ -65,6 +65,7 @@ class Roteador
             'vistorias'    => self::rotasVistorias($seg, $metodo, $ehAdmin),
             'gestoes'      => self::rotasGestoes($seg, $metodo, $ehAdmin),
             'projetos'     => self::rotasProjetos($seg, $metodo, $ehAdmin),
+            'prestadoras'  => self::rotasPrestadoras($seg, $metodo, $ehAdmin),
             'minhas-taxas' => self::rotasMinhasTaxas($seg, $metodo),
             'transparencia'=> self::rotasTransparencia($seg),
             'relatorios'   => self::carregarRelatorio(),
@@ -273,6 +274,26 @@ class Roteador
             return;
         }
         if ($id > 0) { $_GET['id'] = $id; $ctrl->ver(); return; }
+
+        self::naoEncontrado();
+    }
+
+    // ── Prestadoras ──────────────────────────────────────────────────────
+
+    private static function rotasPrestadoras(array $seg, string $metodo, bool $ehAdmin): void
+    {
+        if (!$ehAdmin) { self::naoAutorizado(); return; }
+
+        require_once RAIZ . '/src/controllers/PrestadoraController.php';
+        $ctrl = new PrestadoraController();
+
+        if ($seg[1] === null)                              { $ctrl->listar();    return; }
+        if ($seg[1] === 'nova')                            { $ctrl->formulario(); return; }
+        if ($seg[1] === 'salvar' && $metodo === 'POST')    { $ctrl->salvar();    return; }
+
+        $id = (int) $seg[1];
+        if ($seg[2] === 'editar')  { $_GET['id'] = $id; $ctrl->formulario(); return; }
+        if ($seg[2] === 'excluir') { $_GET['id'] = $id; $ctrl->excluir();    return; }
 
         self::naoEncontrado();
     }

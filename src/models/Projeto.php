@@ -35,9 +35,13 @@ class Projeto
         public ?string          $dataConclusao   = null,
         public ?string          $criadoEm        = null,
         // Dados extras via JOIN
-        public ?string          $nomeResponsavel = null,
-        public ?string          $nomePrestadora  = null,
-        public array            $anexos          = [],
+        public ?string          $nomeResponsavel    = null,
+        public ?string          $nomePrestadora     = null,
+        public ?string          $prestadoraCnpj     = null,
+        public ?string          $prestadoraContato  = null,
+        public ?string          $prestadoraTelefone = null,
+        public ?string          $prestadoraEmail    = null,
+        public array            $anexos             = [],
     ) {}
 
     public static function fromArray(array $dados): self
@@ -55,8 +59,12 @@ class Projeto
             dataInicio:      $dados['data_inicio']      ?? null,
             dataConclusao:   $dados['data_conclusao']   ?? null,
             criadoEm:        $dados['criado_em']        ?? null,
-            nomeResponsavel: $dados['nome_responsavel'] ?? null,
-            nomePrestadora:  $dados['nome_prestadora']  ?? null,
+            nomeResponsavel:    $dados['nome_responsavel']    ?? null,
+            nomePrestadora:     $dados['nome_prestadora']     ?? null,
+            prestadoraCnpj:     $dados['prestadora_cnpj']     ?? null,
+            prestadoraContato:  $dados['prestadora_contato']  ?? null,
+            prestadoraTelefone: $dados['prestadora_telefone'] ?? null,
+            prestadoraEmail:    $dados['prestadora_email']    ?? null,
         );
     }
 
