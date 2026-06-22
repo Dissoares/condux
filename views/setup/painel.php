@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * @var bool          $statusConexao
  * @var bool          $statusBanco
@@ -14,44 +14,47 @@ $config = require RAIZ . '/config/banco.php';
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Setup — Condux</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="<?= url('assets/css/condux.css') ?>">
 </head>
-<body style="background:var(--cor-fundo-pagina); padding:2rem 1rem;">
+<body class="bg-body-tertiary" style="padding:2rem 1rem;">
 
 <div style="max-width:680px; margin:0 auto;">
 
   <!-- Cabeçalho -->
   <div style="text-align:center; margin-bottom:2rem;">
-    <h1 style="font-size:2rem; font-weight:800; color:var(--cor-primaria);">
-      Con<span style="color:var(--cor-acento);">dux</span>
+    <h1 style="font-size:2rem; font-weight:800; color:#1a3c5e;">
+      Con<span style="color:#f0a500;">dux</span>
     </h1>
     <p style="color:#6b7280;">Painel de Configuração Inicial</p>
   </div>
 
   <!-- Resultado da última execução -->
   <?php if (!empty($resultadoExec)): ?>
-  <div class="card-conteudo" style="margin-bottom:1.5rem;">
-    <h2 class="titulo-card">Resultado da execução</h2>
+  <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+    <h6 class="fw-semibold border-bottom pb-2 mb-3">Resultado da execução</h6>
     <?php foreach ((array) $resultadoExec as $item): ?>
-      <div class="alerta-flash <?= $item['sucesso'] ? 'sucesso' : 'erro' ?>" style="margin-bottom:.5rem;">
-        <i class="bi bi-<?= $item['sucesso'] ? 'check-circle-fill' : 'x-circle-fill' ?>"></i>
-        <strong><?= htmlspecialchars($item['nome']) ?></strong>
-        <?php if ($item['erro']): ?>
-          <br><small style="opacity:.8;"><?= htmlspecialchars($item['erro']) ?></small>
-        <?php endif; ?>
+      <div class="alert alert-<?= $item['sucesso'] ? 'success' : 'danger' ?> py-2 d-flex align-items-start gap-2 mb-2">
+        <i class="bi bi-<?= $item['sucesso'] ? 'check-circle-fill' : 'x-circle-fill' ?> flex-shrink-0 mt-1"></i>
+        <div>
+          <strong><?= htmlspecialchars($item['nome']) ?></strong>
+          <?php if ($item['erro']): ?>
+            <br><small><?= htmlspecialchars($item['erro']) ?></small>
+          <?php endif; ?>
+        </div>
       </div>
     <?php endforeach; ?>
   </div>
   <?php endif; ?>
 
   <!-- 1. Conexão MySQL -->
-  <div class="card-conteudo" style="margin-bottom:1.25rem;">
-    <h2 class="titulo-card">
+  <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+    <h6 class="fw-semibold border-bottom pb-2 mb-3">
       <i class="bi bi-<?= $statusConexao ? 'check-circle-fill' : 'x-circle-fill' ?>"
-         style="color:<?= $statusConexao ? 'var(--cor-sucesso)' : 'var(--cor-perigo)' ?>"></i>
+         style="color:<?= $statusConexao ? '#198754' : '#dc3545' ?>"></i>
       Conexão MySQL
-    </h2>
+    </h6>
 
     <table style="width:100%; font-size:.875rem; border-collapse:collapse;">
       <?php foreach (['host' => 'Host', 'porta' => 'Porta', 'usuario' => 'Usuário', 'banco' => 'Banco'] as $chave => $rotulo): ?>
@@ -63,7 +66,7 @@ $config = require RAIZ . '/config/banco.php';
     </table>
 
     <?php if (!$statusConexao): ?>
-      <div class="alerta-flash erro" style="margin-top:1rem;">
+      <div class="alert alert-danger d-flex align-items-center gap-2" style="margin-top:1rem;">
         <i class="bi bi-exclamation-triangle-fill"></i>
         Não foi possível conectar ao MySQL. Verifique as credenciais em <code>config/banco.php</code>.
       </div>
@@ -72,24 +75,24 @@ $config = require RAIZ . '/config/banco.php';
 
   <!-- 2. Banco de dados -->
   <?php if ($statusConexao): ?>
-  <div class="card-conteudo" style="margin-bottom:1.25rem;">
-    <h2 class="titulo-card">
+  <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+    <h6 class="fw-semibold border-bottom pb-2 mb-3">
       <i class="bi bi-<?= $statusBanco ? 'check-circle-fill' : 'x-circle-fill' ?>"
-         style="color:<?= $statusBanco ? 'var(--cor-sucesso)' : 'var(--cor-perigo)' ?>"></i>
+         style="color:<?= $statusBanco ? '#198754' : '#dc3545' ?>"></i>
       Banco de dados: <code><?= htmlspecialchars($config['banco']) ?></code>
-    </h2>
+    </h6>
 
     <?php if (!$statusBanco): ?>
       <p style="color:#6b7280; font-size:.9rem; margin-bottom:1rem;">
         O banco <strong><?= htmlspecialchars($config['banco']) ?></strong> não existe ainda.
       </p>
       <form action="<?= url('setup/criar-banco') ?>" method="POST">
-        <button type="submit" class="botao-primario">
+        <button type="submit" class="btn btn-primary">
           <i class="bi bi-database-add"></i> Criar banco de dados
         </button>
       </form>
     <?php else: ?>
-      <p style="color:var(--cor-sucesso); font-size:.9rem;">
+      <p style="color:#198754; font-size:.9rem;">
         <i class="bi bi-check2"></i> Banco encontrado.
       </p>
     <?php endif; ?>
@@ -98,20 +101,20 @@ $config = require RAIZ . '/config/banco.php';
 
   <!-- 3. Migrations -->
   <?php if ($statusBanco): ?>
-  <div class="card-conteudo" style="margin-bottom:1.25rem;">
-    <div style="display:flex; justify-content:space-between; align-items:center;" class="titulo-card">
+  <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+    <div style="display:flex; justify-content:space-between; align-items:center;" class="fw-semibold border-bottom pb-2 mb-3">
       <span>
         <i class="bi bi-layers"></i> Migrations
         <?php if ($temPendentes): ?>
-          <span class="badge-status vencido" style="margin-left:.5rem;">Pendentes</span>
+          <span class="badge rounded-pill badge-vencido" style="margin-left:.5rem;">Pendentes</span>
         <?php else: ?>
-          <span class="badge-status pago" style="margin-left:.5rem;">Em dia</span>
+          <span class="badge rounded-pill badge-pago" style="margin-left:.5rem;">Em dia</span>
         <?php endif; ?>
       </span>
 
       <?php if ($temPendentes): ?>
       <form action="<?= url('setup/executar') ?>" method="POST">
-        <button type="submit" class="botao-primario" style="font-size:.85rem;">
+        <button type="submit" class="btn btn-primary" style="font-size:.85rem;">
           <i class="bi bi-play-fill"></i> Executar pendentes
         </button>
       </form>
@@ -137,9 +140,9 @@ $config = require RAIZ . '/config/banco.php';
             </td>
             <td style="padding:.5rem .75rem;">
               <?php if ($m['executada']): ?>
-                <span class="badge-status pago">Executada</span>
+                <span class="badge rounded-pill badge-pago">Executada</span>
               <?php else: ?>
-                <span class="badge-status pendente">Pendente</span>
+                <span class="badge rounded-pill badge-pendente">Pendente</span>
               <?php endif; ?>
             </td>
             <td style="padding:.5rem .75rem; color:#6b7280; font-size:.82rem;">
@@ -155,7 +158,7 @@ $config = require RAIZ . '/config/banco.php';
   <!-- Link para o sistema após tudo ok -->
   <?php if (!$temPendentes): ?>
   <div style="text-align:center; padding:1.5rem;">
-    <a href="<?= url('login') ?>" class="botao-primario" style="font-size:1rem; padding:.75rem 2rem;">
+    <a href="<?= url('login') ?>" class="btn btn-primary" style="font-size:1rem; padding:.75rem 2rem;">
       <i class="bi bi-box-arrow-in-right"></i> Acessar o sistema
     </a>
     <p style="color:#9ca3af; font-size:.8rem; margin-top:.75rem;">
@@ -167,5 +170,6 @@ $config = require RAIZ . '/config/banco.php';
   <?php endif; ?>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

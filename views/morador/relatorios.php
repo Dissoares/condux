@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * @var int    $ano
  * @var int[]  $anos
@@ -11,11 +11,11 @@ $totalPago    = array_sum(array_column(array_filter($extrato, fn($r) => $r['stat
 $totalAberto  = array_sum(array_column(array_filter($extrato, fn($r) => in_array($r['status'], ['pendente','vencido'])), 'valor'));
 ?>
 
-<div class="cabecalho-pagina">
-  <h1 class="titulo-pagina"><i class="bi bi-receipt"></i> Meu extrato</h1>
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <h4 class="fw-semibold mb-0"><i class="bi bi-receipt"></i> Meu extrato</h4>
 
   <form method="GET" action="<?= url('relatorios') ?>" style="display:flex; gap:.5rem; align-items:center;">
-    <select name="ano" class="campo-select-inline" onchange="this.form.submit()">
+    <select name="ano" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
       <?php if (empty($anos)): ?>
         <option value="<?= $ano ?>"><?= $ano ?></option>
       <?php else: ?>
@@ -27,27 +27,34 @@ $totalAberto  = array_sum(array_column(array_filter($extrato, fn($r) => in_array
   </form>
 </div>
 
-<!-- Resumo -->
-<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:1rem; margin-bottom:1.5rem;">
-  <div class="card-resumo">
-    <div class="rotulo-resumo">Total pago em <?= $ano ?></div>
-    <div class="valor-resumo" style="color:var(--cor-sucesso);"><?= dinheiro($totalPago) ?></div>
+<div class="row g-3 mb-4">
+  <div class="col-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-body-secondary mb-1" style="font-size:.8rem;">Total pago em <?= $ano ?></div>
+        <div class="fw-bold fs-5 text-success"><?= dinheiro($totalPago) ?></div>
+      </div>
+    </div>
   </div>
-  <div class="card-resumo">
-    <div class="rotulo-resumo">Em aberto em <?= $ano ?></div>
-    <div class="valor-resumo" style="color:var(--cor-perigo);"><?= dinheiro($totalAberto) ?></div>
+  <div class="col-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-body-secondary mb-1" style="font-size:.8rem;">Em aberto em <?= $ano ?></div>
+        <div class="fw-bold fs-5 text-danger"><?= dinheiro($totalAberto) ?></div>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- Extrato -->
-<div class="card-conteudo">
-  <h2 class="titulo-card">Extrato — <?= $ano ?></h2>
+<div class="card border-0 shadow-sm mb-4"><div class="card-body">
+  <h6 class="fw-semibold border-bottom pb-2 mb-3">Extrato — <?= $ano ?></h6>
 
   <?php if (empty($extrato)): ?>
     <p style="color:#6b7280; font-size:.9rem;">Nenhuma taxa encontrada para <?= $ano ?>.</p>
   <?php else: ?>
-    <div class="tabela-responsiva">
-    <table class="tabela-condux">
+    <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
       <thead>
         <tr><th>Competência</th><th>Vencimento</th><th>Valor</th><th>Pago em</th><th>Status</th></tr>
       </thead>
@@ -63,13 +70,13 @@ $totalAberto  = array_sum(array_column(array_filter($extrato, fn($r) => in_array
           <td><?= dataBR($linha['vencimento']) ?></td>
           <td><?= dinheiro((float)$linha['valor']) ?></td>
           <td><?= dataBR($linha['data_pagamento']) ?></td>
-          <td><span class="badge-status <?= $linha['status'] ?>"><?= ucfirst($linha['status']) ?></span></td>
+          <td><span class="badge rounded-pill badge-<?= $linha['status'] ?>"><?= ucfirst($linha['status']) ?></span></td>
         </tr>
         <?php endforeach; ?>
       </tbody>
     </table>
     </div>
   <?php endif; ?>
-</div>
+</div></div>
 
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>

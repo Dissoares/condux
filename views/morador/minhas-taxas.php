@@ -4,62 +4,73 @@ $tituloPagina = 'Minhas Taxas';
 require_once RAIZ . '/views/layouts/cabecalho.php';
 ?>
 
-<div class="cabecalho-pagina">
-  <h1 class="titulo-pagina"><i class="bi bi-receipt"></i> Minhas Taxas</h1>
+<div class="mb-4">
+  <h4 class="fw-semibold mb-0"><i class="bi bi-receipt"></i> Minhas Taxas</h4>
 </div>
 
-<?php if ($mensagem): ?>
-  <div class="alerta-flash sucesso"><i class="bi bi-check-circle-fill"></i> <?= htmlspecialchars($mensagem) ?></div>
+<?php if (!empty($mensagem)): ?>
+  <div class="alert alert-success d-flex align-items-center gap-2">
+    <i class="bi bi-check-circle-fill flex-shrink-0"></i> <?= htmlspecialchars($mensagem) ?>
+  </div>
 <?php endif; ?>
-<?php if ($erroMensagem): ?>
-  <div class="alerta-flash erro"><i class="bi bi-exclamation-circle-fill"></i> <?= htmlspecialchars($erroMensagem) ?></div>
+<?php if (!empty($erroMensagem)): ?>
+  <div class="alert alert-danger d-flex align-items-center gap-2">
+    <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i> <?= htmlspecialchars($erroMensagem) ?>
+  </div>
 <?php endif; ?>
 
 <?php if ($taxaAtual && !$taxaAtual->estaPago() && !$taxaAtual->comprovante): ?>
-<div class="card-conteudo" style="max-width:520px; margin-bottom:1.5rem;">
-  <h2 class="titulo-card">Enviar comprovante — <?= htmlspecialchars($taxaAtual->competenciaFormatada()) ?></h2>
-  <form action="<?= url('minhas-taxas/comprovante') ?>" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="taxa_id" value="<?= $taxaAtual->id ?>">
-    <div class="campo-formulario" style="margin-bottom:1rem;">
-      <label for="arquivo-comprovante-lista">Arquivo (PDF, JPG ou PNG)</label>
-      <input type="file" id="arquivo-comprovante-lista" name="comprovante" accept=".pdf,.jpg,.jpeg,.png" required>
-    </div>
-    <button type="submit" class="botao-primario"><i class="bi bi-send"></i> Enviar</button>
-  </form>
+<div class="card border-0 shadow-sm mb-4" style="max-width:520px;">
+  <div class="card-header bg-transparent fw-semibold py-3">
+    Enviar comprovante — <?= htmlspecialchars($taxaAtual->competenciaFormatada()) ?>
+  </div>
+  <div class="card-body">
+    <form action="<?= url('minhas-taxas/comprovante') ?>" method="POST" enctype="multipart/form-data">
+      <?php $taxaId = (int)$taxaAtual->id; ?>
+      <input type="hidden" name="taxa_id" value="<?= $taxaId ?>">
+      <div class="mb-3">
+        <label for="arquivo-comprovante-lista" class="form-label">Arquivo (PDF, JPG ou PNG)</label>
+        <input type="file" id="arquivo-comprovante-lista" name="comprovante"
+               class="form-control" accept=".pdf,.jpg,.jpeg,.png" required>
+      </div>
+      <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Enviar</button>
+    </form>
+  </div>
 </div>
 <?php endif; ?>
 
-<div class="tabela-responsiva">
-<table class="tabela-condux">
-  <thead>
-    <tr><th>Competência</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Pagamento</th><th>Comprovante</th></tr>
-  </thead>
-  <tbody>
-    <?php if (empty($taxas)): ?>
-      <tr><td colspan="6" style="text-align:center; color:#6b7280; padding:2rem;">Nenhuma taxa encontrada.</td></tr>
-    <?php else: ?>
-      <?php foreach ($taxas as $taxa): ?>
-      <tr>
-        <td><?= htmlspecialchars($taxa->competenciaFormatada()) ?></td>
-        <td><?= dinheiro($taxa->valor) ?></td>
-        <td><?= dataBR($taxa->vencimento) ?></td>
-        <td><span class="badge-status <?= $taxa->status ?>"><?= ucfirst($taxa->status) ?></span></td>
-        <td><?= dataBR($taxa->dataPagamento) ?></td>
-        <td>
-          <?php if ($taxa->comprovante): ?>
-            <a href="<?= url('uploads/' . $taxa->comprovante) ?>" target="_blank"
-               class="botao-secundario" style="font-size:.78rem; padding:.25rem .6rem;">
-              <i class="bi bi-paperclip"></i> Ver
-            </a>
-          <?php else: ?>
-            <span style="color:#9ca3af;">—</span>
-          <?php endif; ?>
-        </td>
-      </tr>
-      <?php endforeach; ?>
-    <?php endif; ?>
-  </tbody>
-</table>
+<div class="card border-0 shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr><th>Competência</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Pagamento</th><th>Comprovante</th></tr>
+      </thead>
+      <tbody>
+        <?php if (empty($taxas)): ?>
+          <tr><td colspan="6" class="text-center text-body-secondary py-4">Nenhuma taxa encontrada.</td></tr>
+        <?php else: ?>
+          <?php foreach ($taxas as $taxa): ?>
+          <tr>
+            <td><?= htmlspecialchars($taxa->competenciaFormatada()) ?></td>
+            <td><?= dinheiro($taxa->valor) ?></td>
+            <td><?= dataBR($taxa->vencimento) ?></td>
+            <td><span class="badge rounded-pill badge-<?= $taxa->status ?>"><?= ucfirst($taxa->status) ?></span></td>
+            <td><?= dataBR($taxa->dataPagamento) ?></td>
+            <td>
+              <?php if ($taxa->comprovante): ?>
+                <a href="<?= url('uploads/' . $taxa->comprovante) ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
+                  <i class="bi bi-paperclip"></i> Ver
+                </a>
+              <?php else: ?>
+                <span class="text-body-tertiary">—</span>
+              <?php endif; ?>
+            </td>
+          </tr>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>

@@ -1,63 +1,61 @@
 <?php
 /** @var Projeto[] $projetos */
-$tituloPagina    = 'Portal da Transparência';
-$filtroStatus    = $_GET['status'] ?? '';
+$tituloPagina      = 'Portal da Transparência';
+$filtroStatus      = $_GET['status'] ?? '';
 $statusDisponiveis = Projeto::$rotulosStatus;
 require_once RAIZ . '/views/layouts/cabecalho.php';
 ?>
 
-<div class="cabecalho-pagina">
-  <h1 class="titulo-pagina"><i class="bi bi-eye"></i> Portal da Transparência</h1>
+<div class="mb-4">
+  <h4 class="fw-semibold mb-0"><i class="bi bi-eye"></i> Portal da Transparência</h4>
 </div>
 
-<div style="display:flex; gap:.5rem; margin-bottom:1.25rem; flex-wrap:wrap;">
-  <a href="<?= url('transparencia') ?>"
-     class="botao-<?= $filtroStatus === '' ? 'primario' : 'secundario' ?>" style="font-size:.82rem; padding:.35rem .8rem;">
-    Todos
-  </a>
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <a href="<?= url('transparencia') ?>" class="btn btn-sm <?= $filtroStatus === '' ? 'btn-primary' : 'btn-outline-secondary' ?>">Todos</a>
   <?php foreach ($statusDisponiveis as $chave => $rotulo): ?>
     <a href="<?= url("transparencia?status={$chave}") ?>"
-       class="botao-<?= $filtroStatus === $chave ? 'primario' : 'secundario' ?>" style="font-size:.82rem; padding:.35rem .8rem;">
+       class="btn btn-sm <?= $filtroStatus === $chave ? 'btn-primary' : 'btn-outline-secondary' ?>">
       <?= htmlspecialchars($rotulo) ?>
     </a>
   <?php endforeach; ?>
 </div>
 
 <?php if (empty($projetos)): ?>
-  <div class="card-conteudo" style="text-align:center; color:#6b7280; padding:3rem;">
-    <i class="bi bi-folder-x" style="font-size:2.5rem; display:block; margin-bottom:.75rem;"></i>
+  <div class="card border-0 shadow-sm text-center text-body-secondary py-5">
+    <i class="bi bi-folder-x d-block mb-2" style="font-size:2.5rem;"></i>
     Nenhum projeto encontrado.
   </div>
 <?php else: ?>
-  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1.25rem;">
+  <div class="row g-3">
     <?php foreach ($projetos as $projeto): ?>
-    <div class="card-conteudo" style="margin-bottom:0;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:.75rem;">
-        <h3 style="font-size:1rem; font-weight:600; color:var(--cor-primaria); margin:0;">
-          <?= htmlspecialchars($projeto->nome) ?>
-        </h3>
-        <span class="badge-status <?= $projeto->status ?>"><?= htmlspecialchars($projeto->rotuloStatus()) ?></span>
+    <div class="col-md-6 col-xl-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="fw-semibold mb-0"><?= htmlspecialchars($projeto->nome) ?></h6>
+            <span class="badge rounded-pill badge-<?= $projeto->status ?> ms-2"><?= htmlspecialchars($projeto->rotuloStatus()) ?></span>
+          </div>
+
+          <?php if ($projeto->descricao): ?>
+            <p class="text-body-secondary mb-2" style="font-size:.875rem; line-height:1.5;">
+              <?= nl2br(htmlspecialchars(mb_substr($projeto->descricao, 0, 120))) ?><?= mb_strlen($projeto->descricao) > 120 ? '…' : '' ?>
+            </p>
+          <?php endif; ?>
+
+          <div class="text-body-secondary mb-3" style="font-size:.8rem;">
+            <?php if ($projeto->nomeResponsavel): ?>
+              <div><i class="bi bi-person"></i> <?= htmlspecialchars($projeto->nomeResponsavel) ?></div>
+            <?php endif; ?>
+            <?php if ($projeto->valorEstimado): ?>
+              <div><i class="bi bi-cash"></i> <?= dinheiro($projeto->valorEstimado) ?> estimado</div>
+            <?php endif; ?>
+          </div>
+
+          <a href="<?= url("transparencia/{$projeto->id}") ?>" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-eye"></i> Ver detalhes
+          </a>
+        </div>
       </div>
-
-      <?php if ($projeto->descricao): ?>
-        <p style="font-size:.875rem; color:#4b5563; margin-bottom:.75rem; line-height:1.5;">
-          <?= nl2br(htmlspecialchars(mb_substr($projeto->descricao, 0, 120))) ?>
-          <?= mb_strlen($projeto->descricao) > 120 ? '…' : '' ?>
-        </p>
-      <?php endif; ?>
-
-      <div style="font-size:.8rem; color:#6b7280; margin-bottom:.75rem;">
-        <?php if ($projeto->nomeResponsavel): ?>
-          <div><i class="bi bi-person"></i> <?= htmlspecialchars($projeto->nomeResponsavel) ?></div>
-        <?php endif; ?>
-        <?php if ($projeto->valorEstimado): ?>
-          <div><i class="bi bi-cash"></i> <?= dinheiro($projeto->valorEstimado) ?> estimado</div>
-        <?php endif; ?>
-      </div>
-
-      <a href="<?= url("transparencia/{$projeto->id}") ?>" class="botao-secundario" style="font-size:.82rem;">
-        <i class="bi bi-eye"></i> Ver detalhes
-      </a>
     </div>
     <?php endforeach; ?>
   </div>

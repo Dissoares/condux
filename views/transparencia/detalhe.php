@@ -1,20 +1,20 @@
-<?php
+﻿<?php
 /** @var Projeto $projeto */
 $tituloPagina = $projeto->nome;
 require_once RAIZ . '/views/layouts/cabecalho.php';
 ?>
 
-<div class="cabecalho-pagina">
-  <h1 class="titulo-pagina" style="font-size:1.15rem;"><?= htmlspecialchars($projeto->nome) ?></h1>
-  <a href="<?= url('transparencia') ?>" class="botao-secundario">
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <h4 class="fw-semibold mb-0" style="font-size:1.15rem;"><?= htmlspecialchars($projeto->nome) ?></h1>
+  <a href="<?= url('transparencia') ?>" class="btn btn-outline-secondary">
     <i class="bi bi-arrow-left"></i> Voltar
   </a>
 </div>
 
 <div style="display:grid; grid-template-columns:2fr 1fr; gap:1.25rem; margin-bottom:1.25rem;" class="grade-formulario">
 
-  <div class="card-conteudo">
-    <h2 class="titulo-card">Sobre o projeto</h2>
+  <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+    <h6 class="fw-semibold border-bottom pb-2 mb-3">Sobre o projeto</h6>
 
     <?php if ($projeto->descricao): ?>
       <p style="font-size:.95rem; line-height:1.7; color:#374151; margin-bottom:1.25rem;">
@@ -48,15 +48,15 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
 
   <div>
     <!-- Status e valores -->
-    <div class="card-conteudo" style="margin-bottom:1rem;">
-      <h2 class="titulo-card">Status</h2>
-      <span class="badge-status <?= $projeto->status ?>" style="font-size:.9rem; padding:.4rem 1rem;">
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h6 class="fw-semibold border-bottom pb-2 mb-3">Status</h6>
+      <span class="badge rounded-pill badge-<?= $projeto->status ?>" style="font-size:.9rem; padding:.4rem 1rem;">
         <?= htmlspecialchars($projeto->rotuloStatus()) ?>
       </span>
     </div>
 
-    <div class="card-conteudo">
-      <h2 class="titulo-card">Financeiro</h2>
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+      <h6 class="fw-semibold border-bottom pb-2 mb-3">Financeiro</h6>
       <div style="margin-bottom:.5rem;">
         <div style="font-size:.78rem; color:#6b7280;">Valor estimado</div>
         <div style="font-size:1.1rem; font-weight:600;">
@@ -81,8 +81,8 @@ $documentos = array_filter($projeto->anexos, fn($a) => in_array($a['tipo'], ['no
 ?>
 
 <?php if (!empty($fotos)): ?>
-<div class="card-conteudo" style="margin-bottom:1.25rem;">
-  <h2 class="titulo-card"><i class="bi bi-images"></i> Fotos</h2>
+<div class="card border-0 shadow-sm mb-4"><div class="card-body">
+  <h6 class="fw-semibold border-bottom pb-2 mb-3"><i class="bi bi-images"></i> Fotos</h6>
   <div class="grade-anexos">
     <?php foreach ($fotos as $foto): ?>
     <div class="item-anexo">
@@ -98,12 +98,12 @@ $documentos = array_filter($projeto->anexos, fn($a) => in_array($a['tipo'], ['no
 <?php endif; ?>
 
 <?php if (!empty($documentos)): ?>
-<div class="card-conteudo">
-  <h2 class="titulo-card"><i class="bi bi-file-earmark-text"></i> Documentos e Notas Fiscais</h2>
+<div class="card border-0 shadow-sm mb-4"><div class="card-body">
+  <h6 class="fw-semibold border-bottom pb-2 mb-3"><i class="bi bi-file-earmark-text"></i> Documentos e Notas Fiscais</h6>
   <div style="display:flex; flex-direction:column; gap:.5rem;">
     <?php foreach ($documentos as $doc): ?>
     <a href="<?= url('uploads/' . $doc['caminho']) ?>" target="_blank"
-       class="botao-secundario" style="justify-content:flex-start;">
+       class="btn btn-outline-secondary" style="justify-content:flex-start;">
       <i class="bi bi-<?= $doc['tipo'] === 'nota_fiscal' ? 'receipt' : 'file-earmark-text' ?>"></i>
       <?= htmlspecialchars($doc['nome_original']) ?>
     </a>
