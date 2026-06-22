@@ -315,13 +315,19 @@ function rotuloBadgeStatus(string $status): string {
                   </div>
 
                   <div class="d-flex align-items-center gap-3">
-                    <div class="form-check mb-0">
-                      <input type="checkbox" name="responsavel" value="1"
-                             class="form-check-input" id="resp-<?= $uid ?>">
-                      <label class="form-check-label" for="resp-<?= $uid ?>" style="font-size:.85rem;">
-                        Responsável financeiro
-                      </label>
-                    </div>
+                    <?php if ($u->inquilinoId): ?>
+                      <span class="text-body-secondary" style="font-size:.8rem;">
+                        <i class="bi bi-info-circle me-1"></i>Adicionado como morador simples — o inquilino já é o responsável.
+                      </span>
+                    <?php else: ?>
+                      <div class="form-check mb-0">
+                        <input type="checkbox" name="responsavel" value="1"
+                               class="form-check-input" id="resp-<?= $uid ?>">
+                        <label class="form-check-label" for="resp-<?= $uid ?>" style="font-size:.85rem;">
+                          Responsável financeiro
+                        </label>
+                      </div>
+                    <?php endif; ?>
                     <button type="submit" class="btn btn-success btn-sm ms-auto">
                       <i class="bi bi-person-plus"></i> Adicionar
                     </button>
