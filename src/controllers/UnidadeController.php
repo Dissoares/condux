@@ -23,9 +23,12 @@ class UnidadeController
 
     public function listar(): void
     {
-        $unidades     = $this->unidadeService->listarUnidades();
-        $mensagem     = Sessao::lerFlash('sucesso');
-        $erroMensagem = Sessao::lerFlash('erro');
+        $unidades          = $this->unidadeService->listarUnidades();
+        $todosCondominios  = $this->unidadeService->listarCondominios();
+        $moradoresPorUnidade = $this->unidadeService->listarMoradoresAgrupados();
+        $mensagem          = Sessao::lerFlash('sucesso');
+        $erroMensagem      = Sessao::lerFlash('erro');
+        $abrirModalId      = (int) ($_GET['abrir'] ?? 0);
         require_once RAIZ . '/views/admin/unidades/lista.php';
     }
 
@@ -46,7 +49,11 @@ class UnidadeController
         try {
             $id = $this->unidadeService->salvarUnidade($_POST);
             Sessao::flash('sucesso', 'Unidade salva com sucesso.');
-            Roteador::redirecionar("/unidades/{$id}");
+            if (!empty($_POST['_retornar']) && $_POST['_retornar'] === 'lista') {
+                Roteador::redirecionar("unidades?abrir={$id}");
+            } else {
+                Roteador::redirecionar("unidades/{$id}");
+            }
         } catch (InvalidArgumentException $e) {
             Sessao::flash('erro', $e->getMessage());
             Roteador::redirecionar('/unidades/nova');
@@ -97,21 +104,29 @@ class UnidadeController
 
         try {
             $this->unidadeService->vincularPorUsuarioId($unidadeId, $usuarioId, $dataEntrada, $responsavel);
-            Sessao::flash('sucesso', 'Morador vinculado com sucesso.');
+            Sessao::flash('sucesso', 'Morador adicionado.');
         } catch (Exception $e) {
             Sessao::flash('erro', $e->getMessage());
         }
 
-        Roteador::redirecionar("/unidades/{$unidadeId}");
+        $retornar = $_POST['_retornar'] ?? '';
+        Roteador::redirecionar($retornar === 'lista'
+            ? "unidades?abrir={$unidadeId}"
+            : "unidades/{$unidadeId}"
+        );
     }
 
     public function desvincularMorador(): void
     {
         $moradorId = (int) ($_GET['morador_id'] ?? 0);
         $unidadeId = (int) ($_GET['unidade_id'] ?? 0);
+        $retornar  = $_GET['retornar'] ?? '';
 
         $this->unidadeService->desvincularMorador($moradorId);
         Sessao::flash('sucesso', 'Morador desvinculado.');
-        Roteador::redirecionar("/unidades/{$unidadeId}");
+        Roteador::redirecionar($retornar === 'lista'
+            ? "unidades?abrir={$unidadeId}"
+            : "unidades/{$unidadeId}"
+        );
     }
 }

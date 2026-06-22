@@ -106,6 +106,12 @@ class UnidadeService
         $this->moradorRepository->salvar($morador);
     }
 
+    /** @return array<int, Morador[]> */
+    public function listarMoradoresAgrupados(): array
+    {
+        return $this->moradorRepository->listarTodosAtivosAgrupados();
+    }
+
     /** @return array[] */
     public function pesquisarCondominios(string $termo): array
     {

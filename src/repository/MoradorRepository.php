@@ -79,6 +79,26 @@ class MoradorRepository
         return array_map(fn($l) => Morador::fromArray($l), $stmt->fetchAll());
     }
 
+    /**
+     * @return array<int, Morador[]>  Moradores ativos indexados por unidade_id
+     */
+    public function listarTodosAtivosAgrupados(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT m.*, u.nome AS nome_usuario, u.email AS email_usuario
+             FROM moradores m
+             JOIN usuarios u ON u.id = m.usuario_id
+             WHERE m.ativo = 1
+             ORDER BY m.unidade_id, m.responsavel DESC, u.nome'
+        );
+        $agrupados = [];
+        foreach ($stmt->fetchAll() as $linha) {
+            $m = Morador::fromArray($linha);
+            $agrupados[$m->unidadeId][] = $m;
+        }
+        return $agrupados;
+    }
+
     public function buscarUnidadeDoUsuario(int $usuarioId): ?int
     {
         $stmt = $this->conexao->prepare(
