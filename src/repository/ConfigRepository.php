@@ -4,7 +4,16 @@ declare(strict_types=1);
 
 class ConfigRepository
 {
-    public function __construct(private readonly PDO $conexao) {}
+    public function __construct(private readonly PDO $conexao)
+    {
+        $this->conexao->exec(
+            'CREATE TABLE IF NOT EXISTS configuracoes (
+                chave         VARCHAR(80) NOT NULL PRIMARY KEY,
+                valor         TEXT        NULL,
+                atualizado_em DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'
+        );
+    }
 
     public function obter(string $chave, mixed $padrao = null): mixed
     {
