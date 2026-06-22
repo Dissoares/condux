@@ -1,4 +1,5 @@
 <?php
+/** @var int $diaVencimento @var string|null $valorMensal */
 $tituloPagina = 'Gerar Taxas em Lote';
 require_once RAIZ . '/views/layouts/cabecalho.php';
 ?>
@@ -21,13 +22,18 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           <div class="input-group">
             <span class="input-group-text">Dia</span>
             <input type="number" id="campo-dia-vencimento" name="dia_vencimento"
-                   class="form-control" min="1" max="31" value="10" required>
+                   class="form-control" min="1" max="31"
+                   value="<?= $diaVencimento ?>" required>
           </div>
+          <div class="form-text">Salvo automaticamente ao gerar.</div>
         </div>
         <div class="col-6">
           <label for="campo-valor" class="form-label">Valor mensal (R$)</label>
           <input type="text" id="campo-valor" name="valor" class="form-control"
-                 placeholder="500,00" required>
+                 placeholder="500,00"
+                 value="<?= $valorMensal ? number_format((float)$valorMensal, 2, ',', '.') : '' ?>"
+                 required>
+          <div class="form-text">Salvo automaticamente ao gerar.</div>
         </div>
       </div>
 

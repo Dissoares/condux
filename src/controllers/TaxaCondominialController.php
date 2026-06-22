@@ -6,11 +6,13 @@ require_once __DIR__ . '/../services/TaxaCondominialService.php';
 require_once __DIR__ . '/../repository/TaxaCondominialRepository.php';
 require_once __DIR__ . '/../repository/UnidadeRepository.php';
 require_once __DIR__ . '/../repository/MoradorRepository.php';
+require_once __DIR__ . '/../repository/ConfigRepository.php';
 
 class TaxaCondominialController
 {
     private TaxaCondominialService $taxaService;
     private MoradorRepository      $moradorRepository;
+    private ConfigRepository       $configRepo;
 
     public function __construct()
     {
@@ -20,6 +22,7 @@ class TaxaCondominialController
             new UnidadeRepository($conexao),
         );
         $this->moradorRepository = new MoradorRepository($conexao);
+        $this->configRepo        = new ConfigRepository($conexao);
     }
 
     public function listar(): void
@@ -34,21 +37,23 @@ class TaxaCondominialController
 
     public function formularioGerarLote(): void
     {
+        $diaVencimento = (int) $this->configRepo->obter('taxa_dia_vencimento', 10);
+        $valorMensal   = $this->configRepo->obter('taxa_valor_mensal');
         require_once RAIZ . '/views/admin/taxas/gerar-lote.php';
     }
 
     public function gerarEmLote(): void
     {
         try {
-            $competencia   = $_POST['competencia'] ?? '';
-            $dia           = max(1, min(31, (int) ($_POST['dia_vencimento'] ?? 10)));
-            $vencimento    = $competencia . '-' . str_pad((string) $dia, 2, '0', STR_PAD_LEFT);
+            $competencia = $_POST['competencia'] ?? '';
+            $dia         = max(1, min(31, (int) ($_POST['dia_vencimento'] ?? 10)));
+            $valor       = parseDinheiro($_POST['valor'] ?? null) ?? 0.0;
+            $vencimento  = $competencia . '-' . str_pad((string) $dia, 2, '0', STR_PAD_LEFT);
 
-            $total = $this->taxaService->gerarEmLote(
-                $competencia,
-                parseDinheiro($_POST['valor'] ?? null) ?? 0.0,
-                $vencimento,
-            );
+            $this->configRepo->salvar('taxa_dia_vencimento', $dia);
+            $this->configRepo->salvar('taxa_valor_mensal',   $valor);
+
+            $total = $this->taxaService->gerarEmLote($competencia, $valor, $vencimento);
             Sessao::flash('sucesso', "{$total} taxas geradas com sucesso.");
         } catch (InvalidArgumentException $e) {
             Sessao::flash('erro', $e->getMessage());
