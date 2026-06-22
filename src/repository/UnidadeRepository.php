@@ -13,7 +13,13 @@ class UnidadeRepository
         $stmt = $this->conexao->prepare(
             'SELECT u.*,
                     m_usr.nome  AS nome_responsavel,
-                    tc.status   AS status_taxa_atual,
+                    CASE
+                      WHEN tc.status IS NULL                                          THEN NULL
+                      WHEN tc.status = \'pago\'                                      THEN \'pago\'
+                      WHEN tc.status = \'isento\'                                    THEN \'isento\'
+                      WHEN tc.status = \'pendente\' AND tc.vencimento < CURDATE()    THEN \'vencido\'
+                      ELSE tc.status
+                    END         AS status_taxa_atual,
                     prop.nome   AS nome_prop_vinc,
                     prop.email  AS email_prop_vinc,
                     inq.nome    AS nome_inq_vinc,
@@ -41,7 +47,13 @@ class UnidadeRepository
         $stmt = $this->conexao->query(
             'SELECT u.*,
                     m_usr.nome  AS nome_responsavel,
-                    tc.status   AS status_taxa_atual,
+                    CASE
+                      WHEN tc.status IS NULL                                          THEN NULL
+                      WHEN tc.status = \'pago\'                                      THEN \'pago\'
+                      WHEN tc.status = \'isento\'                                    THEN \'isento\'
+                      WHEN tc.status = \'pendente\' AND tc.vencimento < CURDATE()    THEN \'vencido\'
+                      ELSE tc.status
+                    END         AS status_taxa_atual,
                     prop.nome   AS nome_prop_vinc,
                     prop.email  AS email_prop_vinc,
                     inq.nome    AS nome_inq_vinc,

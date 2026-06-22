@@ -20,7 +20,7 @@ ksort($porBloco);
 function rotuloBadgeStatus(string $status): string {
     return match($status) {
         'pago'    => 'Pago',
-        'vencido' => 'Vencido',
+        'vencido' => 'Atrasado',
         'isento'  => 'Isento',
         'pendente'=> 'Pendente',
         default   => 'Sem taxa',
