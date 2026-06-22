@@ -95,6 +95,27 @@ class UnidadeService
         return $this->moradorRepository->salvar($morador);
     }
 
+    public function vincularPorUsuarioId(int $unidadeId, int $usuarioId, string $dataEntrada, bool $responsavel): void
+    {
+        if ($responsavel) {
+            $this->removerResponsavelAnterior($unidadeId);
+        }
+        $morador = new Morador(
+            id:          null,
+            usuarioId:   $usuarioId,
+            unidadeId:   $unidadeId,
+            responsavel: $responsavel,
+            dataEntrada: $dataEntrada ?: date('Y-m-d'),
+        );
+        $this->moradorRepository->salvar($morador);
+    }
+
+    /** @return array[] */
+    public function pesquisarCondominios(string $termo): array
+    {
+        return $this->usuarioRepository->pesquisarMoradores($termo);
+    }
+
     public function desvincularMorador(int $moradorId): void
     {
         $this->moradorRepository->desativar($moradorId);

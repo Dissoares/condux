@@ -45,6 +45,11 @@ $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
         </a>
       </li>
       <li class="nav-item">
+        <a href="<?= url('condominios') ?>" class="nav-link <?= $segAtivo === 'condominios' ? 'ativo' : '' ?>">
+          <i class="bi bi-people"></i> Condôminos
+        </a>
+      </li>
+      <li class="nav-item">
         <a href="<?= url('taxas') ?>" class="nav-link <?= $segAtivo === 'taxas' ? 'ativo' : '' ?>">
           <i class="bi bi-cash-stack"></i> Taxas Mensais
         </a>

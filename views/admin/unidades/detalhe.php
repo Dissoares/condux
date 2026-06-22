@@ -1,5 +1,5 @@
 <?php
-/** @var Unidade $unidade @var Morador[] $moradores @var string|null $mensagem @var string|null $erroMensagem */
+/** @var Unidade $unidade @var Morador[] $moradores @var array[]|null $resultadosBusca @var string|null $mensagem @var string|null $erroMensagem */
 $tituloPagina = 'Unidade ' . $unidade->identificacao();
 require_once RAIZ . '/views/layouts/cabecalho.php';
 ?>
@@ -85,38 +85,70 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
     </div>
   </div>
 
-  <!-- Vincular novo morador -->
+  <!-- Buscar e vincular condômino -->
   <div class="col-md-6">
     <div class="card border-0 shadow-sm h-100">
       <div class="card-body">
-        <h6 class="fw-semibold border-bottom pb-2 mb-3"><i class="bi bi-person-plus"></i> Vincular morador</h6>
-        <form action="<?= url("unidades/{$unidade->id}/vincular-morador") ?>" method="POST">
-          <div class="mb-3">
-            <label for="campo-nome-morador" class="form-label">Nome *</label>
-            <input type="text" id="campo-nome-morador" name="nome" class="form-control" required placeholder="Nome completo">
+        <h6 class="fw-semibold border-bottom pb-2 mb-3"><i class="bi bi-person-plus"></i> Vincular condômino</h6>
+
+        <!-- Campo de busca -->
+        <?php $unidadeIdAtual = (int)$unidade->id; ?>
+        <form method="GET" action="<?= url("unidades/{$unidadeIdAtual}") ?>" class="mb-3">
+          <label for="campo-buscar-condomino" class="form-label">Buscar por nome ou e-mail</label>
+          <div class="input-group">
+            <input type="text" id="campo-buscar-condomino" name="buscar"
+                   class="form-control" placeholder="Nome ou e-mail..."
+                   value="<?= htmlspecialchars($_GET['buscar'] ?? '') ?>">
+            <button type="submit" class="btn btn-outline-secondary">
+              <i class="bi bi-search"></i>
+            </button>
           </div>
-          <div class="mb-3">
-            <label for="campo-email-morador" class="form-label">E-mail *</label>
-            <input type="email" id="campo-email-morador" name="email" class="form-control" required placeholder="morador@email.com">
-            <div class="form-text">Se o e-mail já existir, o usuário é vinculado sem criar novo.</div>
-          </div>
-          <div class="mb-3">
-            <label for="campo-senha-morador" class="form-label">Senha (apenas para novos usuários)</label>
-            <input type="password" id="campo-senha-morador" name="senha" class="form-control" placeholder="Senha de acesso">
-          </div>
-          <div class="mb-3">
-            <label for="campo-entrada" class="form-label">Data de entrada</label>
-            <?php $dataHoje = date('Y-m-d'); ?>
-            <input type="date" id="campo-entrada" name="data_entrada" class="form-control" value="<?= $dataHoje ?>">
-          </div>
-          <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="campo-responsavel" name="responsavel" value="1">
-            <label class="form-check-label" for="campo-responsavel">Responsável financeiro</label>
-          </div>
-          <button type="submit" class="btn btn-primary btn-sm">
-            <i class="bi bi-person-plus"></i> Vincular
-          </button>
         </form>
+
+        <!-- Resultados da busca -->
+        <?php if ($resultadosBusca !== null): ?>
+          <?php if (empty($resultadosBusca)): ?>
+            <div class="alert alert-warning py-2 d-flex align-items-center gap-2 mb-3" style="font-size:.875rem;">
+              <i class="bi bi-person-x flex-shrink-0"></i>
+              Nenhum condômino encontrado com esse nome ou e-mail.
+            </div>
+          <?php else: ?>
+            <ul class="list-group list-group-flush mb-3">
+              <?php foreach ($resultadosBusca as $c): ?>
+              <li class="list-group-item px-0">
+                <div class="d-flex align-items-start justify-content-between gap-2">
+                  <div>
+                    <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($c['nome']) ?></div>
+                    <div class="text-body-secondary" style="font-size:.78rem;"><?= htmlspecialchars($c['email']) ?></div>
+                    <?php if ($c['identificacao_unidade']): ?>
+                      <div class="text-warning-emphasis" style="font-size:.75rem;">
+                        <i class="bi bi-building"></i> Já vinculado: <?= htmlspecialchars($c['identificacao_unidade']) ?>
+                      </div>
+                    <?php endif; ?>
+                  </div>
+                  <?php $cId = (int)$c['id']; ?>
+                  <form action="<?= url("unidades/{$unidadeIdAtual}/vincular-existente") ?>" method="POST" class="flex-shrink-0">
+                    <input type="hidden" name="usuario_id" value="<?= $cId ?>">
+                    <input type="hidden" name="data_entrada" value="<?= date('Y-m-d') ?>">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                      <i class="bi bi-link-45deg"></i> Vincular
+                    </button>
+                  </form>
+                </div>
+              </li>
+              <?php endforeach; ?>
+            </ul>
+          <?php endif; ?>
+        <?php endif; ?>
+
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-body-secondary" style="font-size:.82rem;">Não encontrou?</span>
+          <a href="<?= url("condominios/novo?retornar_unidade={$unidadeIdAtual}") ?>"
+             class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-person-plus"></i> Cadastrar novo
+          </a>
+        </div>
+
       </div>
     </div>
   </div>

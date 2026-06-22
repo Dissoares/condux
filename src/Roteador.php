@@ -59,6 +59,7 @@ class Roteador
         match ($seg[0]) {
             'painel'       => self::carregarPainel($ehAdmin),
             'unidades'     => self::rotasUnidades($seg, $metodo, $ehAdmin),
+            'condominios'  => self::rotasCondominios($seg, $metodo, $ehAdmin),
             'taxas'        => self::rotasTaxas($seg, $metodo, $ehAdmin),
             'projetos'     => self::rotasProjetos($seg, $metodo, $ehAdmin),
             'minhas-taxas' => self::rotasMinhasTaxas($seg, $metodo),
@@ -105,6 +106,12 @@ class Roteador
             $ctrl->vincularMorador();
             return;
         }
+        // POST /unidades/{id}/vincular-existente
+        if ($seg[2] === 'vincular-existente' && $metodo === 'POST') {
+            $_POST['unidade_id'] = $id;
+            $ctrl->vincularExistente();
+            return;
+        }
         // GET  /unidades/{id}/desvincular-morador/{morador_id}
         if ($seg[2] === 'desvincular-morador') {
             $_GET['unidade_id'] = $id;
@@ -116,6 +123,26 @@ class Roteador
         if ($seg[2] === 'editar') { $_GET['id'] = $id; $ctrl->formulario(); return; }
         // GET  /unidades/{id}
         if ($id > 0)              { $_GET['id'] = $id; $ctrl->ver(); return; }
+
+        self::naoEncontrado();
+    }
+
+    // ── Condôminos ──────────────────────────────────────────────────────
+
+    private static function rotasCondominios(array $seg, string $metodo, bool $ehAdmin): void
+    {
+        if (!$ehAdmin) { self::naoAutorizado(); return; }
+
+        require_once RAIZ . '/src/controllers/CondominoController.php';
+        $ctrl = new CondominoController();
+
+        if ($seg[1] === null)                              { $ctrl->listar(); return; }
+        if ($seg[1] === 'novo')                            { $ctrl->formulario(); return; }
+        if ($seg[1] === 'salvar' && $metodo === 'POST')    { $ctrl->salvar(); return; }
+
+        $id = (int) $seg[1];
+        if ($seg[2] === 'editar')                          { $_GET['id'] = $id; $ctrl->formulario(); return; }
+        if ($seg[2] === 'excluir')                         { $_GET['id'] = $id; $ctrl->excluir(); return; }
 
         self::naoEncontrado();
     }

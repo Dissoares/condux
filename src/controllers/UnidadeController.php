@@ -64,6 +64,10 @@ class UnidadeController
         $moradores    = $this->unidadeService->listarMoradoresDaUnidade($id);
         $mensagem     = Sessao::lerFlash('sucesso');
         $erroMensagem = Sessao::lerFlash('erro');
+
+        $busca           = trim($_GET['buscar'] ?? '');
+        $resultadosBusca = $busca !== '' ? $this->unidadeService->pesquisarCondominios($busca) : null;
+
         require_once RAIZ . '/views/admin/unidades/detalhe.php';
     }
 
@@ -75,6 +79,23 @@ class UnidadeController
             $this->unidadeService->vincularMorador($unidadeId, $_POST);
             Sessao::flash('sucesso', 'Morador vinculado com sucesso.');
         } catch (InvalidArgumentException $e) {
+            Sessao::flash('erro', $e->getMessage());
+        }
+
+        Roteador::redirecionar("/unidades/{$unidadeId}");
+    }
+
+    public function vincularExistente(): void
+    {
+        $unidadeId   = (int) ($_POST['unidade_id'] ?? 0);
+        $usuarioId   = (int) ($_POST['usuario_id'] ?? 0);
+        $dataEntrada = $_POST['data_entrada'] ?? date('Y-m-d');
+        $responsavel = !empty($_POST['responsavel']);
+
+        try {
+            $this->unidadeService->vincularPorUsuarioId($unidadeId, $usuarioId, $dataEntrada, $responsavel);
+            Sessao::flash('sucesso', 'Morador vinculado com sucesso.');
+        } catch (Exception $e) {
             Sessao::flash('erro', $e->getMessage());
         }
 

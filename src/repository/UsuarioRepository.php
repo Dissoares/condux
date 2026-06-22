@@ -97,4 +97,42 @@ class UsuarioRepository
         );
         $stmt->execute([':id' => $id]);
     }
+
+    /** @return array[] Moradores com info de unidade (LEFT JOIN) */
+    public function listarMoradoresComUnidade(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT u.*,
+                    m.id AS morador_id,
+                    m.responsavel,
+                    m.data_entrada,
+                    un.id AS unidade_id_vinculo,
+                    CONCAT("Apto ", un.numero, IF(un.bloco IS NOT NULL, CONCAT(" \xe2\x80\x94 Bloco ", un.bloco), "")) AS identificacao_unidade
+             FROM usuarios u
+             LEFT JOIN moradores m ON m.usuario_id = u.id AND m.ativo = 1
+             LEFT JOIN unidades un ON un.id = m.unidade_id
+             WHERE u.perfil = \'morador\' AND u.ativo = 1
+             ORDER BY u.nome'
+        );
+        return $stmt->fetchAll();
+    }
+
+    /** @return array[] Busca moradores por nome ou e-mail */
+    public function pesquisarMoradores(string $termo): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT u.*,
+                    m.id AS morador_id,
+                    un.id AS unidade_id_vinculo,
+                    CONCAT("Apto ", un.numero, IF(un.bloco IS NOT NULL, CONCAT(" \xe2\x80\x94 Bloco ", un.bloco), "")) AS identificacao_unidade
+             FROM usuarios u
+             LEFT JOIN moradores m ON m.usuario_id = u.id AND m.ativo = 1
+             LEFT JOIN unidades un ON un.id = m.unidade_id
+             WHERE u.perfil = \'morador\' AND u.ativo = 1
+               AND (u.nome LIKE :termo OR u.email LIKE :termo)
+             ORDER BY u.nome LIMIT 20'
+        );
+        $stmt->execute([':termo' => '%' . $termo . '%']);
+        return $stmt->fetchAll();
+    }
 }
