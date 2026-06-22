@@ -39,6 +39,8 @@ class TaxaCondominialController
     {
         $diaVencimento = (int) $this->configRepo->obter('taxa_dia_vencimento', 10);
         $valorMensal   = $this->configRepo->obter('taxa_valor_mensal');
+        $mensagem      = Sessao::lerFlash('sucesso');
+        $erroMensagem  = Sessao::lerFlash('erro');
         require_once RAIZ . '/views/admin/taxas/gerar-lote.php';
     }
 
@@ -58,7 +60,7 @@ class TaxaCondominialController
         } catch (InvalidArgumentException $e) {
             Sessao::flash('erro', $e->getMessage());
         }
-        Roteador::redirecionar('/taxas');
+        Roteador::redirecionar('/taxas/gerar-lote');
     }
 
     public function aprovarComprovante(): void

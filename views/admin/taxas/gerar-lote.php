@@ -1,5 +1,5 @@
 <?php
-/** @var int $diaVencimento @var string|null $valorMensal */
+/** @var int $diaVencimento @var string|null $valorMensal @var string|null $mensagem @var string|null $erroMensagem */
 $tituloPagina = 'Gerar Taxas em Lote';
 require_once RAIZ . '/views/layouts/cabecalho.php';
 ?>
@@ -10,6 +10,17 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
     <i class="bi bi-arrow-left"></i> Voltar
   </a>
 </div>
+
+<?php if ($mensagem): ?>
+  <div class="alert alert-success d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-check-circle-fill flex-shrink-0"></i> <?= htmlspecialchars($mensagem) ?>
+  </div>
+<?php endif; ?>
+<?php if ($erroMensagem): ?>
+  <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i> <?= htmlspecialchars($erroMensagem) ?>
+  </div>
+<?php endif; ?>
 
 <div class="card border-0 shadow-sm" style="max-width:480px;">
   <div class="card-header bg-transparent fw-semibold py-3">Parâmetros de geração</div>
