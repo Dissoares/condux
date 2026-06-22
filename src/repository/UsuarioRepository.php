@@ -110,8 +110,11 @@ class UsuarioRepository
                     m.id AS morador_id,
                     m.responsavel,
                     m.data_entrada,
-                    un.id AS unidade_id_vinculo,
-                    CONCAT("Apto ", un.numero, IF(un.bloco IS NOT NULL, CONCAT(" — Bloco ", un.bloco), "")) AS identificacao_unidade
+                    un.id   AS unidade_id_vinculo,
+                    CONCAT("Apto ", un.numero, IF(un.bloco IS NOT NULL, CONCAT(" — Bloco ", un.bloco), ""))
+                            AS identificacao_unidade,
+                    (SELECT COUNT(*) FROM unidades WHERE proprietario_id = u.id) AS eh_proprietario,
+                    (SELECT COUNT(*) FROM unidades WHERE inquilino_id    = u.id) AS eh_inquilino
              FROM usuarios u
              LEFT JOIN moradores m ON m.usuario_id = u.id AND m.ativo = 1
              LEFT JOIN unidades un ON un.id = m.unidade_id

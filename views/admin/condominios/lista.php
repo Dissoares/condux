@@ -31,7 +31,7 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           <th>Telefone</th>
           <th>E-mail</th>
           <th>Unidade</th>
-          <th>Responsável</th>
+          <th>Papel</th>
           <th></th>
         </tr>
       </thead>
@@ -69,8 +69,15 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
               <?php endif; ?>
             </td>
             <td>
-              <?php if ($c['responsavel']): ?>
-                <span class="badge rounded-pill badge-pago">Responsável</span>
+              <?php
+                $papeis = [];
+                if ($c['eh_proprietario']) $papeis[] = '<span class="badge bg-primary-subtle text-primary-emphasis rounded-pill"><i class="bi bi-person-badge me-1"></i>Proprietário</span>';
+                if ($c['eh_inquilino'])    $papeis[] = '<span class="badge bg-warning-subtle text-warning-emphasis rounded-pill"><i class="bi bi-key me-1"></i>Inquilino</span>';
+                if ($c['responsavel'] && !$c['eh_inquilino']) $papeis[] = '<span class="badge badge-pago rounded-pill">Responsável</span>';
+                if ($c['morador_id'] && !$c['responsavel'] && !$c['eh_inquilino'] && !$c['eh_proprietario']) $papeis[] = '<span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill"><i class="bi bi-person me-1"></i>Morador</span>';
+              ?>
+              <?php if ($papeis): ?>
+                <div class="d-flex flex-wrap gap-1"><?= implode('', $papeis) ?></div>
               <?php else: ?>
                 <span class="text-body-tertiary">—</span>
               <?php endif; ?>
