@@ -13,7 +13,6 @@
     });
   }
 
-  /* Aplica ícone correto ao carregar */
   (function () {
     var tema = localStorage.getItem('condux-tema') || 'light';
     document.querySelectorAll('.condux-tema-icone').forEach(function (el) {
@@ -21,18 +20,30 @@
     });
   }());
 
-  /* ── Sidebar mobile ── */
+  /* ── Drawer (sidebar) mobile ── */
   document.addEventListener('DOMContentLoaded', function () {
-    var botao   = document.getElementById('botaoToggleMenu');
     var sidebar = document.getElementById('barraLateral');
     var overlay = document.getElementById('conduxOverlay');
+    var maisBtn = document.getElementById('conduxMaisBtn');
 
-    function abrir()  { sidebar.classList.add('aberta');    overlay.classList.add('visivel'); }
-    function fechar() { sidebar.classList.remove('aberta'); overlay.classList.remove('visivel'); }
+    function abrirDrawer()  {
+      sidebar.classList.add('aberta');
+      overlay.classList.add('visivel');
+      if (maisBtn) maisBtn.classList.add('ativo');
+    }
+    function fecharDrawer() {
+      sidebar.classList.remove('aberta');
+      overlay.classList.remove('visivel');
+      if (maisBtn) maisBtn.classList.remove('ativo');
+    }
 
-    if (botao)   botao.addEventListener('click', function () { sidebar.classList.contains('aberta') ? fechar() : abrir(); });
-    if (overlay) overlay.addEventListener('click', fechar);
-    if (sidebar) sidebar.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', fechar); });
+    if (maisBtn)  maisBtn.addEventListener('click', function () {
+      sidebar.classList.contains('aberta') ? fecharDrawer() : abrirDrawer();
+    });
+    if (overlay)  overlay.addEventListener('click', fecharDrawer);
+    if (sidebar)  sidebar.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', fecharDrawer);
+    });
   });
 </script>
 </body>

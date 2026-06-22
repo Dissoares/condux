@@ -8,6 +8,7 @@ $segAtivo  = trim(substr($uriAtual, strlen(BASE_URL)), '/');
 $segAtivo  = explode('/', $segAtivo)[0] ?? '';
 
 $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
+$ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR" data-bs-theme="light">
@@ -27,13 +28,25 @@ $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
 </head>
 <body>
 
+<!-- ══ Mobile: header fixo no topo ══════════════════════ -->
+<header class="condux-top-bar" id="conduxTopBar">
+  <a href="<?= url('painel') ?>" class="condux-logo-mobile">Con<span>dux</span></a>
+  <div class="condux-top-bar-acoes">
+    <button class="condux-top-btn condux-btn-tema" onclick="conduxToggleTema()" title="Tema">
+      <i class="bi bi-moon-fill condux-tema-icone"></i>
+    </button>
+    <div class="condux-avatar-sm"><?= $inicialNome ?></div>
+  </div>
+</header>
+
+<!-- ══ Sidebar (desktop sempre visível; mobile = drawer) ═ -->
 <aside class="condux-sidebar" id="barraLateral">
   <a href="<?= url('painel') ?>" class="condux-logo d-block">Con<span>dux</span></a>
 
   <nav class="flex-grow-1 pb-2">
     <ul class="nav flex-column">
       <li class="nav-item">
-        <a href="<?= url('painel') ?>" class="nav-link <?= ($segAtivo === '' || $segAtivo === 'painel') ? 'ativo' : '' ?>">
+        <a href="<?= url('painel') ?>" class="nav-link <?= $ePainel ? 'ativo' : '' ?>">
           <i class="bi bi-speedometer2"></i> Painel
         </a>
       </li>
@@ -108,7 +121,7 @@ $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
     </ul>
   </nav>
 
-  <!-- Usuário + toggle de tema -->
+  <!-- Usuário + toggle de tema (desktop) -->
   <div class="condux-usuario">
     <div class="condux-avatar"><?= $inicialNome ?></div>
     <div class="flex-grow-1 overflow-hidden">
@@ -129,10 +142,50 @@ $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
   </div>
 </aside>
 
+<!-- ══ Overlay (fecha o drawer mobile) ══════════════════ -->
 <div class="condux-overlay" id="conduxOverlay"></div>
 
-<button class="botao-menu-mobile" id="botaoToggleMenu" aria-label="Abrir menu">
-  <i class="bi bi-list"></i>
-</button>
+<!-- ══ Mobile: bottom nav ═══════════════════════════════ -->
+<nav class="condux-bottom-nav" id="conduxBottomNav" aria-label="Navegação principal">
+  <?php if ($ehAdmin): ?>
+  <a href="<?= url('painel') ?>" class="condux-bnav-item <?= $ePainel ? 'ativo' : '' ?>">
+    <i class="bi bi-speedometer2"></i>
+    <span>Início</span>
+  </a>
+  <a href="<?= url('unidades') ?>" class="condux-bnav-item <?= $segAtivo === 'unidades' ? 'ativo' : '' ?>">
+    <i class="bi bi-building"></i>
+    <span>Unidades</span>
+  </a>
+  <a href="<?= url('condominios') ?>" class="condux-bnav-item <?= $segAtivo === 'condominios' ? 'ativo' : '' ?>">
+    <i class="bi bi-people"></i>
+    <span>Condôminos</span>
+  </a>
+  <a href="<?= url('taxas') ?>" class="condux-bnav-item <?= $segAtivo === 'taxas' ? 'ativo' : '' ?>">
+    <i class="bi bi-cash-stack"></i>
+    <span>Taxas</span>
+  </a>
+  <button class="condux-bnav-item" id="conduxMaisBtn" aria-label="Mais opções">
+    <i class="bi bi-grid"></i>
+    <span>Mais</span>
+  </button>
+  <?php else: ?>
+  <a href="<?= url('painel') ?>" class="condux-bnav-item <?= $ePainel ? 'ativo' : '' ?>">
+    <i class="bi bi-house-fill"></i>
+    <span>Início</span>
+  </a>
+  <a href="<?= url('minhas-taxas') ?>" class="condux-bnav-item <?= $segAtivo === 'minhas-taxas' ? 'ativo' : '' ?>">
+    <i class="bi bi-receipt"></i>
+    <span>Taxas</span>
+  </a>
+  <a href="<?= url('transparencia') ?>" class="condux-bnav-item <?= $segAtivo === 'transparencia' ? 'ativo' : '' ?>">
+    <i class="bi bi-eye"></i>
+    <span>Transparência</span>
+  </a>
+  <button class="condux-bnav-item" id="conduxMaisBtn" aria-label="Mais opções">
+    <i class="bi bi-grid"></i>
+    <span>Mais</span>
+  </button>
+  <?php endif; ?>
+</nav>
 
 <main class="condux-conteudo">
