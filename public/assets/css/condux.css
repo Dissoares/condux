@@ -202,7 +202,6 @@ body {
   border-bottom: 2px solid var(--bs-border-color) !important;
   padding-top: .9rem;
   padding-bottom: .9rem;
-  white-space: nowrap;
 }
 .table tbody tr { transition: background .12s; }
 .table-hover tbody tr:hover { background: rgba(26,60,94,.04); }

@@ -28,9 +28,9 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
       <thead class="table-light">
         <tr>
           <th>Unidade</th>
-          <th>Responsável</th>
-          <th>Status mês atual</th>
-          <th style="width:100px;"></th>
+          <th class="d-none d-sm-table-cell">Responsável</th>
+          <th class="d-none d-md-table-cell">Status mês atual</th>
+          <th style="width:80px;"></th>
         </tr>
       </thead>
       <tbody>
@@ -38,23 +38,28 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           <tr><td colspan="4" class="text-center text-body-secondary py-4">Nenhuma unidade cadastrada.</td></tr>
         <?php else: ?>
           <?php foreach ($unidades as $unidade): ?>
+          <?php $status = $unidade->statusTaxaAtual ?? 'sem_taxa'; ?>
           <tr>
             <td>
-              <span class="fw-semibold"><?= htmlspecialchars($unidade->identificacao()) ?></span>
+              <div class="fw-semibold lh-sm"><?= htmlspecialchars($unidade->identificacao()) ?></div>
               <?php if ($unidade->andar): ?>
-                <br><small class="text-body-secondary"><?= $unidade->andar ?>º andar</small>
+                <div class="text-body-secondary" style="font-size:.78rem;"><?= $unidade->andar ?>º andar</div>
               <?php endif; ?>
+              <div class="d-sm-none mt-1">
+                <span class="badge rounded-pill badge-<?= $status ?>">
+                  <?= match($status) { 'pago' => 'Pago', 'vencido' => 'Vencido', 'isento' => 'Isento', 'pendente' => 'Pendente', default => 'Sem taxa' } ?>
+                </span>
+              </div>
             </td>
-            <td><?= htmlspecialchars($unidade->nomeResponsavel ?? '—') ?></td>
-            <td>
-              <?php $status = $unidade->statusTaxaAtual ?? 'sem_taxa'; ?>
+            <td class="d-none d-sm-table-cell"><?= htmlspecialchars($unidade->nomeResponsavel ?? '—') ?></td>
+            <td class="d-none d-md-table-cell">
               <span class="badge rounded-pill badge-<?= $status ?>">
                 <?= match($status) { 'pago' => 'Pago', 'vencido' => 'Vencido', 'isento' => 'Isento', 'pendente' => 'Pendente', default => 'Sem taxa' } ?>
               </span>
             </td>
             <td>
               <a href="<?= url("unidades/{$unidade->id}") ?>" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-eye"></i> Ver
+                <i class="bi bi-eye"></i>
               </a>
             </td>
           </tr>

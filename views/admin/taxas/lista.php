@@ -31,42 +31,42 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
   <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-search"></i> Filtrar</button>
 </form>
 
-<div class="row g-3 mb-4">
+<div class="row g-2 g-md-3 mb-4">
   <div class="col-4">
     <div class="card border-0 shadow-sm h-100">
-      <div class="card-body d-flex align-items-center gap-3">
-        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 bg-success bg-opacity-10 text-success" style="width:44px;height:44px;font-size:1.2rem;">
+      <div class="card-body p-2 p-md-3 d-flex align-items-center gap-2 gap-md-3">
+        <div class="rounded-circle d-none d-sm-flex align-items-center justify-content-center flex-shrink-0 bg-success bg-opacity-10 text-success" style="width:40px;height:40px;font-size:1.1rem;">
           <i class="bi bi-check-circle-fill"></i>
         </div>
-        <div>
-          <div class="fs-4 fw-bold lh-1"><?= $resumo['total_pagas'] ?? 0 ?></div>
-          <div class="text-body-secondary" style="font-size:.8rem;">Pagas</div>
+        <div class="min-w-0">
+          <div class="fs-5 fw-bold lh-1"><?= $resumo['total_pagas'] ?? 0 ?></div>
+          <div class="text-body-secondary text-truncate" style="font-size:.72rem;">Pagas</div>
         </div>
       </div>
     </div>
   </div>
   <div class="col-4">
     <div class="card border-0 shadow-sm h-100">
-      <div class="card-body d-flex align-items-center gap-3">
-        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 bg-warning bg-opacity-10 text-warning" style="width:44px;height:44px;font-size:1.2rem;">
+      <div class="card-body p-2 p-md-3 d-flex align-items-center gap-2 gap-md-3">
+        <div class="rounded-circle d-none d-sm-flex align-items-center justify-content-center flex-shrink-0 bg-warning bg-opacity-10 text-warning" style="width:40px;height:40px;font-size:1.1rem;">
           <i class="bi bi-clock-fill"></i>
         </div>
-        <div>
-          <div class="fs-4 fw-bold lh-1"><?= $resumo['total_pendentes'] ?? 0 ?></div>
-          <div class="text-body-secondary" style="font-size:.8rem;">Pendentes/Vencidas</div>
+        <div class="min-w-0">
+          <div class="fs-5 fw-bold lh-1"><?= $resumo['total_pendentes'] ?? 0 ?></div>
+          <div class="text-body-secondary text-truncate" style="font-size:.72rem;">Pendentes</div>
         </div>
       </div>
     </div>
   </div>
   <div class="col-4">
     <div class="card border-0 shadow-sm h-100">
-      <div class="card-body d-flex align-items-center gap-3">
-        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 bg-primary bg-opacity-10 text-primary" style="width:44px;height:44px;font-size:1.2rem;">
+      <div class="card-body p-2 p-md-3 d-flex align-items-center gap-2 gap-md-3">
+        <div class="rounded-circle d-none d-sm-flex align-items-center justify-content-center flex-shrink-0 bg-primary bg-opacity-10 text-primary" style="width:40px;height:40px;font-size:1.1rem;">
           <i class="bi bi-cash"></i>
         </div>
-        <div>
-          <div class="fw-bold lh-1"><?= dinheiro((float)($resumo['valor_arrecadado'] ?? 0)) ?></div>
-          <div class="text-body-secondary" style="font-size:.8rem;">Arrecadado</div>
+        <div class="min-w-0">
+          <div class="fw-bold lh-1" style="font-size:.9rem;"><?= dinheiro((float)($resumo['valor_arrecadado'] ?? 0)) ?></div>
+          <div class="text-body-secondary text-truncate" style="font-size:.72rem;">Arrecadado</div>
         </div>
       </div>
     </div>
@@ -78,8 +78,13 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
         <tr>
-          <th>Unidade</th><th>Competência</th><th>Valor</th>
-          <th>Vencimento</th><th>Status</th><th>Comprovante</th><th></th>
+          <th>Unidade</th>
+          <th class="d-none d-sm-table-cell">Competência</th>
+          <th>Valor</th>
+          <th class="d-none d-md-table-cell">Vencimento</th>
+          <th>Status</th>
+          <th class="d-none d-md-table-cell">Comprovante</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -89,11 +94,11 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           <?php foreach ($taxas as $taxa): ?>
           <tr>
             <td><?= htmlspecialchars($taxa->identificacaoUnidade ?? '—') ?></td>
-            <td><?= htmlspecialchars($taxa->competenciaFormatada()) ?></td>
+            <td class="d-none d-sm-table-cell"><?= htmlspecialchars($taxa->competenciaFormatada()) ?></td>
             <td><?= dinheiro($taxa->valor) ?></td>
-            <td><?= dataBR($taxa->vencimento) ?></td>
+            <td class="d-none d-md-table-cell"><?= dataBR($taxa->vencimento) ?></td>
             <td><span class="badge rounded-pill badge-<?= $taxa->status ?>"><?= ucfirst($taxa->status) ?></span></td>
-            <td>
+            <td class="d-none d-md-table-cell">
               <?php if ($taxa->comprovante): ?>
                 <a href="<?= url('uploads/' . $taxa->comprovante) ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
                   <i class="bi bi-paperclip"></i> Ver
