@@ -287,6 +287,10 @@ function rotuloBadgeStatus(string $status): string {
                     </span>
                   <?php elseif ($m->responsavel): ?>
                     <span class="badge badge-pago flex-shrink-0" style="font-size:.68rem;">Responsável</span>
+                  <?php else: ?>
+                    <span class="badge bg-secondary bg-opacity-25 text-body flex-shrink-0" style="font-size:.68rem;">
+                      <i class="bi bi-person me-1"></i>Morador
+                    </span>
                   <?php endif; ?>
                   <a href="<?= url("unidades/{$uid}/desvincular-morador/{$m->id}?retornar=lista") ?>"
                      class="btn btn-outline-danger btn-sm flex-shrink-0"
