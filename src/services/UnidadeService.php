@@ -47,7 +47,14 @@ class UnidadeService
             inquilinoId:    !empty($dados['inquilino_id'])    ? (int) $dados['inquilino_id']    : null,
         );
 
-        return $this->unidadeRepository->salvar($unidade);
+        $id = $this->unidadeRepository->salvar($unidade);
+
+        // Ao vincular inquilino, garantir que ele seja morador responsável
+        if ($unidade->tipoOcupacao === 'alugado' && $unidade->inquilinoId) {
+            $this->garantirInquilinoComoResponsavel($id, $unidade->inquilinoId);
+        }
+
+        return $id;
     }
 
     /**
@@ -195,6 +202,32 @@ class UnidadeService
     public function listarMoradoresDaUnidade(int $unidadeId): array
     {
         return $this->moradorRepository->listarAtivosPorUnidade($unidadeId);
+    }
+
+    private function garantirInquilinoComoResponsavel(int $unidadeId, int $inquilinoId): void
+    {
+        $moradores = $this->moradorRepository->listarAtivosPorUnidade($unidadeId);
+
+        foreach ($moradores as $m) {
+            if ($m->usuarioId === $inquilinoId) {
+                if (!$m->responsavel) {
+                    $this->removerResponsavelAnterior($unidadeId);
+                    $m->responsavel = true;
+                    $this->moradorRepository->salvar($m);
+                }
+                return;
+            }
+        }
+
+        // Não está vinculado ainda — vincular como responsável
+        $this->removerResponsavelAnterior($unidadeId);
+        $this->moradorRepository->salvar(new Morador(
+            id:          null,
+            usuarioId:   $inquilinoId,
+            unidadeId:   $unidadeId,
+            responsavel: true,
+            dataEntrada: date('Y-m-d'),
+        ));
     }
 
     private function removerResponsavelAnterior(int $unidadeId): void
