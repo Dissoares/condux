@@ -59,10 +59,10 @@ class Sessao
         return self::obter('usuario')['perfil'] ?? null;
     }
 
-    /** Armazena mensagem flash (exibida uma única vez). */
-    public static function flash(string $tipo, string $mensagem): void
+    /** Armazena valor flash (exibido uma única vez). Aceita string ou array. */
+    public static function flash(string $tipo, mixed $valor): void
     {
-        self::definir("flash_{$tipo}", $mensagem);
+        self::definir("flash_{$tipo}", $valor);
     }
 
     /** Retorna e apaga a mensagem flash. */
