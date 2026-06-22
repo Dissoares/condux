@@ -30,7 +30,7 @@ $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
 <aside class="condux-sidebar" id="barraLateral">
   <a href="<?= url('painel') ?>" class="condux-logo d-block">Con<span>dux</span></a>
 
-  <nav class="flex-grow-1 py-2">
+  <nav class="flex-grow-1 pb-2">
     <ul class="nav flex-column">
       <li class="nav-item">
         <a href="<?= url('painel') ?>" class="nav-link <?= ($segAtivo === '' || $segAtivo === 'painel') ? 'ativo' : '' ?>">
@@ -39,6 +39,8 @@ $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
       </li>
 
       <?php if ($ehAdmin): ?>
+
+      <p class="condux-nav-label">Gestão</p>
       <li class="nav-item">
         <a href="<?= url('unidades') ?>" class="nav-link <?= $segAtivo === 'unidades' ? 'ativo' : '' ?>">
           <i class="bi bi-building"></i> Unidades
@@ -49,6 +51,8 @@ $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
           <i class="bi bi-people"></i> Condôminos
         </a>
       </li>
+
+      <p class="condux-nav-label">Financeiro</p>
       <li class="nav-item">
         <a href="<?= url('taxas') ?>" class="nav-link <?= $segAtivo === 'taxas' ? 'ativo' : '' ?>">
           <i class="bi bi-cash-stack"></i> Taxas Mensais
@@ -59,6 +63,8 @@ $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
           <i class="bi bi-plus-circle"></i> Taxas Extras
         </a>
       </li>
+
+      <p class="condux-nav-label">Obras</p>
       <li class="nav-item">
         <a href="<?= url('projetos') ?>" class="nav-link <?= $segAtivo === 'projetos' ? 'ativo' : '' ?>">
           <i class="bi bi-kanban"></i> Projetos
@@ -69,27 +75,35 @@ $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
           <i class="bi bi-clipboard-check"></i> Vistorias
         </a>
       </li>
+
+      <p class="condux-nav-label">Análises</p>
       <li class="nav-item">
         <a href="<?= url('relatorios') ?>" class="nav-link <?= $segAtivo === 'relatorios' ? 'ativo' : '' ?>">
           <i class="bi bi-bar-chart-line"></i> Relatórios
         </a>
       </li>
+
       <?php else: ?>
+
+      <p class="condux-nav-label">Minha conta</p>
       <li class="nav-item">
         <a href="<?= url('minhas-taxas') ?>" class="nav-link <?= $segAtivo === 'minhas-taxas' ? 'ativo' : '' ?>">
           <i class="bi bi-receipt"></i> Minhas Taxas
         </a>
       </li>
       <li class="nav-item">
+        <a href="<?= url('relatorios') ?>" class="nav-link <?= $segAtivo === 'relatorios' ? 'ativo' : '' ?>">
+          <i class="bi bi-file-earmark-text"></i> Extrato
+        </a>
+      </li>
+
+      <p class="condux-nav-label">Condomínio</p>
+      <li class="nav-item">
         <a href="<?= url('transparencia') ?>" class="nav-link <?= $segAtivo === 'transparencia' ? 'ativo' : '' ?>">
           <i class="bi bi-eye"></i> Transparência
         </a>
       </li>
-      <li class="nav-item">
-        <a href="<?= url('relatorios') ?>" class="nav-link <?= $segAtivo === 'relatorios' ? 'ativo' : '' ?>">
-          <i class="bi bi-file-earmark-text"></i> Relatórios
-        </a>
-      </li>
+
       <?php endif; ?>
     </ul>
   </nav>
