@@ -228,60 +228,87 @@ function rotuloBadgeStatus(string $status): string {
           <!-- ── Tab Ocupação ── -->
           <div class="tab-pane fade show active" id="tab-ocupacao-<?= $uid ?>" role="tabpanel">
             <form action="<?= url('unidades/salvar') ?>" method="POST">
-              <input type="hidden" name="id"         value="<?= $uid ?>">
-              <input type="hidden" name="numero"     value="<?= htmlspecialchars($u->numero) ?>">
-              <input type="hidden" name="bloco"      value="<?= htmlspecialchars($u->bloco ?? '') ?>">
-              <input type="hidden" name="andar"      value="<?= $u->andar ?? '' ?>">
-              <input type="hidden" name="descricao"  value="<?= htmlspecialchars($u->descricao ?? '') ?>">
-              <input type="hidden" name="_retornar"  value="lista">
+              <input type="hidden" name="id"        value="<?= $uid ?>">
+              <input type="hidden" name="numero"    value="<?= htmlspecialchars($u->numero) ?>">
+              <input type="hidden" name="bloco"     value="<?= htmlspecialchars($u->bloco ?? '') ?>">
+              <input type="hidden" name="andar"     value="<?= $u->andar ?? '' ?>">
+              <input type="hidden" name="descricao" value="<?= htmlspecialchars($u->descricao ?? '') ?>">
+              <input type="hidden" name="_retornar" value="lista">
 
-              <div class="mb-4">
-                <label class="form-label fw-semibold">Situação da unidade</label>
-                <div class="d-flex gap-2">
-                  <?php foreach (['proprio' => ['Próprio', 'house-check', 'success'], 'alugado' => ['Alugado', 'key', 'warning']] as $val => [$rot, $ico, $cor]): ?>
-                  <div class="flex-fill">
-                    <input type="radio" class="btn-check" name="tipo_ocupacao"
-                           id="oc-<?= $val ?>-<?= $uid ?>" value="<?= $val ?>"
-                           <?= $u->tipoOcupacao === $val ? 'checked' : '' ?>>
-                    <label class="btn btn-outline-<?= $cor ?> w-100 d-flex flex-column align-items-center gap-1 py-2"
-                           for="oc-<?= $val ?>-<?= $uid ?>" style="font-size:.82rem;">
-                      <i class="bi bi-<?= $ico ?>" style="font-size:1.2rem;"></i><?= $rot ?>
-                    </label>
-                  </div>
-                  <?php endforeach; ?>
-                </div>
+              <!-- Toggle situação — segmented control -->
+              <div class="d-flex rounded-2 overflow-hidden mb-4 border" style="height:42px;">
+                <input type="radio" class="btn-check" name="tipo_ocupacao"
+                       id="oc-proprio-<?= $uid ?>" value="proprio"
+                       <?= $u->tipoOcupacao === 'proprio' ? 'checked' : '' ?>>
+                <label class="btn btn-outline-success border-0 flex-fill rounded-0 d-flex align-items-center justify-content-center gap-2"
+                       for="oc-proprio-<?= $uid ?>" style="font-size:.85rem;">
+                  <i class="bi bi-house-check"></i> Próprio
+                </label>
+                <div class="vr"></div>
+                <input type="radio" class="btn-check" name="tipo_ocupacao"
+                       id="oc-alugado-<?= $uid ?>" value="alugado"
+                       <?= $u->tipoOcupacao === 'alugado' ? 'checked' : '' ?>>
+                <label class="btn btn-outline-warning border-0 flex-fill rounded-0 d-flex align-items-center justify-content-center gap-2"
+                       for="oc-alugado-<?= $uid ?>" style="font-size:.85rem;">
+                  <i class="bi bi-key"></i> Alugado
+                </label>
               </div>
 
               <!-- Proprietário -->
-              <div class="mb-3">
-                <label class="form-label fw-semibold">
-                  <i class="bi bi-person-badge text-warning me-1"></i>Proprietário
-                </label>
+              <div class="mb-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <div class="avatar-unidade avatar-prop flex-shrink-0" style="width:28px;height:28px;font-size:.72rem;">
+                    <?= $u->proprietarioId ? mb_strtoupper(mb_substr($u->nomeProprietarioVinc ?? '?', 0, 1)) : '?' ?>
+                  </div>
+                  <span class="fw-semibold" style="font-size:.9rem;">Proprietário</span>
+                  <?php if ($u->proprietarioId && $u->nomeProprietarioVinc): ?>
+                    <span class="text-body-secondary ms-1" style="font-size:.82rem;">
+                      — <?= htmlspecialchars($u->nomeProprietarioVinc) ?>
+                      <?php if ($u->emailProprietarioVinc): ?>
+                        <span class="opacity-60">(<?= htmlspecialchars($u->emailProprietarioVinc) ?>)</span>
+                      <?php endif; ?>
+                    </span>
+                  <?php endif; ?>
+                </div>
                 <?php if (empty($todosCondominios)): ?>
                   <p class="text-body-secondary mb-0" style="font-size:.85rem;">
                     <a href="<?= url('condominios/novo') ?>">Cadastre um condômino</a> para vincular.
                   </p>
                 <?php else: ?>
-                  <?php renderPicker('proprietario_id', $todosCondominios, $u->proprietarioId, 'Buscar proprietário pelo nome...', '— Sem proprietário —') ?>
+                  <?php renderPicker('proprietario_id', $todosCondominios, $u->proprietarioId,
+                    $u->proprietarioId ? 'Alterar proprietário...' : 'Buscar proprietário...', '— Sem proprietário —') ?>
                 <?php endif; ?>
               </div>
 
-              <!-- Inquilino -->
+              <!-- Inquilino (visível só quando alugado) -->
               <div id="bloco-inquilino-<?= $uid ?>" class="mb-4" style="display:<?= $u->estaAlugada() ? '' : 'none' ?>;">
-                <label class="form-label fw-semibold">
-                  <i class="bi bi-person-check text-info me-1"></i>Inquilino
-                </label>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <div class="avatar-unidade avatar-inq flex-shrink-0" style="width:28px;height:28px;font-size:.72rem;">
+                    <?= $u->inquilinoId ? mb_strtoupper(mb_substr($u->nomeInquilinoVinc ?? '?', 0, 1)) : '?' ?>
+                  </div>
+                  <span class="fw-semibold" style="font-size:.9rem;">Inquilino</span>
+                  <?php if ($u->inquilinoId && $u->nomeInquilinoVinc): ?>
+                    <span class="text-body-secondary ms-1" style="font-size:.82rem;">
+                      — <?= htmlspecialchars($u->nomeInquilinoVinc) ?>
+                      <?php if ($u->emailInquilinoVinc): ?>
+                        <span class="opacity-60">(<?= htmlspecialchars($u->emailInquilinoVinc) ?>)</span>
+                      <?php endif; ?>
+                    </span>
+                  <?php endif; ?>
+                </div>
                 <?php if (!empty($todosCondominios)): ?>
-                  <?php renderPicker('inquilino_id', $todosCondominios, $u->inquilinoId, 'Buscar inquilino pelo nome...', '— Sem inquilino —') ?>
+                  <?php renderPicker('inquilino_id', $todosCondominios, $u->inquilinoId,
+                    $u->inquilinoId ? 'Alterar inquilino...' : 'Buscar inquilino...', '— Sem inquilino —') ?>
                 <?php endif; ?>
               </div>
 
-              <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary btn-sm px-3">
-                  <i class="bi bi-floppy"></i> Salvar ocupação
+              <!-- Rodapé de ações -->
+              <div class="d-flex align-items-center gap-2 pt-3 border-top">
+                <button type="submit" class="btn btn-primary px-4">
+                  <i class="bi bi-floppy me-1"></i>Salvar
                 </button>
-                <a href="<?= url("unidades/{$uid}/editar") ?>" class="btn btn-outline-secondary btn-sm">
-                  <i class="bi bi-pencil"></i> Editar completo
+                <a href="<?= url("unidades/{$uid}/editar") ?>" class="btn btn-outline-secondary ms-auto">
+                  Editar completo <i class="bi bi-arrow-right ms-1"></i>
                 </a>
               </div>
             </form>
