@@ -32,8 +32,8 @@ class ProjetoService
             idealizador:    $dados['idealizador']    ?? null,
             responsavelId:  !empty($dados['responsavel_id'])  ? (int) $dados['responsavel_id']  : null,
             prestadoraId:   !empty($dados['prestadora_id'])   ? (int) $dados['prestadora_id']   : null,
-            valorEstimado:  !empty($dados['valor_estimado'])  ? (float) $dados['valor_estimado']  : null,
-            valorRealizado: !empty($dados['valor_realizado']) ? (float) $dados['valor_realizado'] : null,
+            valorEstimado:  parseDinheiro($dados['valor_estimado']  ?? null),
+            valorRealizado: parseDinheiro($dados['valor_realizado'] ?? null),
             dataInicio:     $dados['data_inicio']    ?? null,
             dataConclusao:  $dados['data_conclusao'] ?? null,
         );

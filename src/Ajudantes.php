@@ -17,6 +17,16 @@ function dinheiro(float $valor): string
     return 'R$ ' . number_format($valor, 2, ',', '.');
 }
 
+/** Converte valor monetário digitado em BR (ex: "5.000,50") para float. */
+function parseDinheiro(?string $valor): ?float
+{
+    if ($valor === null || trim($valor) === '') return null;
+    $valor = str_replace('.', '', $valor);
+    $valor = str_replace(',', '.', $valor);
+    $float = filter_var($valor, FILTER_VALIDATE_FLOAT);
+    return $float === false ? null : $float;
+}
+
 /** Formata data do banco (Y-m-d) para exibição (d/m/Y). */
 function dataBR(?string $data): string
 {
