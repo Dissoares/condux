@@ -68,7 +68,7 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
       <p class="condux-nav-label">Financeiro</p>
       <li class="nav-item">
         <a href="<?= url('taxas') ?>" class="nav-link <?= $segAtivo === 'taxas' ? 'ativo' : '' ?>">
-          <i class="bi bi-cash-stack"></i> Taxas Mensais
+          <i class="bi bi-cash-stack"></i> Taxa Condominial
         </a>
       </li>
       <li class="nav-item">

@@ -1,11 +1,11 @@
 <?php
 /** @var TaxaCondominial[] $taxas @var array $resumo @var string $competencia */
-$tituloPagina = 'Taxas Mensais';
+$tituloPagina = 'Taxa Condominial';
 require_once RAIZ . '/views/layouts/cabecalho.php';
 ?>
 
 <div class="d-flex align-items-center justify-content-between mb-4">
-  <h4 class="fw-semibold mb-0"><i class="bi bi-cash-stack"></i> Taxas Mensais</h4>
+  <h4 class="fw-semibold mb-0"><i class="bi bi-cash-stack"></i> Taxa Condominial</h4>
   <a href="<?= url('taxas/gerar-lote') ?>" class="btn btn-primary">
     <i class="bi bi-lightning-fill"></i> Gerar em lote
   </a>
