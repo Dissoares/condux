@@ -92,10 +92,10 @@ class ProjetoService
 
         $extensao = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
         $permitidas = match ($tipo) {
-            'foto'        => $config['extensoes_imagem'],
-            'video'       => $config['extensoes_video'],
-            'nota_fiscal' => $config['extensoes_documento'],
-            'documento'   => $config['extensoes_documento'],
+            'foto', 'antes', 'depois' => $config['extensoes_imagem'],
+            'video'                   => $config['extensoes_video'],
+            'nota_fiscal', 'documento'=> $config['extensoes_documento'],
+            default                   => $config['extensoes_imagem'],
         };
 
         if (!in_array($extensao, $permitidas, true)) {
