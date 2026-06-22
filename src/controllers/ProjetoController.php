@@ -69,6 +69,7 @@ class ProjetoController
             $this->usuarioRepository->listarPorPerfil('subsindico'),
         );
         $prestadoras = $this->prestadoraRepository->listarAtivas();
+        $moradores   = $this->usuarioRepository->listarPorPerfil('morador');
 
         if (!empty($_GET['id'])) {
             $projeto = $this->projetoService->buscarProjeto((int) $_GET['id']);

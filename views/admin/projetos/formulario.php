@@ -1,5 +1,5 @@
 <?php
-/** @var Projeto|null $projeto @var Usuario[] $responsaveis @var Prestadora[] $prestadoras */
+/** @var Projeto|null $projeto @var Usuario[] $responsaveis @var Prestadora[] $prestadoras @var Usuario[] $moradores */
 $editando     = $projeto !== null;
 $tituloPagina = $editando ? 'Editar Projeto' : 'Novo Projeto';
 require_once RAIZ . '/views/layouts/cabecalho.php';
@@ -47,8 +47,15 @@ $opcoesPrestadora = array_map(fn($p) => [
         <div class="col-6">
           <label for="campo-idealizador" class="form-label">Idealizador</label>
           <input type="text" id="campo-idealizador" name="idealizador" class="form-control"
-                 placeholder="Nome do morador ou conselho"
+                 placeholder="Nome do condômino ou conselho"
+                 list="lista-moradores"
+                 autocomplete="off"
                  value="<?= htmlspecialchars($projeto?->idealizador ?? '') ?>">
+          <datalist id="lista-moradores">
+            <?php foreach ($moradores as $m): ?>
+              <option value="<?= htmlspecialchars($m->nome) ?>">
+            <?php endforeach; ?>
+          </datalist>
         </div>
         <div class="col-6">
           <label for="campo-responsavel" class="form-label">Responsável</label>
