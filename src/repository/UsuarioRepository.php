@@ -39,6 +39,19 @@ class UsuarioRepository
         return array_map(fn($l) => Usuario::fromArray($l), $stmt->fetchAll());
     }
 
+    /** @return Usuario[] Apenas usuários que são proprietários de alguma unidade */
+    public function listarProprietarios(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT DISTINCT u.*
+             FROM usuarios u
+             INNER JOIN unidades un ON un.proprietario_id = u.id
+             WHERE u.ativo = 1
+             ORDER BY u.nome'
+        );
+        return array_map(fn($l) => Usuario::fromArray($l), $stmt->fetchAll());
+    }
+
     /** @return Usuario[] */
     public function listarPorPerfil(string $perfil): array
     {
