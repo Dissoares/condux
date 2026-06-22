@@ -41,8 +41,9 @@ class TaxaCondominialService
     }
 
     /**
-     * Gera taxas condominiais em lote para todas as unidades ativas de uma competência.
-     * Ignora unidades que já possuem taxa gerada para o período (INSERT IGNORE).
+     * Gera (ou atualiza) taxas condominiais em lote para todas as unidades ativas.
+     * Unidades sem taxa no período recebem uma nova; as que já têm taxa pendente/atrasada
+     * têm valor e vencimento atualizados. Taxas pagas ou isentas não são alteradas.
      */
     public function gerarEmLote(string $competencia, float $valor, string $vencimento): int
     {

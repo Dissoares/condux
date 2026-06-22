@@ -56,7 +56,7 @@ class TaxaCondominialController
             $this->configRepo->salvar('taxa_valor_mensal',   $valor);
 
             $total = $this->taxaService->gerarEmLote($competencia, $valor, $vencimento);
-            Sessao::flash('sucesso', "{$total} taxas geradas com sucesso.");
+            Sessao::flash('sucesso', "{$total} taxas geradas/atualizadas com sucesso.");
         } catch (InvalidArgumentException $e) {
             Sessao::flash('erro', $e->getMessage());
         }

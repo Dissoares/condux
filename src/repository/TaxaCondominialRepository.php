@@ -138,10 +138,12 @@ class TaxaCondominialRepository
         array  $unidadeIds
     ): int {
         $stmt = $this->conexao->prepare(
-            'INSERT IGNORE INTO taxas_condominiais (unidade_id, competencia, valor, vencimento, status)
-             VALUES (:unidade_id, :competencia, :valor, :vencimento, "pendente")'
+            'INSERT INTO taxas_condominiais (unidade_id, competencia, valor, vencimento, status)
+             VALUES (:unidade_id, :competencia, :valor, :vencimento, "pendente")
+             ON DUPLICATE KEY UPDATE
+               valor      = IF(status NOT IN ("pago","isento"), VALUES(valor),      valor),
+               vencimento = IF(status NOT IN ("pago","isento"), VALUES(vencimento), vencimento)'
         );
-        $inseridas = 0;
         foreach ($unidadeIds as $unidadeId) {
             $stmt->execute([
                 ':unidade_id'  => $unidadeId,
@@ -149,9 +151,8 @@ class TaxaCondominialRepository
                 ':valor'       => $valor,
                 ':vencimento'  => $vencimento,
             ]);
-            $inseridas += $stmt->rowCount();
         }
-        return $inseridas;
+        return count($unidadeIds);
     }
 
     /** @return array<int, TaxaCondominial[]> indexado por unidade_id */
