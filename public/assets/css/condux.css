@@ -575,24 +575,27 @@ body {
   }
   .condux-sidebar.aberta { transform: translateX(0); }
 
-  /* Botão fechar (X) no topo do drawer mobile */
+  /* Faixa topo da sidebar no mobile */
+  .condux-sidebar-mobile-top {
+    border-bottom: 1px solid rgba(255,255,255,.1);
+    min-height: 44px;
+    flex-shrink: 0;
+  }
+  /* Botão fechar (X) */
   .condux-sidebar-fechar {
-    position: absolute;
-    top: .6rem;
-    right: .6rem;
     background: rgba(255,255,255,.12);
     border: none;
-    color: rgba(255,255,255,.8);
+    color: rgba(255,255,255,.85);
     width: 32px; height: 32px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: .9rem;
+    font-size: .85rem;
     cursor: pointer;
     transition: background .15s, color .15s;
     -webkit-tap-highlight-color: transparent;
-    z-index: 1;
+    flex-shrink: 0;
   }
-  .condux-sidebar-fechar:hover { background: rgba(255,255,255,.22); color: #fff; }
+  .condux-sidebar-fechar:hover { background: rgba(255,255,255,.25); color: #fff; }
 
   /* Conteúdo: espaço para header + bottom nav */
   .condux-conteudo {
