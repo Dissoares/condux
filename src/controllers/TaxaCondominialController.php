@@ -258,21 +258,32 @@ class TaxaCondominialController
     public function listarMinhasTaxas(): void
     {
         $unidadeId = $this->obterUnidadeDoMoradorLogado();
+        $mensagem     = Sessao::lerFlash('sucesso');
+        $erroMensagem = Sessao::lerFlash('erro');
 
         if ($unidadeId === null) {
             $tituloPagina = 'Minhas Taxas';
-            $taxas = [];
-            $taxaAtual = null;
-            $mensagem = null;
-            $erroMensagem = 'Você ainda não está vinculado a nenhuma unidade. Entre em contato com o síndico.';
+            $anos      = [];
+            $taxas     = null;
+            $anoFiltro = null;
+            $erroMensagem = $erroMensagem ?: 'Você ainda não está vinculado a nenhuma unidade. Entre em contato com o síndico.';
             require_once RAIZ . '/views/morador/minhas-taxas.php';
             return;
         }
 
-        $taxas        = $this->taxaService->listarPorUnidade($unidadeId);
-        $taxaAtual    = $this->taxaService->buscarTaxaMesAtualDaUnidade($unidadeId);
-        $mensagem     = Sessao::lerFlash('sucesso');
-        $erroMensagem = Sessao::lerFlash('erro');
+        $anoFiltro = isset($_GET['ano']) && preg_match('/^\d{4}$/', $_GET['ano'])
+            ? $_GET['ano'] : null;
+
+        if ($anoFiltro) {
+            $tituloPagina = 'Minhas Taxas — ' . $anoFiltro;
+            $taxas = $this->taxaService->listarPorUnidadeEAno($unidadeId, $anoFiltro);
+            $anos  = null;
+        } else {
+            $tituloPagina = 'Minhas Taxas';
+            $taxas = null;
+            $anos  = $this->taxaService->resumoAnosPorUnidade($unidadeId);
+        }
+
         require_once RAIZ . '/views/morador/minhas-taxas.php';
     }
 

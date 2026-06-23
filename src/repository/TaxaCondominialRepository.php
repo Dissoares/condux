@@ -53,6 +53,43 @@ class TaxaCondominialRepository
         return array_map(fn($l) => TaxaCondominial::fromArray($l), $stmt->fetchAll());
     }
 
+    /** Resumo por ano para a listagem inicial do morador */
+    public function resumoAnosPorUnidade(int $unidadeId): array
+    {
+        $stmt = $this->conexao->prepare(
+            "SELECT
+                LEFT(competencia, 4)                                      AS ano,
+                COUNT(*)                                                   AS total,
+                SUM(status IN ('pago','isento'))                           AS pagas,
+                SUM(status NOT IN ('pago','isento'))                       AS pendentes,
+                SUM(status = 'pendente' AND vencimento < CURDATE())        AS vencidas,
+                SUM(status = 'aguardando')                                 AS aguardando,
+                SUM(valor)                                                 AS valor_total
+             FROM taxas_condominiais
+             WHERE unidade_id = :unidade_id
+             GROUP BY ano
+             ORDER BY ano DESC"
+        );
+        $stmt->execute([':unidade_id' => $unidadeId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /** @return TaxaCondominial[] — todas as taxas de um ano específico */
+    public function listarPorUnidadeEAno(int $unidadeId, string $ano): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT tc.*,
+                    CONCAT("Apto ", u.numero, IF(u.bloco IS NOT NULL, CONCAT(" — Bloco ", u.bloco), "")) AS identificacao_unidade
+             FROM taxas_condominiais tc
+             JOIN unidades u ON u.id = tc.unidade_id
+             WHERE tc.unidade_id = :unidade_id
+               AND LEFT(tc.competencia, 4) = :ano
+             ORDER BY tc.competencia DESC'
+        );
+        $stmt->execute([':unidade_id' => $unidadeId, ':ano' => $ano]);
+        return array_map(fn($l) => TaxaCondominial::fromArray($l), $stmt->fetchAll());
+    }
+
     /** @return TaxaCondominial[] — taxas pendentes/vencidas de uma unidade */
     public function listarPendentesPorunidade(int $unidadeId): array
     {

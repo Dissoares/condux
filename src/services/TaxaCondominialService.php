@@ -19,6 +19,17 @@ class TaxaCondominialService
         return $this->taxaRepository->listarPorUnidade($unidadeId);
     }
 
+    public function resumoAnosPorUnidade(int $unidadeId): array
+    {
+        return $this->taxaRepository->resumoAnosPorUnidade($unidadeId);
+    }
+
+    /** @return TaxaCondominial[] */
+    public function listarPorUnidadeEAno(int $unidadeId, string $ano): array
+    {
+        return $this->taxaRepository->listarPorUnidadeEAno($unidadeId, $ano);
+    }
+
     /** @return TaxaCondominial[] */
     public function listarPorCompetencia(string $competencia): array
     {
