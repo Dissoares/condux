@@ -584,7 +584,7 @@ body {
   }
 
   /* Header da sidebar oculto no mobile (top bar já exibe o nome) */
-  .condux-logo { display: none; }
+  .condux-logo { display: none !important; }
 
   /* ── Top header ── */
   .condux-top-bar {
