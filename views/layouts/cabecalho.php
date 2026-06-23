@@ -212,6 +212,11 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
 
       <p class="condux-nav-label">Sistema</p>
       <li class="nav-item">
+        <a href="<?= url('tickets') ?>" class="nav-link <?= $segAtivo === 'tickets' ? 'ativo' : '' ?>">
+          <i class="bi bi-ticket-perforated"></i> Tickets
+        </a>
+      </li>
+      <li class="nav-item">
         <a href="<?= url('configuracoes') ?>" class="nav-link <?= $segAtivo === 'configuracoes' ? 'ativo' : '' ?>">
           <i class="bi bi-gear"></i> Configurações
         </a>
@@ -247,6 +252,11 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
       <li class="nav-item">
         <a href="<?= url('transparencia') ?>" class="nav-link <?= $segAtivo === 'transparencia' ? 'ativo' : '' ?>">
           <i class="bi bi-eye"></i> Transparência
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="<?= url('tickets') ?>" class="nav-link <?= $segAtivo === 'tickets' ? 'ativo' : '' ?>">
+          <i class="bi bi-ticket-perforated"></i> Tickets
         </a>
       </li>
 

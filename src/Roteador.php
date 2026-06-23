@@ -77,6 +77,7 @@ class Roteador
             'transparencia' => self::rotasTransparencia($seg),
             'relatorios'    => self::carregarRelatorio(),
             'perfil'        => self::rotasPerfil($seg, $metodo),
+            'tickets'       => self::rotasTickets($seg, $metodo, $ehAdmin),
             default         => self::naoEncontrado(),
         };
     }
@@ -493,6 +494,28 @@ class Roteador
         } else {
             $ctrl->exibir();
         }
+    }
+
+    // ── Tickets ───────────────────────────────────────────────────────────
+
+    private static function rotasTickets(array $seg, string $metodo, bool $ehAdmin): void
+    {
+        require_once RAIZ . '/src/controllers/TicketController.php';
+        $ctrl = new TicketController();
+
+        if ($seg[1] === null) {
+            $ehAdmin ? $ctrl->listarAdmin() : $ctrl->listarMorador();
+            return;
+        }
+        if ($seg[1] === 'novo')                              { $ctrl->formulario(); return; }
+        if ($seg[1] === 'salvar' && $metodo === 'POST')      { $ctrl->salvar();     return; }
+
+        $id = (int) $seg[1];
+        if ($id > 0 && $seg[2] === 'responder' && $metodo === 'POST') { $ctrl->responder();     return; }
+        if ($id > 0 && $seg[2] === 'status'    && $metodo === 'POST') { $ctrl->alterarStatus(); return; }
+        if ($id > 0) { $_GET['id'] = $id; $ctrl->ver(); return; }
+
+        self::naoEncontrado();
     }
 
     // ── Utilitários ───────────────────────────────────────────────────────
