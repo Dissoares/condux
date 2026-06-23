@@ -1,12 +1,12 @@
 <?php
 /**
- * @var int     $ano
- * @var int[]   $anos
- * @var string  $aba
- * @var array   $dados
- * @var array   $unidades
+ * @var int      $ano
+ * @var int[]    $anos
+ * @var string   $aba
+ * @var array    $dados
+ * @var array    $unidades
  * @var int|null $unidadeId
- * @var string  $competencia
+ * @var string   $competencia
  */
 
 $meses = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho',
@@ -22,12 +22,12 @@ $urlBase   = url('relatorios');
 $urlExport = $urlBase . '?acao=exportar';
 
 $abas = [
-    'arrecadacao'   => ['label' => 'Arrecadação',   'icon' => 'cash-stack'],
-    'balancete'     => ['label' => 'Balancete',      'icon' => 'calculator'],
-    'inadimplencia' => ['label' => 'Inadimplência',  'icon' => 'exclamation-triangle'],
-    'despesas'      => ['label' => 'Despesas',        'icon' => 'receipt'],
-    'folha'         => ['label' => 'Folha de Pessoal','icon' => 'people'],
-    'unidade'       => ['label' => 'Por Unidade',     'icon' => 'building'],
+    'arrecadacao'   => ['label' => 'Arrecadação',    'icon' => 'cash-stack'],
+    'balancete'     => ['label' => 'Balancete',       'icon' => 'calculator'],
+    'inadimplencia' => ['label' => 'Inadimplência',   'icon' => 'exclamation-triangle'],
+    'despesas'      => ['label' => 'Despesas',         'icon' => 'receipt'],
+    'folha'         => ['label' => 'Folha de Pessoal', 'icon' => 'people'],
+    'unidade'       => ['label' => 'Por Unidade',      'icon' => 'building'],
 ];
 ?>
 
@@ -41,6 +41,8 @@ $abas = [
   .print-header { display: block !important; }
 }
 .print-header { display: none; }
+/* Remove wrapping on mobile for currency */
+.val-nowrap { white-space: nowrap; }
 </style>
 
 <!-- Cabeçalho para impressão -->
@@ -48,15 +50,13 @@ $abas = [
   <h2 style="font-size:1.4rem; font-weight:800;">Relatório — <?= $abas[$aba]['label'] ?? '' ?></h2>
   <p style="font-size:.85rem; color:#6b7280;">
     Gerado em <?= date('d/m/Y H:i') ?> &nbsp;|&nbsp;
-    <?= in_array($aba, ['inadimplencia']) ? 'Competência: ' . $competencia : 'Ano: ' . $ano ?>
+    <?= $aba === 'inadimplencia' ? 'Competência: ' . $competencia : 'Ano: ' . $ano ?>
   </p>
   <hr>
 </div>
 
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 no-print">
   <h4 class="fw-semibold mb-0"><i class="bi bi-bar-chart-line"></i> Relatórios</h4>
-
-  <!-- Ações de exportação -->
   <div class="d-flex gap-2 flex-wrap">
     <?php
     $exportParams = match ($aba) {
@@ -65,8 +65,7 @@ $abas = [
         default         => "tipo={$aba}&ano={$ano}",
     };
     ?>
-    <a href="<?= $urlExport . '&' . $exportParams ?>"
-       class="btn btn-sm btn-outline-success">
+    <a href="<?= $urlExport . '&' . $exportParams ?>" class="btn btn-sm btn-outline-success">
       <i class="bi bi-file-earmark-excel"></i> Excel / CSV
     </a>
     <button onclick="window.print()" class="btn btn-sm btn-outline-secondary">
@@ -75,7 +74,7 @@ $abas = [
   </div>
 </div>
 
-<!-- Abas de relatório -->
+<!-- Abas -->
 <ul class="nav nav-tabs mb-4 no-print" style="flex-wrap:nowrap; overflow-x:auto;">
   <?php foreach ($abas as $chave => $info): ?>
   <li class="nav-item" style="white-space:nowrap;">
@@ -88,21 +87,18 @@ $abas = [
   <?php endforeach; ?>
 </ul>
 
-<!-- Filtros por aba -->
+<!-- Filtros -->
 <div class="d-flex flex-wrap gap-3 align-items-end mb-4 no-print">
-
   <?php if (in_array($aba, ['arrecadacao','balancete','despesas','folha','unidade'])): ?>
   <div>
     <label class="form-label mb-1 text-body-secondary" style="font-size:.8rem;">Ano</label>
-    <select class="form-select form-select-sm" style="width:auto;"
-            onchange="mudarFiltro('ano', this.value)">
+    <select class="form-select form-select-sm" style="width:auto;" onchange="mudarFiltro('ano', this.value)">
       <?php foreach ($anos as $a): ?>
         <option value="<?= $a ?>" <?= $a === $ano ? 'selected' : '' ?>><?= $a ?></option>
       <?php endforeach; ?>
     </select>
   </div>
   <?php endif; ?>
-
   <?php if ($aba === 'inadimplencia'): ?>
   <div>
     <label class="form-label mb-1 text-body-secondary" style="font-size:.8rem;">Competência</label>
@@ -110,12 +106,10 @@ $abas = [
            style="width:auto;" onchange="mudarFiltro('comp', this.value)">
   </div>
   <?php endif; ?>
-
   <?php if ($aba === 'unidade'): ?>
   <div>
     <label class="form-label mb-1 text-body-secondary" style="font-size:.8rem;">Unidade</label>
-    <select class="form-select form-select-sm" style="width:auto;"
-            onchange="mudarFiltro('unidade', this.value)">
+    <select class="form-select form-select-sm" style="width:auto;" onchange="mudarFiltro('unidade', this.value)">
       <option value="">— selecione —</option>
       <?php foreach ($unidades as $u): ?>
         <option value="<?= $u['id'] ?>" <?= $u['id'] == $unidadeId ? 'selected' : '' ?>>
@@ -125,14 +119,10 @@ $abas = [
     </select>
   </div>
   <?php endif; ?>
-
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- ABA: ARRECADAÇÃO                                                        -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<?php /* ═══════════════════════════════════════════════════════ ARRECADAÇÃO */ ?>
 <?php if ($aba === 'arrecadacao'): ?>
-
 <?php
 $totalCobrado    = array_sum(array_column($dados, 'total_cobrado'));
 $totalArrecadado = array_sum(array_column($dados, 'total_pago'));
@@ -140,18 +130,18 @@ $totalAberto     = $totalCobrado - $totalArrecadado;
 $adimplencia     = $totalCobrado > 0 ? round(($totalArrecadado / $totalCobrado) * 100, 1) : 0;
 ?>
 
-<div class="row g-3 mb-4">
+<div class="row g-2 mb-4">
   <?php foreach ([
-    ['Cobrado em '.$ano,    $totalCobrado,    'text-body'],
-    ['Arrecadado',          $totalArrecadado, 'text-success'],
-    ['Em aberto',           $totalAberto,     'text-danger'],
-    ['Taxa de adimplência', $adimplencia.'%', 'fw-bold'],
+    ['Cobrado em '.$ano, $totalCobrado,    'text-body'],
+    ['Arrecadado',       $totalArrecadado, 'text-success'],
+    ['Em aberto',        $totalAberto,     'text-danger'],
+    ['Adimplência',      $adimplencia.'%', 'fw-bold'],
   ] as [$label, $val, $cls]): ?>
   <div class="col-6 col-md-3">
     <div class="card border-0 shadow-sm h-100">
-      <div class="card-body">
-        <div class="text-body-secondary mb-1" style="font-size:.8rem;"><?= $label ?></div>
-        <div class="fw-bold fs-5 <?= $cls ?>">
+      <div class="card-body py-3">
+        <div class="text-body-secondary mb-1" style="font-size:.78rem;"><?= $label ?></div>
+        <div class="fw-bold <?= $cls ?>" style="font-size:1rem;">
           <?= is_string($val) ? $val : dinheiro((float)$val) ?>
         </div>
       </div>
@@ -167,7 +157,44 @@ $adimplencia     = $totalCobrado > 0 ? round(($totalArrecadado / $totalCobrado) 
   <?php if (empty($dados)): ?>
     <div class="card-body text-body-secondary">Nenhum dado para <?= $ano ?>.</div>
   <?php else: ?>
-  <div class="table-responsive">
+
+  <!-- Mobile -->
+  <div class="d-md-none">
+    <?php foreach ($dados as $i => $r):
+      $pct = $r['total_cobrado'] > 0 ? round(($r['total_pago'] / $r['total_cobrado']) * 100) : 0;
+    ?>
+    <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?>">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <span class="fw-semibold"><?= rotulomes($r['competencia']) ?></span>
+        <div class="text-end">
+          <div class="val-nowrap fw-bold" style="font-size:.95rem;"><?= dinheiro((float)$r['total_cobrado']) ?></div>
+          <div class="text-body-secondary" style="font-size:.72rem;">cobrado</div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="text-body-secondary" style="font-size:.75rem;"><?= $r['total_unidades'] ?> unid.</span>
+        <span class="badge rounded-pill badge-pago" style="font-size:.65rem;"><?= $r['total_pagas'] ?> pagas</span>
+        <?php if ($r['total_inadimplentes'] > 0): ?>
+          <span class="badge rounded-pill badge-vencido" style="font-size:.65rem;"><?= $r['total_inadimplentes'] ?> inadim.</span>
+        <?php endif; ?>
+        <span class="ms-auto fw-semibold text-success val-nowrap" style="font-size:.82rem;"><?= dinheiro((float)$r['total_pago']) ?></span>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <div style="flex:1; height:5px; background:#e5e7eb; border-radius:3px;">
+          <div style="width:<?= $pct ?>%; height:100%; background:#198754; border-radius:3px;"></div>
+        </div>
+        <span style="font-size:.72rem; color:#6b7280; white-space:nowrap;"><?= $pct ?>%</span>
+      </div>
+    </div>
+    <?php endforeach; ?>
+    <div class="border-top bg-body-tertiary px-3 py-2 d-flex justify-content-between fw-bold">
+      <span style="font-size:.8rem;">TOTAL</span>
+      <span class="val-nowrap"><?= dinheiro($totalCobrado) ?></span>
+    </div>
+  </div>
+
+  <!-- Desktop -->
+  <div class="d-none d-md-block table-responsive">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
         <tr>
@@ -213,16 +240,13 @@ $adimplencia     = $totalCobrado > 0 ? round(($totalArrecadado / $totalCobrado) 
       </tfoot>
     </table>
   </div>
+
   <?php endif; ?>
 </div>
-
 <?php endif; ?>
 
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- ABA: BALANCETE                                                          -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<?php /* ═══════════════════════════════════════════════════════ BALANCETE */ ?>
 <?php if ($aba === 'balancete'): ?>
-
 <?php
 $totArrecadado = array_sum(array_column($dados, 'arrecadado'));
 $totDespesas   = array_sum(array_column($dados, 'despesas'));
@@ -230,18 +254,18 @@ $totFolha      = array_sum(array_column($dados, 'folha'));
 $totSaldo      = array_sum(array_column($dados, 'saldo'));
 ?>
 
-<div class="row g-3 mb-4">
+<div class="row g-2 mb-4">
   <?php foreach ([
-    ['Arrecadado',  $totArrecadado, 'text-success'],
-    ['Despesas',    $totDespesas,   'text-danger'],
-    ['Folha',       $totFolha,      'text-danger'],
-    ['Saldo',       $totSaldo,      $totSaldo >= 0 ? 'text-success' : 'text-danger'],
+    ['Arrecadado', $totArrecadado, 'text-success'],
+    ['Despesas',   $totDespesas,   'text-danger'],
+    ['Folha',      $totFolha,      'text-danger'],
+    ['Saldo',      $totSaldo,      $totSaldo >= 0 ? 'text-success' : 'text-danger'],
   ] as [$label, $val, $cls]): ?>
   <div class="col-6 col-md-3">
     <div class="card border-0 shadow-sm h-100">
-      <div class="card-body">
-        <div class="text-body-secondary mb-1" style="font-size:.8rem;"><?= $label ?> <?= $ano ?></div>
-        <div class="fw-bold fs-5 <?= $cls ?>"><?= dinheiro((float)$val) ?></div>
+      <div class="card-body py-3">
+        <div class="text-body-secondary mb-1" style="font-size:.78rem;"><?= $label ?> <?= $ano ?></div>
+        <div class="fw-bold <?= $cls ?>" style="font-size:1rem;"><?= dinheiro((float)$val) ?></div>
       </div>
     </div>
   </div>
@@ -255,7 +279,41 @@ $totSaldo      = array_sum(array_column($dados, 'saldo'));
   <?php if (empty($dados)): ?>
     <div class="card-body text-body-secondary">Nenhum dado para <?= $ano ?>.</div>
   <?php else: ?>
-  <div class="table-responsive">
+
+  <!-- Mobile -->
+  <div class="d-md-none">
+    <?php foreach ($dados as $i => $r): $saldo = (float)$r['saldo']; ?>
+    <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?>">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="fw-semibold"><?= rotulomes($r['competencia']) ?></span>
+        <span class="fw-bold val-nowrap <?= $saldo >= 0 ? 'text-success' : 'text-danger' ?>">
+          <?= dinheiro($saldo) ?>
+        </span>
+      </div>
+      <div class="d-flex gap-3" style="font-size:.78rem;">
+        <div>
+          <span class="text-body-secondary">Arrecadado</span><br>
+          <span class="text-success fw-semibold val-nowrap"><?= dinheiro((float)$r['arrecadado']) ?></span>
+        </div>
+        <div>
+          <span class="text-body-secondary">Despesas</span><br>
+          <span class="text-danger val-nowrap"><?= dinheiro((float)$r['despesas']) ?></span>
+        </div>
+        <div>
+          <span class="text-body-secondary">Folha</span><br>
+          <span class="text-danger val-nowrap"><?= dinheiro((float)$r['folha']) ?></span>
+        </div>
+      </div>
+    </div>
+    <?php endforeach; ?>
+    <div class="border-top bg-body-tertiary px-3 py-2 d-flex justify-content-between fw-bold">
+      <span style="font-size:.8rem;">SALDO TOTAL</span>
+      <span class="val-nowrap <?= $totSaldo >= 0 ? 'text-success' : 'text-danger' ?>"><?= dinheiro($totSaldo) ?></span>
+    </div>
+  </div>
+
+  <!-- Desktop -->
+  <div class="d-none d-md-block table-responsive">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
         <tr>
@@ -290,14 +348,12 @@ $totSaldo      = array_sum(array_column($dados, 'saldo'));
       </tfoot>
     </table>
   </div>
+
   <?php endif; ?>
 </div>
-
 <?php endif; ?>
 
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- ABA: INADIMPLÊNCIA                                                      -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<?php /* ═══════════════════════════════════════════════════════ INADIMPLÊNCIA */ ?>
 <?php if ($aba === 'inadimplencia'): ?>
 
 <div class="card border-0 shadow-sm">
@@ -310,7 +366,39 @@ $totSaldo      = array_sum(array_column($dados, 'saldo'));
       <i class="bi bi-check-circle-fill"></i> Nenhuma inadimplência nesta competência.
     </div>
   <?php else: ?>
-  <div class="table-responsive">
+
+  <!-- Mobile -->
+  <div class="d-md-none">
+    <?php foreach ($dados as $i => $r): ?>
+    <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?> border-start border-danger border-3">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="fw-semibold" style="font-size:.95rem;"><?= htmlspecialchars($r['unidade']) ?></div>
+          <div class="text-body-secondary" style="font-size:.78rem;"><?= htmlspecialchars($r['responsavel'] ?? '—') ?></div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold val-nowrap" style="font-size:.95rem;"><?= dinheiro((float)$r['valor']) ?></div>
+          <span class="badge rounded-pill badge-<?= $r['status'] ?>" style="font-size:.65rem;"><?= ucfirst($r['status']) ?></span>
+        </div>
+      </div>
+      <div class="mt-1 d-flex gap-3" style="font-size:.75rem; color:var(--bs-body-secondary);">
+        <span>Venc.: <?= dataBR($r['vencimento']) ?></span>
+        <?php if ($r['dias_atraso'] > 0): ?>
+          <span class="text-danger fw-semibold"><?= $r['dias_atraso'] ?> dias de atraso</span>
+        <?php else: ?>
+          <span class="text-success">No prazo</span>
+        <?php endif; ?>
+      </div>
+    </div>
+    <?php endforeach; ?>
+    <div class="border-top bg-body-tertiary px-3 py-2 d-flex justify-content-between fw-bold">
+      <span style="font-size:.8rem;">TOTAL EM ABERTO</span>
+      <span class="val-nowrap text-danger"><?= dinheiro(array_sum(array_column($dados, 'valor'))) ?></span>
+    </div>
+  </div>
+
+  <!-- Desktop -->
+  <div class="d-none d-md-block table-responsive">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
         <tr>
@@ -345,43 +433,33 @@ $totSaldo      = array_sum(array_column($dados, 'saldo'));
       </tfoot>
     </table>
   </div>
+
   <?php endif; ?>
 </div>
-
 <?php endif; ?>
 
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- ABA: DESPESAS                                                           -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<?php /* ═══════════════════════════════════════════════════════ DESPESAS */ ?>
 <?php if ($aba === 'despesas'): ?>
-
 <?php $totDespAno = array_sum(array_column($dados, 'total')); ?>
 
-<div class="row g-3 mb-4">
+<div class="row g-2 mb-4">
+  <?php foreach ([
+    ['Total lançado',        $totDespAno,                                          'text-body'],
+    ['Pago',                 array_sum(array_column($dados, 'total_pago')),         'text-success'],
+    ['Pendente',             array_sum(array_column($dados, 'total_pendente')),     'text-warning'],
+    ['Meses c/ lançamento',  count($dados),                                        'fw-bold'],
+  ] as [$label, $val, $cls]): ?>
   <div class="col-6 col-md-3">
-    <div class="card border-0 shadow-sm h-100"><div class="card-body">
-      <div class="text-body-secondary mb-1" style="font-size:.8rem;">Total lançado</div>
-      <div class="fw-bold fs-5"><?= dinheiro($totDespAno) ?></div>
-    </div></div>
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body py-3">
+        <div class="text-body-secondary mb-1" style="font-size:.78rem;"><?= $label ?></div>
+        <div class="fw-bold <?= $cls ?>" style="font-size:1rem;">
+          <?= is_int($val) ? $val : dinheiro((float)$val) ?>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="col-6 col-md-3">
-    <div class="card border-0 shadow-sm h-100"><div class="card-body">
-      <div class="text-body-secondary mb-1" style="font-size:.8rem;">Pago</div>
-      <div class="fw-bold fs-5 text-success"><?= dinheiro(array_sum(array_column($dados, 'total_pago'))) ?></div>
-    </div></div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card border-0 shadow-sm h-100"><div class="card-body">
-      <div class="text-body-secondary mb-1" style="font-size:.8rem;">Pendente</div>
-      <div class="fw-bold fs-5 text-warning"><?= dinheiro(array_sum(array_column($dados, 'total_pendente'))) ?></div>
-    </div></div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card border-0 shadow-sm h-100"><div class="card-body">
-      <div class="text-body-secondary mb-1" style="font-size:.8rem;">Meses com lançamento</div>
-      <div class="fw-bold fs-5"><?= count($dados) ?></div>
-    </div></div>
-  </div>
+  <?php endforeach; ?>
 </div>
 
 <div class="card border-0 shadow-sm">
@@ -391,7 +469,30 @@ $totSaldo      = array_sum(array_column($dados, 'saldo'));
   <?php if (empty($dados)): ?>
     <div class="card-body text-body-secondary">Nenhuma despesa registrada em <?= $ano ?>.</div>
   <?php else: ?>
-  <div class="table-responsive">
+
+  <!-- Mobile -->
+  <div class="d-md-none">
+    <?php foreach ($dados as $i => $r): ?>
+    <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?>">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <span class="fw-semibold"><?= rotulomes($r['competencia']) ?></span>
+        <span class="text-body-secondary" style="font-size:.75rem;"><?= $r['qtd'] ?> lançamento<?= $r['qtd'] != 1 ? 's' : '' ?></span>
+      </div>
+      <div class="d-flex gap-3" style="font-size:.8rem;">
+        <div><span class="text-body-secondary" style="font-size:.72rem;">Total</span><br><span class="fw-semibold val-nowrap"><?= dinheiro((float)$r['total']) ?></span></div>
+        <div><span class="text-body-secondary" style="font-size:.72rem;">Pago</span><br><span class="text-success val-nowrap"><?= dinheiro((float)$r['total_pago']) ?></span></div>
+        <div><span class="text-body-secondary" style="font-size:.72rem;">Pendente</span><br><span class="text-warning val-nowrap"><?= dinheiro((float)$r['total_pendente']) ?></span></div>
+      </div>
+    </div>
+    <?php endforeach; ?>
+    <div class="border-top bg-body-tertiary px-3 py-2 d-flex justify-content-between fw-bold">
+      <span style="font-size:.8rem;">TOTAL</span>
+      <span class="val-nowrap"><?= dinheiro($totDespAno) ?></span>
+    </div>
+  </div>
+
+  <!-- Desktop -->
+  <div class="d-none d-md-block table-responsive">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
         <tr>
@@ -420,14 +521,12 @@ $totSaldo      = array_sum(array_column($dados, 'saldo'));
       </tfoot>
     </table>
   </div>
+
   <?php endif; ?>
 </div>
-
 <?php endif; ?>
 
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- ABA: FOLHA DE PESSOAL                                                   -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<?php /* ═══════════════════════════════════════════════════════ FOLHA */ ?>
 <?php if ($aba === 'folha'): ?>
 
 <div class="card border-0 shadow-sm">
@@ -437,7 +536,29 @@ $totSaldo      = array_sum(array_column($dados, 'saldo'));
   <?php if (empty($dados)): ?>
     <div class="card-body text-body-secondary">Nenhum registro de folha em <?= $ano ?>.</div>
   <?php else: ?>
-  <div class="table-responsive">
+
+  <!-- Mobile -->
+  <div class="d-md-none">
+    <?php foreach ($dados as $i => $r): ?>
+    <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?>">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <span class="fw-semibold"><?= rotulomes($r['competencia']) ?></span>
+        <span class="text-body-secondary" style="font-size:.75rem;"><?= $r['qtd_funcionarios'] ?> funcionário<?= $r['qtd_funcionarios'] != 1 ? 's' : '' ?></span>
+      </div>
+      <div class="d-flex gap-3" style="font-size:.8rem;">
+        <div><span class="text-body-secondary" style="font-size:.72rem;">Total folha</span><br><span class="fw-semibold val-nowrap"><?= dinheiro((float)$r['total']) ?></span></div>
+        <div><span class="text-body-secondary" style="font-size:.72rem;">Pago</span><br><span class="text-success val-nowrap"><?= dinheiro((float)$r['total_pago']) ?></span></div>
+      </div>
+    </div>
+    <?php endforeach; ?>
+    <div class="border-top bg-body-tertiary px-3 py-2 d-flex justify-content-between fw-bold">
+      <span style="font-size:.8rem;">TOTAL</span>
+      <span class="val-nowrap"><?= dinheiro(array_sum(array_column($dados, 'total'))) ?></span>
+    </div>
+  </div>
+
+  <!-- Desktop -->
+  <div class="d-none d-md-block table-responsive">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
         <tr>
@@ -464,14 +585,12 @@ $totSaldo      = array_sum(array_column($dados, 'saldo'));
       </tfoot>
     </table>
   </div>
+
   <?php endif; ?>
 </div>
-
 <?php endif; ?>
 
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!-- ABA: POR UNIDADE                                                        -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<?php /* ═══════════════════════════════════════════════════════ POR UNIDADE */ ?>
 <?php if ($aba === 'unidade'): ?>
 
 <?php if (!$unidadeId): ?>
@@ -489,23 +608,23 @@ $totalPago   = array_sum(array_map(fn($r) => $r['status'] === 'pago' ? (float)$r
 $totalAberto = array_sum(array_map(fn($r) => $r['status'] !== 'pago' ? (float)$r['valor'] : 0, $dados));
 ?>
 
-<div class="row g-3 mb-4">
+<div class="row g-2 mb-4">
   <div class="col-6 col-md-4">
-    <div class="card border-0 shadow-sm h-100"><div class="card-body">
-      <div class="text-body-secondary mb-1" style="font-size:.8rem;">Total pago</div>
-      <div class="fw-bold fs-5 text-success"><?= dinheiro($totalPago) ?></div>
+    <div class="card border-0 shadow-sm h-100"><div class="card-body py-3">
+      <div class="text-body-secondary mb-1" style="font-size:.78rem;">Total pago</div>
+      <div class="fw-bold text-success" style="font-size:1rem;"><?= dinheiro($totalPago) ?></div>
     </div></div>
   </div>
   <div class="col-6 col-md-4">
-    <div class="card border-0 shadow-sm h-100"><div class="card-body">
-      <div class="text-body-secondary mb-1" style="font-size:.8rem;">Em aberto</div>
-      <div class="fw-bold fs-5 <?= $totalAberto > 0 ? 'text-danger' : 'text-success' ?>"><?= dinheiro($totalAberto) ?></div>
+    <div class="card border-0 shadow-sm h-100"><div class="card-body py-3">
+      <div class="text-body-secondary mb-1" style="font-size:.78rem;">Em aberto</div>
+      <div class="fw-bold <?= $totalAberto > 0 ? 'text-danger' : 'text-success' ?>" style="font-size:1rem;"><?= dinheiro($totalAberto) ?></div>
     </div></div>
   </div>
   <div class="col-6 col-md-4">
-    <div class="card border-0 shadow-sm h-100"><div class="card-body">
-      <div class="text-body-secondary mb-1" style="font-size:.8rem;">Competências</div>
-      <div class="fw-bold fs-5"><?= count($dados) ?></div>
+    <div class="card border-0 shadow-sm h-100"><div class="card-body py-3">
+      <div class="text-body-secondary mb-1" style="font-size:.78rem;">Competências</div>
+      <div class="fw-bold" style="font-size:1rem;"><?= count($dados) ?></div>
     </div></div>
   </div>
 </div>
@@ -514,7 +633,33 @@ $totalAberto = array_sum(array_map(fn($r) => $r['status'] !== 'pago' ? (float)$r
   <div class="card-header bg-transparent fw-semibold py-3">
     <i class="bi bi-building"></i> Extrato — <?= $ano ?>
   </div>
-  <div class="table-responsive">
+
+  <!-- Mobile -->
+  <div class="d-md-none">
+    <?php foreach ($dados as $i => $r): ?>
+    <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?> border-start border-3 <?= $r['status'] === 'pago' ? 'border-success' : 'border-danger' ?>">
+      <div class="d-flex justify-content-between align-items-start">
+        <span class="fw-semibold"><?= rotulomes($r['competencia']) ?></span>
+        <div class="text-end">
+          <div class="fw-bold val-nowrap" style="font-size:.95rem;"><?= dinheiro((float)$r['valor']) ?></div>
+          <span class="badge rounded-pill badge-<?= $r['status'] ?>" style="font-size:.65rem;"><?= ucfirst($r['status']) ?></span>
+        </div>
+      </div>
+      <div class="mt-1 d-flex gap-3" style="font-size:.75rem; color:var(--bs-body-secondary);">
+        <span>Venc.: <?= dataBR($r['vencimento']) ?></span>
+        <?php if ($r['data_pagamento']): ?>
+          <span class="text-success">Pago: <?= dataBR($r['data_pagamento']) ?></span>
+        <?php endif; ?>
+      </div>
+      <?php if (!empty($r['observacao'])): ?>
+        <div class="text-body-secondary mt-1" style="font-size:.73rem;"><?= htmlspecialchars($r['observacao']) ?></div>
+      <?php endif; ?>
+    </div>
+    <?php endforeach; ?>
+  </div>
+
+  <!-- Desktop -->
+  <div class="d-none d-md-block table-responsive">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
         <tr>
