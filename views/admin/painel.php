@@ -271,21 +271,31 @@ $eArrec  = (float) ($resumoExtras['valor_atrasado']  ?? 0);
       <?php else: ?>
       <div class="list-group list-group-flush">
         <?php foreach ($vistoriasAVencer as $v):
-          $diasRestantes = (int) round((strtotime($v->validade) - time()) / 86400);
-          $cor = $diasRestantes <= 15 ? 'danger' : ($diasRestantes <= 30 ? 'warning' : 'secondary');
+          if ($v->status === 'agendada') {
+              $dataRef = $v->dataVistoria;
+              $dias    = (int) round((strtotime($dataRef) - time()) / 86400);
+              $cor     = $dias < 0 ? 'danger' : ($dias <= 7 ? 'warning' : 'secondary');
+              $badge   = $dias < 0 ? abs($dias) . 'd atraso' : $dias . 'd';
+          } else {
+              $dataRef = $v->validade;
+              $dias    = (int) round((strtotime($dataRef) - time()) / 86400);
+              $cor     = $dias <= 15 ? 'danger' : ($dias <= 30 ? 'warning' : 'secondary');
+              $badge   = $dias . 'd';
+          }
         ?>
         <a href="<?= url("vistorias/{$v->id}") ?>"
            class="list-group-item list-group-item-action border-0 py-2 px-3">
           <div class="d-flex justify-content-between align-items-start">
             <div>
-              <div class="fw-semibold" style="font-size:.85rem;"><?= htmlspecialchars($v->rotuloTipo()) ?></div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="fw-semibold" style="font-size:.85rem;"><?= htmlspecialchars($v->rotuloTipo()) ?></span>
+                <span class="badge rounded-pill badge-<?= $v->status ?>" style="font-size:.65rem;"><?= $v->rotuloStatus() ?></span>
+              </div>
               <div class="text-body-secondary" style="font-size:.75rem;">
-                <?= htmlspecialchars($v->nomeResponsavel ?? $v->nomePrestadora ?? '—') ?>
+                <?= dataBR($dataRef) ?> · <?= htmlspecialchars($v->nomePrestadora ?? $v->nomeResponsavel ?? '—') ?>
               </div>
             </div>
-            <span class="badge bg-<?= $cor ?> bg-opacity-85 flex-shrink-0 ms-2">
-              <?= $diasRestantes ?>d
-            </span>
+            <span class="badge bg-<?= $cor ?> flex-shrink-0 ms-2"><?= $badge ?></span>
           </div>
         </a>
         <?php endforeach; ?>

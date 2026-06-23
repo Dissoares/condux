@@ -46,8 +46,8 @@ class PainelAdminController
         $projetosRecentes    = array_slice($this->projetoRepo->listarTodos(), 0, 5);
         $totalProjetosAtivos = $this->projetoRepo->contarPorStatus('em_andamento');
 
-        // Vistorias próximas do vencimento
-        $vistoriasAVencer = $this->vistoriaRepo->listarValidadesProximas();
+        // Vistorias agendadas + realizadas com validade próxima
+        $vistoriasAVencer = $this->vistoriaRepo->listarParaPainel();
 
         // Contadores
         $totalUnidades    = count($this->unidadeRepo->listarAtivas());
