@@ -111,7 +111,8 @@ class TaxaCondominialService
         $caminho = $this->salvarArquivoComprovante($arquivoUpload);
 
         $taxa->comprovante = $caminho;
-        $taxa->observacao  = 'Comprovante enviado — aguardando aprovação.';
+        $taxa->status      = TaxaCondominial::STATUS_AGUARDANDO;
+        $taxa->observacao  = 'Comprovante enviado — aguardando aprovação do síndico.';
 
         $this->taxaRepository->salvar($taxa);
 

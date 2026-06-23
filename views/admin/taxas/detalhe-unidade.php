@@ -51,7 +51,7 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
   <?php else:
     $statusEf = ($taxaCond->status === 'vencido' || ($taxaCond->status === 'pendente' && $taxaCond->vencimento < date('Y-m-d')))
                 ? 'vencido' : $taxaCond->status;
-    $labels   = ['pago' => 'Pago', 'vencido' => 'Atrasado', 'pendente' => 'Pendente', 'isento' => 'Isento'];
+    $labels   = ['pago' => 'Pago', 'vencido' => 'Atrasado', 'pendente' => 'Pendente', 'isento' => 'Isento', 'aguardando' => 'Aguardando'];
   ?>
   <div class="card-body">
     <div class="row g-3">
@@ -89,10 +89,10 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           <i class="bi bi-paperclip"></i> Ver comprovante
         </a>
       <?php endif; ?>
-      <?php if ($taxaCond->comprovante && $taxaCond->status !== 'pago'): ?>
+      <?php if ($taxaCond->comprovante && !in_array($taxaCond->status, ['pago', 'isento'], true)): ?>
         <a href="<?= url("taxas/{$taxaCond->id}/aprovar?competencia={$competencia}&unidade_id={$unidade->id}") ?>"
            class="btn btn-success btn-sm"
-           onclick="return confirm('Aprovar este pagamento?')">
+           onclick="return confirm('Confirmar aprovação deste pagamento?')">
           <i class="bi bi-check-lg"></i> Aprovar pagamento
         </a>
       <?php endif; ?>

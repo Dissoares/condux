@@ -195,14 +195,24 @@ class TaxaCondominialRepository
                 SUM(status = "pago") AS total_pagas,
                 SUM(status = "pago" OR status = "isento") AS total_quitadas,
                 SUM(status = "vencido" OR (status = "pendente" AND vencimento < CURDATE())) AS total_atrasadas,
-                SUM(status = "pendente" AND vencimento >= CURDATE()) AS total_pendentes,
+                SUM(status = "aguardando" OR (status = "pendente" AND vencimento >= CURDATE())) AS total_pendentes,
+                SUM(status = "aguardando") AS total_aguardando,
                 SUM(CASE WHEN status = "pago" THEN valor ELSE 0 END) AS valor_arrecadado,
                 SUM(CASE WHEN status = "vencido" OR (status = "pendente" AND vencimento < CURDATE()) THEN valor ELSE 0 END) AS valor_atrasado,
-                SUM(CASE WHEN status = "pendente" AND vencimento >= CURDATE() THEN valor ELSE 0 END) AS valor_pendente
+                SUM(CASE WHEN status = "aguardando" OR (status = "pendente" AND vencimento >= CURDATE()) THEN valor ELSE 0 END) AS valor_pendente
              FROM taxas_condominiais
              WHERE competencia = DATE_FORMAT(NOW(), "%Y-%m")'
         );
         return $stmt->fetch() ?: [];
+    }
+
+    /** Conta taxas com comprovante enviado aguardando aprovação do síndico */
+    public function contarAguardandoAprovacao(): int
+    {
+        $stmt = $this->conexao->query(
+            'SELECT COUNT(*) FROM taxas_condominiais WHERE status = "aguardando"'
+        );
+        return (int) $stmt->fetchColumn();
     }
 
     /** Totais globais de inadimplência (todos os meses) */
@@ -211,9 +221,10 @@ class TaxaCondominialRepository
         $stmt = $this->conexao->query(
             'SELECT
                 SUM(CASE WHEN status = "vencido" OR (status = "pendente" AND vencimento < CURDATE()) THEN valor ELSE 0 END) AS valor_total_atrasado,
-                SUM(CASE WHEN status = "pendente" AND vencimento >= CURDATE() THEN valor ELSE 0 END) AS valor_total_pendente,
+                SUM(CASE WHEN status = "aguardando" OR (status = "pendente" AND vencimento >= CURDATE()) THEN valor ELSE 0 END) AS valor_total_pendente,
                 SUM(CASE WHEN status = "vencido" OR (status = "pendente" AND vencimento < CURDATE()) THEN 1 ELSE 0 END) AS qtd_atrasadas,
-                SUM(CASE WHEN status = "pendente" AND vencimento >= CURDATE() THEN 1 ELSE 0 END) AS qtd_pendentes
+                SUM(CASE WHEN status = "aguardando" OR (status = "pendente" AND vencimento >= CURDATE()) THEN 1 ELSE 0 END) AS qtd_pendentes,
+                COUNT(DISTINCT CASE WHEN status = "vencido" OR (status = "pendente" AND vencimento < CURDATE()) THEN unidade_id END) AS qtd_unidades_inadimplentes
              FROM taxas_condominiais
              WHERE status NOT IN ("pago", "isento")'
         );
@@ -247,7 +258,8 @@ class TaxaCondominialRepository
                 COUNT(*) AS total,
                 SUM(status = "pago") AS total_pagas,
                 SUM(status = "vencido" OR (status = "pendente" AND vencimento < CURDATE())) AS total_atrasadas,
-                SUM(status = "pendente" AND vencimento >= CURDATE()) AS total_pendentes,
+                SUM(status = "aguardando" OR (status = "pendente" AND vencimento >= CURDATE())) AS total_pendentes,
+                SUM(status = "aguardando") AS total_aguardando,
                 SUM(CASE WHEN status = "pago" THEN valor ELSE 0 END) AS valor_arrecadado
              FROM taxas_condominiais
              GROUP BY competencia

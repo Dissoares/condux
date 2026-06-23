@@ -7,10 +7,11 @@ declare(strict_types=1);
  */
 class TaxaCondominial
 {
-    public const STATUS_PENDENTE = 'pendente';
-    public const STATUS_PAGO     = 'pago';
-    public const STATUS_VENCIDO  = 'vencido';
-    public const STATUS_ISENTO   = 'isento';
+    public const STATUS_PENDENTE   = 'pendente';
+    public const STATUS_AGUARDANDO = 'aguardando';
+    public const STATUS_PAGO       = 'pago';
+    public const STATUS_VENCIDO    = 'vencido';
+    public const STATUS_ISENTO     = 'isento';
 
     public function __construct(
         public readonly ?int    $id,
@@ -62,6 +63,11 @@ class TaxaCondominial
     public function estaPago(): bool
     {
         return $this->status === self::STATUS_PAGO;
+    }
+
+    public function estaAguardando(): bool
+    {
+        return $this->status === self::STATUS_AGUARDANDO;
     }
 
     public function estaVencido(): bool

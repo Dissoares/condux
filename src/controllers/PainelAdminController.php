@@ -49,6 +49,9 @@ class PainelAdminController
         // Vistorias agendadas + realizadas com validade próxima
         $vistoriasAVencer = $this->vistoriaRepo->listarParaPainel();
 
+        // Comprovantes aguardando aprovação do síndico
+        $qtdAguardando = $this->taxaRepo->contarAguardandoAprovacao();
+
         // Contadores
         $totalUnidades    = count($this->unidadeRepo->listarAtivas());
         $totalMoradores   = $this->moradorRepo->contarAtivos();
