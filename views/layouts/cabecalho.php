@@ -11,6 +11,13 @@ $inicialNome  = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
 $_fotoUsuario = !empty($usuarioAtual['foto']) ? url('uploads/' . $usuarioAtual['foto']) . '?v=' . time() : null;
 $ePainel      = ($segAtivo === '' || $segAtivo === 'painel');
 
+// Contagem de tickets pendentes para badge no sininho
+require_once RAIZ . '/src/repository/TicketRepository.php';
+$_ticketRepo  = new TicketRepository(Conexao::obter());
+$_badgeTicket = $ehAdmin
+    ? $_ticketRepo->contarAbertos()
+    : $_ticketRepo->contarRespostasParaMorador((int)($usuarioAtual['id'] ?? 0));
+
 // Configurações dinâmicas da plataforma
 require_once RAIZ . '/src/repository/ConfiguracaoRepository.php';
 $_cfg = (new ConfiguracaoRepository(Conexao::obter()))->todas();
@@ -81,9 +88,15 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
   <!-- Direita: sininho + avatar com dropdown -->
   <div class="condux-top-bar-dir">
 
+    <a href="<?= url('tickets') ?>" class="condux-top-btn condux-bell-btn" title="Tickets / Notificações" style="position:relative;">
+      <i class="bi bi-bell<?= $_badgeTicket > 0 ? '-fill' : '' ?>"></i>
+      <?php if ($_badgeTicket > 0): ?>
+        <span class="condux-badge-sino"><?= $_badgeTicket > 9 ? '9+' : $_badgeTicket ?></span>
+      <?php endif; ?>
+    </a>
     <?php if (file_exists(RAIZ . '/config/vapid.php')): ?>
-    <button id="condux-push-btn" class="condux-top-btn condux-push-off" title="Notificações">
-      <i class="bi bi-bell"></i>
+    <button id="condux-push-btn" class="condux-top-btn condux-push-off d-none d-lg-inline-flex" title="Push">
+      <i class="bi bi-bell-slash" style="font-size:.85rem;"></i>
     </button>
     <?php endif; ?>
 
@@ -287,11 +300,17 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
             style="color:rgba(255,255,255,.6); font-size:1rem;">
       <i class="bi bi-moon-fill condux-tema-icone"></i>
     </button>
+    <a href="<?= url('tickets') ?>" title="Tickets" class="condux-sidebar-bell" style="position:relative;">
+      <i class="bi bi-bell<?= $_badgeTicket > 0 ? '-fill' : '' ?>"></i>
+      <?php if ($_badgeTicket > 0): ?>
+        <span class="condux-badge-sino"><?= $_badgeTicket > 9 ? '9+' : $_badgeTicket ?></span>
+      <?php endif; ?>
+    </a>
     <?php if (file_exists(RAIZ . '/config/vapid.php')): ?>
     <button id="condux-push-btn" class="btn btn-link p-0 border-0 condux-push-off"
             title="Ativar notificações"
             style="color:rgba(255,255,255,.6); font-size:1rem;">
-      <i class="bi bi-bell"></i>
+      <i class="bi bi-bell-slash" style="font-size:.8rem;"></i>
     </button>
     <?php endif; ?>
     <a href="<?= url('sair') ?>" title="Sair" style="color:rgba(255,255,255,.6); font-size:1rem;">

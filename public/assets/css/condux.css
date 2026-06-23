@@ -116,6 +116,32 @@ body {
 .condux-sidebar .nav-link.ativo i { opacity: 1; }
 
 /* Usuário / footer da sidebar */
+/* ── Badge do sininho de tickets ───────────────────────── */
+.condux-badge-sino {
+  position: absolute;
+  top: 1px; right: 1px;
+  background: #e53935;
+  color: #fff;
+  font-size: .6rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 8px;
+  min-width: 16px;
+  text-align: center;
+  pointer-events: none;
+}
+.condux-sidebar-bell {
+  color: rgba(255,255,255,.6);
+  font-size: 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  transition: color .15s;
+}
+.condux-sidebar-bell:hover { color: var(--condux-acento); }
+
 .condux-usuario {
   padding: .85rem 1.25rem;
   border-top: 1px solid rgba(255,255,255,.08);
@@ -659,6 +685,22 @@ body {
   }
   .condux-top-btn:hover,
   .condux-top-btn:active { color: var(--condux-acento); }
+  .condux-bell-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,.8);
+    font-size: 1.05rem;
+    padding: .35rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: .4rem;
+    text-decoration: none;
+    transition: color .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .condux-bell-btn:hover { color: var(--condux-acento); }
   .condux-avatar-sm {
     width: 30px; height: 30px;
     border-radius: 50%;

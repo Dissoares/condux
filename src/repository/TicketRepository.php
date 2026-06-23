@@ -139,4 +139,22 @@ class TicketRepository
         $stmt->execute([':uid' => $usuarioId]);
         return (int) $stmt->fetchColumn();
     }
+
+    /** Tickets do morador que receberam resposta da equipe (status em_andamento ou resolvido) */
+    public function contarRespostasParaMorador(int $usuarioId): int
+    {
+        $stmt = $this->conexao->prepare(
+            "SELECT COUNT(*) FROM tickets
+             WHERE usuario_id = :uid
+               AND status IN ('em_andamento','resolvido')
+               AND EXISTS (
+                   SELECT 1 FROM ticket_mensagens tm
+                   JOIN usuarios u ON u.id = tm.usuario_id
+                   WHERE tm.ticket_id = tickets.id
+                     AND u.perfil IN ('sindico','subsindico')
+               )"
+        );
+        $stmt->execute([':uid' => $usuarioId]);
+        return (int) $stmt->fetchColumn();
+    }
 }
