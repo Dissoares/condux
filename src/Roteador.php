@@ -74,9 +74,10 @@ class Roteador
             'push'             => self::rotasPush($seg, $metodo),
             'configuracoes'    => self::rotasConfiguracoes($seg, $metodo, $ehAdmin),
             'minhas-taxas'     => self::rotasMinhasTaxas($seg, $metodo),
-            'transparencia'=> self::rotasTransparencia($seg),
-            'relatorios'   => self::carregarRelatorio(),
-            default        => self::naoEncontrado(),
+            'transparencia' => self::rotasTransparencia($seg),
+            'relatorios'    => self::carregarRelatorio(),
+            'perfil'        => self::rotasPerfil($seg, $metodo),
+            default         => self::naoEncontrado(),
         };
     }
 
@@ -479,6 +480,19 @@ class Roteador
     {
         require_once RAIZ . '/src/controllers/RelatorioController.php';
         (new RelatorioController())->exibir();
+    }
+
+    // ── Perfil do usuário logado ───────────────────────────────────────────
+
+    private static function rotasPerfil(array $seg, string $metodo): void
+    {
+        require_once RAIZ . '/src/controllers/PerfilController.php';
+        $ctrl = new PerfilController();
+        if ($seg[1] === 'salvar' && $metodo === 'POST') {
+            $ctrl->salvar();
+        } else {
+            $ctrl->exibir();
+        }
     }
 
     // ── Utilitários ───────────────────────────────────────────────────────
