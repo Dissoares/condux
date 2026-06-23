@@ -78,19 +78,71 @@ $primeiroNome = explode(' ', Sessao::usuarioAtual()['nome'] ?? 'Morador')[0];
 
   <?php if (!empty($taxasPendentes)): ?>
   <div class="card border-0 shadow-sm">
-    <div class="card-header bg-transparent fw-semibold py-3"><i class="bi bi-exclamation-triangle"></i> Taxas pendentes</div>
-    <div class="table-responsive">
+    <div class="card-header bg-transparent fw-semibold py-3">
+      <i class="bi bi-exclamation-triangle text-warning me-1"></i> Taxas pendentes
+    </div>
+
+    <!-- Mobile: itens em lista -->
+    <div class="d-md-none">
+      <?php foreach ($taxasPendentes as $i => $taxa):
+        $statusEf = $taxa->estaVencido() ? 'vencido' : $taxa->status;
+        $badgeClass = match($statusEf) {
+          'vencido'    => 'bg-danger text-white',
+          'aguardando' => 'badge-aguardando',
+          default      => 'badge-pendente',
+        };
+        $rotulo = match($statusEf) {
+          'vencido'    => 'Atrasado',
+          'aguardando' => 'Enviado',
+          default      => 'Pendente',
+        };
+      ?>
+      <div class="d-flex align-items-center justify-content-between px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?>">
+        <div>
+          <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($taxa->competenciaFormatada()) ?></div>
+          <div class="text-body-secondary" style="font-size:.78rem;">Venc. <?= dataBR($taxa->vencimento) ?></div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="fw-semibold" style="font-size:.9rem;"><?= dinheiro($taxa->valor) ?></span>
+          <span class="badge rounded-pill <?= $badgeClass ?>"><?= $rotulo ?></span>
+        </div>
+      </div>
+      <?php endforeach; ?>
+      <div class="px-3 pb-3 pt-1">
+        <a href="<?= url('minhas-taxas') ?>" class="btn btn-primary btn-sm w-100">
+          <i class="bi bi-send me-1"></i>Pagar / enviar comprovante
+        </a>
+      </div>
+    </div>
+
+    <!-- Desktop: tabela -->
+    <div class="d-none d-md-block table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead class="table-light">
-          <tr><th>Competência</th><th>Valor</th><th>Vencimento</th><th>Status</th></tr>
+          <tr><th>Competência</th><th>Valor</th><th>Vencimento</th><th>Status</th><th></th></tr>
         </thead>
         <tbody>
-          <?php foreach ($taxasPendentes as $taxa): ?>
+          <?php foreach ($taxasPendentes as $taxa):
+            $statusEf = $taxa->estaVencido() ? 'vencido' : $taxa->status;
+            $badgeClass = match($statusEf) {
+              'vencido'    => 'bg-danger text-white',
+              'aguardando' => 'badge-aguardando',
+              default      => 'badge-pendente',
+            };
+            $rotulo = match($statusEf) { 'vencido' => 'Atrasado', 'aguardando' => 'Enviado', default => 'Pendente' };
+          ?>
           <tr>
             <td><?= htmlspecialchars($taxa->competenciaFormatada()) ?></td>
             <td><?= dinheiro($taxa->valor) ?></td>
             <td><?= dataBR($taxa->vencimento) ?></td>
-            <td><span class="badge rounded-pill badge-<?= $taxa->status ?>"><?= ucfirst($taxa->status) ?></span></td>
+            <td><span class="badge rounded-pill <?= $badgeClass ?>"><?= $rotulo ?></span></td>
+            <td class="text-end">
+              <?php if ($statusEf !== 'aguardando'): ?>
+              <a href="<?= url('minhas-taxas') ?>" class="btn btn-primary btn-sm py-0 px-2">
+                <i class="bi bi-send me-1"></i>Pagar
+              </a>
+              <?php endif; ?>
+            </td>
           </tr>
           <?php endforeach; ?>
         </tbody>
