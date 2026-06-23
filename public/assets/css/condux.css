@@ -42,7 +42,7 @@ body {
 /* ── Sidebar ────────────────────────────────────────── */
 .condux-sidebar {
   width: 256px;
-  min-height: 100vh;
+  height: 100vh;
   background: linear-gradient(180deg, var(--condux-primaria) 0%, var(--condux-escura) 100%);
   position: fixed;
   top: 0; left: 0;
