@@ -157,6 +157,35 @@ class TaxaCondominialRepository
         return count($unidadeIds);
     }
 
+    /**
+     * Retorna todas as unidades ativas com o resumo de taxas para uma competência.
+     * Unidades sem taxa aparecem com taxa_id = null.
+     * @return array<array{unidade_id:int, identificacao:string, taxa_id:int|null, status:string|null, valor:float|null, vencimento:string|null, data_pagamento:string|null}>
+     */
+    public function listarUnidadesComTaxaPorCompetencia(string $competencia): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT
+                u.id AS unidade_id,
+                u.numero,
+                u.bloco,
+                CONCAT("Apto ", u.numero, IF(u.bloco IS NOT NULL, CONCAT(" — Bloco ", u.bloco), "")) AS identificacao,
+                tc.id         AS taxa_id,
+                tc.status,
+                tc.valor,
+                tc.vencimento,
+                tc.data_pagamento,
+                tc.forma_pagamento
+             FROM unidades u
+             LEFT JOIN taxas_condominiais tc
+                    ON tc.unidade_id = u.id AND tc.competencia = :competencia
+             WHERE u.ativo = 1
+             ORDER BY u.bloco, u.numero'
+        );
+        $stmt->execute([':competencia' => $competencia]);
+        return $stmt->fetchAll();
+    }
+
     /** @return array<int, TaxaCondominial[]> indexado por unidade_id */
     public function listarTodasAgrupadasPorUnidade(): array
     {
