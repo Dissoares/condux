@@ -81,6 +81,11 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
           <i class="bi bi-plus-circle"></i> Taxas Extras
         </a>
       </li>
+      <li class="nav-item">
+        <a href="<?= url('folha-pagamento') ?>" class="nav-link <?= $segAtivo === 'folha-pagamento' ? 'ativo' : '' ?>">
+          <i class="bi bi-people"></i> Folha de Pagamento
+        </a>
+      </li>
 
       <p class="condux-nav-label">Obras</p>
       <li class="nav-item">

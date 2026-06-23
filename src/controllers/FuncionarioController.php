@@ -31,6 +31,18 @@ class FuncionarioController
         require RAIZ . '/views/admin/funcionarios/lista.php';
     }
 
+    public function folhaPagamento(): void
+    {
+        $this->exigirAdmin();
+        $compFiltro   = trim($_GET['comp'] ?? '') ?: null;
+        $resumos      = $this->pagRepo->resumoPorCompetencia();
+        $competencias = $this->pagRepo->listarCompetencias();
+        $pagamentos   = $compFiltro ? $this->pagRepo->listarFolhaConsolidada($compFiltro) : [];
+        $mensagem     = Sessao::lerFlash('sucesso');
+        $erroMensagem = Sessao::lerFlash('erro');
+        require RAIZ . '/views/admin/funcionarios/folha.php';
+    }
+
     public function ver(): void
     {
         $this->exigirAdmin();

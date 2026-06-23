@@ -65,9 +65,10 @@ class Roteador
             'vistorias'    => self::rotasVistorias($seg, $metodo, $ehAdmin),
             'gestoes'      => self::rotasGestoes($seg, $metodo, $ehAdmin),
             'projetos'     => self::rotasProjetos($seg, $metodo, $ehAdmin),
-            'prestadoras'  => self::rotasPrestadoras($seg, $metodo, $ehAdmin),
-            'funcionarios' => self::rotasFuncionarios($seg, $metodo, $ehAdmin),
-            'minhas-taxas' => self::rotasMinhasTaxas($seg, $metodo),
+            'prestadoras'      => self::rotasPrestadoras($seg, $metodo, $ehAdmin),
+            'funcionarios'     => self::rotasFuncionarios($seg, $metodo, $ehAdmin),
+            'folha-pagamento'  => self::rotasFolhaPagamento($ehAdmin),
+            'minhas-taxas'     => self::rotasMinhasTaxas($seg, $metodo),
             'transparencia'=> self::rotasTransparencia($seg),
             'relatorios'   => self::carregarRelatorio(),
             default        => self::naoEncontrado(),
@@ -357,6 +358,15 @@ class Roteador
         if ($id > 0) { $_GET['id'] = $id; $ctrl->ver(); return; }
 
         self::naoEncontrado();
+    }
+
+    // ── Folha de pagamento ───────────────────────────────────────────────
+
+    private static function rotasFolhaPagamento(bool $ehAdmin): void
+    {
+        if (!$ehAdmin) { self::naoAutorizado(); return; }
+        require_once RAIZ . '/src/controllers/FuncionarioController.php';
+        (new FuncionarioController())->folhaPagamento();
     }
 
     // ── Minhas taxas (morador) ────────────────────────────────────────────
