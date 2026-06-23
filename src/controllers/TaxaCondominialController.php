@@ -165,7 +165,12 @@ class TaxaCondominialController
         $unidadeId = $this->obterUnidadeDoMoradorLogado();
 
         if ($unidadeId === null) {
-            echo 'Você não está vinculado a nenhuma unidade.';
+            $tituloPagina = 'Minhas Taxas';
+            $taxas = [];
+            $taxaAtual = null;
+            $mensagem = null;
+            $erroMensagem = 'Você ainda não está vinculado a nenhuma unidade. Entre em contato com o síndico.';
+            require_once RAIZ . '/views/morador/minhas-taxas.php';
             return;
         }
 
