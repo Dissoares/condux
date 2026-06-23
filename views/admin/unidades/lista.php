@@ -65,15 +65,25 @@ function rotuloBadgeStatus(string $status): string {
 <?php else: ?>
 
 <?php foreach ($porBloco as $nomeBloco => $unidadesBloco): ?>
+<?php
+  // Extrai a letra do bloco ("Bloco A" → "A", "Sem bloco" → "?")
+  $partes       = explode(' ', $nomeBloco);
+  $letraBloco   = strtoupper(end($partes));
+  $isSemBloco   = $nomeBloco === 'Sem bloco';
+?>
 <div class="mb-5">
-  <h6 class="text-body-secondary text-uppercase fw-semibold mb-3 d-flex align-items-center gap-2"
-      style="font-size:.72rem;letter-spacing:.08em;">
-    <i class="bi bi-grid-3x3-gap"></i>
-    <?= htmlspecialchars($nomeBloco) ?>
-    <span class="badge bg-secondary bg-opacity-10 text-body fw-normal" style="font-size:.75rem;text-transform:none;letter-spacing:0;">
-      <?= count($unidadesBloco) ?> unidade<?= count($unidadesBloco) !== 1 ? 's' : '' ?>
-    </span>
-  </h6>
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <div class="bloco-header-letra <?= $isSemBloco ? 'bloco-sem-letra' : '' ?>">
+      <?= $isSemBloco ? '<i class="bi bi-question-lg"></i>' : htmlspecialchars($letraBloco) ?>
+    </div>
+    <div class="d-flex align-items-baseline gap-2 flex-shrink-0">
+      <span class="fw-bold" style="font-size:1.05rem;"><?= htmlspecialchars($nomeBloco) ?></span>
+      <span class="text-body-secondary" style="font-size:.8rem;">
+        · <?= count($unidadesBloco) ?> unidade<?= count($unidadesBloco) !== 1 ? 's' : '' ?>
+      </span>
+    </div>
+    <div class="flex-grow-1 border-bottom"></div>
+  </div>
 
   <div class="row g-3">
     <?php foreach ($unidadesBloco as $u): ?>
