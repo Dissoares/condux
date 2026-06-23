@@ -115,9 +115,9 @@ $eArrec  = (float) ($resumoExtras['valor_atrasado']  ?? 0);
     <div class="card card-stat card-stat-warning">
       <div class="card-body">
         <i class="bi bi-clock-fill stat-icone"></i>
-        <div class="stat-label">A vencer</div>
-        <div class="stat-valor"><?= $mPendentes ?></div>
-        <div class="stat-detalhe"><?= dinheiro($mPendVal) ?></div>
+        <div class="stat-label">Pendentes (geral)</div>
+        <div class="stat-valor"><?= $gPendQtd ?></div>
+        <div class="stat-detalhe"><?= dinheiro($gPendVal) ?></div>
       </div>
     </div>
   </div>
