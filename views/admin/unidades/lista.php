@@ -473,7 +473,7 @@ function rotuloBadgeStatus(string $status): string {
                       <th>Vencimento</th>
                       <th>Status</th>
                       <th>Pagamento</th>
-                      <th>Anexo</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -481,17 +481,20 @@ function rotuloBadgeStatus(string $status): string {
                     <?php
                       $statusEfetivo = $t->estaVencido() ? 'vencido' : $t->status;
                       $badgeClass = match($statusEfetivo) {
-                        'pago'    => 'badge-pago',
-                        'vencido' => 'bg-danger text-white',
-                        'isento'  => 'bg-secondary-subtle text-secondary-emphasis',
-                        default   => 'bg-warning-subtle text-warning-emphasis',
+                        'pago'       => 'badge-pago',
+                        'vencido'    => 'bg-danger text-white',
+                        'isento'     => 'bg-secondary-subtle text-secondary-emphasis',
+                        'aguardando' => 'badge-aguardando',
+                        default      => 'bg-warning-subtle text-warning-emphasis',
                       };
                       $rotulo = match($statusEfetivo) {
-                        'pago'    => 'Pago',
-                        'vencido' => 'Atrasado',
-                        'isento'  => 'Isento',
-                        default   => 'Pendente',
+                        'pago'       => 'Pago',
+                        'vencido'    => 'Atrasado',
+                        'isento'     => 'Isento',
+                        'aguardando' => 'Aguardando',
+                        default      => 'Pendente',
                       };
+                      $urlDetalhe = url("taxas/unidade/{$uid}?competencia={$t->competencia}");
                     ?>
                     <tr>
                       <td class="fw-semibold"><?= htmlspecialchars($t->competenciaFormatada()) ?></td>
@@ -501,15 +504,27 @@ function rotuloBadgeStatus(string $status): string {
                       <td class="text-body-secondary">
                         <?= $t->dataPagamento ? date('d/m/Y', strtotime($t->dataPagamento)) : '—' ?>
                       </td>
-                      <td>
-                        <?php if ($t->comprovante): ?>
-                          <a href="/<?= htmlspecialchars($t->comprovante) ?>" target="_blank"
-                             class="btn btn-outline-secondary btn-sm py-0 px-1" title="Ver comprovante">
-                            <i class="bi bi-paperclip"></i>
-                          </a>
-                        <?php else: ?>
-                          <span class="text-body-tertiary">—</span>
-                        <?php endif; ?>
+                      <td class="text-end">
+                        <div class="d-flex gap-1 justify-content-end">
+                          <?php if ($t->comprovante): ?>
+                            <a href="<?= url('uploads/' . $t->comprovante) ?>" target="_blank"
+                               class="btn btn-outline-secondary btn-sm py-0 px-1" title="Ver comprovante">
+                              <i class="bi bi-paperclip"></i>
+                            </a>
+                          <?php endif; ?>
+                          <?php if ($statusEfetivo === 'aguardando'): ?>
+                            <a href="<?= url("taxas/{$t->id}/aprovar?competencia={$t->competencia}&unidade_id={$uid}") ?>"
+                               class="btn btn-success btn-sm py-0 px-2"
+                               title="Aprovar pagamento"
+                               onclick="return confirm('Aprovar pagamento de <?= htmlspecialchars($t->competenciaFormatada()) ?>?')">
+                              <i class="bi bi-check-lg"></i>
+                            </a>
+                          <?php elseif ($statusEfetivo !== 'pago' && $statusEfetivo !== 'isento'): ?>
+                            <a href="<?= $urlDetalhe ?>" class="btn btn-outline-primary btn-sm py-0 px-2" title="Registrar pagamento">
+                              <i class="bi bi-cash-coin"></i>
+                            </a>
+                          <?php endif; ?>
+                        </div>
                       </td>
                     </tr>
                     <?php endforeach; ?>

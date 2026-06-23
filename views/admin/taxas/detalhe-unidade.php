@@ -81,7 +81,7 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
     </div>
     <?php endif; ?>
 
-    <?php if ($taxaCond->comprovante || $taxaCond->status === 'pago'): ?>
+    <?php if (!in_array($taxaCond->status, ['pago', 'isento'], true) || $taxaCond->comprovante): ?>
     <div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top flex-wrap">
       <?php if ($taxaCond->comprovante): ?>
         <a href="<?= url('uploads/' . $taxaCond->comprovante) ?>" target="_blank"
@@ -89,12 +89,21 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
           <i class="bi bi-paperclip"></i> Ver comprovante
         </a>
       <?php endif; ?>
-      <?php if ($taxaCond->comprovante && !in_array($taxaCond->status, ['pago', 'isento'], true)): ?>
-        <a href="<?= url("taxas/{$taxaCond->id}/aprovar?competencia={$competencia}&unidade_id={$unidade->id}") ?>"
-           class="btn btn-success btn-sm"
-           onclick="return confirm('Confirmar aprovação deste pagamento?')">
-          <i class="bi bi-check-lg"></i> Aprovar pagamento
-        </a>
+
+      <?php if (!in_array($taxaCond->status, ['pago', 'isento'], true)): ?>
+        <?php if ($taxaCond->status === 'aguardando'): ?>
+          <a href="<?= url("taxas/{$taxaCond->id}/aprovar?competencia={$competencia}&unidade_id={$unidade->id}") ?>"
+             class="btn btn-success btn-sm"
+             onclick="return confirm('Confirmar aprovação do comprovante?')">
+            <i class="bi bi-check-lg"></i> Aprovar comprovante
+          </a>
+        <?php else: ?>
+          <a href="<?= url("taxas/{$taxaCond->id}/aprovar?competencia={$competencia}&unidade_id={$unidade->id}") ?>"
+             class="btn btn-primary btn-sm"
+             onclick="return confirm('Marcar taxa de <?= htmlspecialchars($taxaCond->competenciaFormatada()) ?> como paga?')">
+            <i class="bi bi-cash-coin"></i> Marcar como pago
+          </a>
+        <?php endif; ?>
       <?php endif; ?>
     </div>
     <?php endif; ?>
