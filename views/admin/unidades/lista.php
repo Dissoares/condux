@@ -178,12 +178,12 @@ function rotuloBadgeStatus(string $status): string {
           </div>
 
           <!-- Rodapé: moradores + status financeiro -->
-          <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top">
+          <div class="d-flex flex-column gap-1 mt-auto pt-2 border-top">
             <span class="text-body-secondary" style="font-size:.73rem;">
               <i class="bi bi-people me-1"></i>
               <?= $qtdMoradores ?> morador<?= $qtdMoradores !== 1 ? 'es' : '' ?>
             </span>
-            <div class="d-flex gap-1">
+            <div class="d-flex flex-wrap gap-1">
               <?php if ($u->qtdAtrasadas > 0): ?>
                 <span class="badge rounded-pill badge-vencido" style="font-size:.65rem;">
                   <?= $u->qtdAtrasadas ?> atrasada<?= $u->qtdAtrasadas !== 1 ? 's' : '' ?>
@@ -196,7 +196,7 @@ function rotuloBadgeStatus(string $status): string {
               <?php endif; ?>
               <?php if ($u->qtdAtrasadas === 0 && $u->qtdPendentes === 0): ?>
                 <span class="badge rounded-pill badge-pago" style="font-size:.65rem;">
-                  <i class="bi bi-check-circle-fill me-1"></i>Tudo em dia
+                  <i class="bi bi-check-circle-fill me-1"></i>Em dia
                 </span>
               <?php endif; ?>
             </div>
