@@ -26,18 +26,6 @@ class PushNotificationService
     {
         require_once RAIZ . '/vendor/autoload.php';
 
-        // No Windows o OpenSSL precisa que OPENSSL_CONF aponte para o .cnf
-        if (DIRECTORY_SEPARATOR === '\\' && empty(getenv('OPENSSL_CONF'))) {
-            $candidatos = [
-                'C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/extras/ssl/openssl.cnf',
-                'C:/laragon/bin/apache/httpd-2.4.66-260107-Win64-VS18/conf/openssl.cnf',
-                'C:/Program Files/OpenSSL-Win64/bin/openssl.cfg',
-            ];
-            foreach ($candidatos as $c) {
-                if (file_exists($c)) { putenv("OPENSSL_CONF={$c}"); break; }
-            }
-        }
-
         $keys = VAPID::createVapidKeys();
 
         $conteudo = "<?php\nreturn [\n"
