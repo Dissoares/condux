@@ -35,9 +35,10 @@ $logoUrl = !empty($config['app_logo'])
     <div class="card-body p-4">
 
       <div class="row g-4">
-        <!-- Logo -->
+
+        <!-- Logo (header/sidebar) -->
         <div class="col-md-4">
-          <label class="form-label fw-semibold">Logo</label>
+          <label class="form-label fw-semibold">Logo <span class="text-body-secondary fw-normal">(header/sidebar)</span></label>
           <div class="mb-3">
             <?php if ($logoUrl): ?>
               <div class="mb-2 p-3 rounded-2 bg-body-tertiary d-inline-flex align-items-center justify-content-center"
@@ -62,9 +63,37 @@ $logoUrl = !empty($config['app_logo'])
                  accept="image/png,image/jpeg,image/svg+xml,image/webp"
                  id="logo-input">
           <div class="form-text">
-            Formatos: PNG, JPG, SVG ou WebP.<br>
-            Resolução recomendada: <strong>400×120 px</strong> (proporção 3:1).<br>
-            Tamanho máximo: <strong>2 MB</strong>. Prefira fundo transparente (PNG ou SVG).
+            PNG, JPG, SVG ou WebP. Recomendado: <strong>400×120 px</strong> (3:1), fundo transparente. Máx. 2 MB.
+          </div>
+        </div>
+
+        <!-- Ícone do App (PWA) -->
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Ícone do App <span class="text-body-secondary fw-normal">(PWA — tela inicial)</span></label>
+          <div class="mb-3">
+            <?php
+            $iconePwa = RAIZ . '/public/icons/icon-512.png';
+            $iconeUrl = file_exists($iconePwa) ? url('icons/icon-512.png') . '?v=' . filemtime($iconePwa) : null;
+            ?>
+            <?php if ($iconeUrl): ?>
+              <div class="mb-2 p-3 rounded-2 bg-body-tertiary d-inline-flex align-items-center justify-content-center"
+                   style="min-width:72px; min-height:72px;">
+                <img src="<?= $iconeUrl ?>" alt="Ícone PWA"
+                     style="width:64px; height:64px; border-radius:12px; object-fit:cover;">
+              </div>
+            <?php else: ?>
+              <div class="p-3 rounded-2 bg-body-tertiary d-inline-flex align-items-center justify-content-center mb-2"
+                   style="min-width:72px; min-height:72px; color:var(--bs-body-secondary)">
+                <i class="bi bi-phone fs-3 opacity-25"></i>
+              </div>
+            <?php endif; ?>
+          </div>
+          <input type="file" name="icone_pwa" class="form-control form-control-sm"
+                 accept="image/png,image/jpeg,image/webp"
+                 id="icone-pwa-input">
+          <div class="form-text">
+            PNG, JPG ou WebP. <strong>Quadrado obrigatório</strong> (ex: 512×512 px).<br>
+            Gera automaticamente os ícones de 192 px e 512 px para instalação.
           </div>
         </div>
 
@@ -267,6 +296,21 @@ document.getElementById('logo-input')?.addEventListener('change', function() {
   var prev = document.createElement('img');
   prev.src = url;
   prev.style.cssText = 'max-height:60px; max-width:200px; object-fit:contain;';
+  var container = this.previousElementSibling;
+  if (container) {
+    container.innerHTML = '';
+    container.appendChild(prev);
+  }
+});
+
+// Preview ícone PWA
+document.getElementById('icone-pwa-input')?.addEventListener('change', function() {
+  var f = this.files[0];
+  if (!f) return;
+  var url = URL.createObjectURL(f);
+  var prev = document.createElement('img');
+  prev.src = url;
+  prev.style.cssText = 'width:64px; height:64px; border-radius:12px; object-fit:cover;';
   var container = this.previousElementSibling;
   if (container) {
     container.innerHTML = '';

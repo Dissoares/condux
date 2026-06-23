@@ -68,6 +68,20 @@ class ConfiguracaoController
             $pares['app_logo'] = null;
         }
 
+        // Upload do ícone PWA (quadrado → gera icon-192.png e icon-512.png)
+        if (!empty($_FILES['icone_pwa']) && $_FILES['icone_pwa']['error'] === UPLOAD_ERR_OK) {
+            $ext   = strtolower(pathinfo($_FILES['icone_pwa']['name'], PATHINFO_EXTENSION));
+            $bytes = $_FILES['icone_pwa']['size'];
+            if ($bytes > 2 * 1024 * 1024) {
+                Sessao::flash('erro', 'O ícone do app deve ter no máximo 2 MB.');
+                Roteador::redirecionar('/configuracoes');
+                return;
+            }
+            if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp'], true)) {
+                $this->gerarIconesPwa($_FILES['icone_pwa']['tmp_name'], $ext);
+            }
+        }
+
         $this->repo->salvarVarios($pares);
 
         // Regenera manifest.json com novo nome
@@ -75,6 +89,39 @@ class ConfiguracaoController
 
         Sessao::flash('sucesso', 'Configurações salvas.');
         Roteador::redirecionar('/configuracoes');
+    }
+
+    private function gerarIconesPwa(string $tmpPath, string $ext): void
+    {
+        if (!function_exists('imagecreatefromstring')) return;
+
+        $conteudo = file_get_contents($tmpPath);
+        $origem   = imagecreatefromstring($conteudo);
+        if (!$origem) return;
+
+        $dir = RAIZ . '/public/icons';
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+        foreach ([192, 512] as $tamanho) {
+            $dest = imagecreatetruecolor($tamanho, $tamanho);
+            // Fundo branco (para ícones sem transparência)
+            $branco = imagecolorallocate($dest, 255, 255, 255);
+            imagefill($dest, 0, 0, $branco);
+            // Preserva transparência se PNG
+            if ($ext === 'png') {
+                imagealphablending($dest, false);
+                imagesavealpha($dest, true);
+                $transparente = imagecolorallocatealpha($dest, 0, 0, 0, 127);
+                imagefill($dest, 0, 0, $transparente);
+                imagealphablending($dest, true);
+            }
+            $larg = imagesx($origem);
+            $alt  = imagesy($origem);
+            imagecopyresampled($dest, $origem, 0, 0, 0, 0, $tamanho, $tamanho, $larg, $alt);
+            imagepng($dest, $dir . '/icon-' . $tamanho . '.png');
+            imagedestroy($dest);
+        }
+        imagedestroy($origem);
     }
 
     private function validarCor(string $valor, string $padrao): string
