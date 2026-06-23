@@ -5,10 +5,10 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
 
 $rotulos = [
     'pago'       => ['label' => 'Pago',       'badge' => 'badge-pago'],
-    'aguardando' => ['label' => 'Aguardando', 'badge' => 'badge-aguardando'],
-    'isento'     => ['label' => 'Isento',     'badge' => 'badge-pago'],
-    'vencido'    => ['label' => 'Atrasado',   'badge' => 'bg-danger text-white'],
-    'pendente'   => ['label' => 'Pendente',   'badge' => 'badge-pendente'],
+    'aguardando' => ['label' => 'Enviado',     'badge' => 'badge-aguardando'],
+    'isento'     => ['label' => 'Isento',      'badge' => 'badge-pago'],
+    'vencido'    => ['label' => 'Atrasado',    'badge' => 'bg-danger text-white'],
+    'pendente'   => ['label' => 'Pendente',    'badge' => 'badge-pendente'],
 ];
 ?>
 
@@ -34,9 +34,75 @@ $rotulos = [
       <p class="mt-2 mb-0">Nenhuma taxa encontrada.</p>
     </div>
   </div>
+
 <?php else: ?>
 
-<div class="card border-0 shadow-sm">
+<!-- ── Mobile: cards ── -->
+<div class="d-md-none d-flex flex-column gap-3">
+  <?php foreach ($taxas as $taxa):
+    $statusEf   = $taxa->estaVencido() ? 'vencido' : $taxa->status;
+    $info       = $rotulos[$statusEf] ?? $rotulos['pendente'];
+    $podeEnviar = in_array($statusEf, ['pendente', 'vencido'], true);
+    $aguardando = $statusEf === 'aguardando';
+  ?>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-3">
+      <div class="d-flex align-items-start justify-content-between mb-2">
+        <div>
+          <div class="fw-semibold"><?= htmlspecialchars($taxa->competenciaFormatada()) ?></div>
+          <div class="text-body-secondary" style="font-size:.82rem;">
+            Venc. <?= dataBR($taxa->vencimento) ?>
+          </div>
+        </div>
+        <span class="badge rounded-pill <?= $info['badge'] ?>"><?= $info['label'] ?></span>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="fw-bold" style="font-size:1.1rem;"><?= dinheiro($taxa->valor) ?></div>
+          <?php if ($taxa->formaPagamento): ?>
+            <div class="text-body-secondary" style="font-size:.78rem;">
+              <?= htmlspecialchars(ucfirst(str_replace('_', ' ', $taxa->formaPagamento))) ?>
+              <?= $taxa->dataPagamento ? ' · ' . dataBR($taxa->dataPagamento) : '' ?>
+            </div>
+          <?php elseif ($taxa->dataPagamento): ?>
+            <div class="text-body-secondary" style="font-size:.78rem;">
+              Pago em <?= dataBR($taxa->dataPagamento) ?>
+            </div>
+          <?php endif; ?>
+        </div>
+
+        <div class="d-flex gap-2 align-items-center">
+          <?php if ($taxa->comprovante): ?>
+            <a href="<?= url('uploads/' . $taxa->comprovante) ?>" target="_blank"
+               class="btn btn-outline-secondary btn-sm py-1 px-2">
+              <i class="bi bi-paperclip"></i>
+            </a>
+          <?php endif; ?>
+
+          <?php if ($podeEnviar): ?>
+            <button type="button"
+                    class="btn btn-primary btn-sm btn-pagar"
+                    data-taxa-id="<?= (int)$taxa->id ?>"
+                    data-competencia="<?= htmlspecialchars($taxa->competenciaFormatada()) ?>"
+                    data-valor="<?= dinheiro($taxa->valor) ?>"
+                    data-bs-toggle="modal" data-bs-target="#modalPagar">
+              <i class="bi bi-send me-1"></i>Pagar
+            </button>
+          <?php elseif ($aguardando): ?>
+            <span class="text-primary" style="font-size:.78rem;">
+              <i class="bi bi-hourglass-split"></i> Análise
+            </span>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+  </div>
+  <?php endforeach; ?>
+</div>
+
+<!-- ── Desktop: tabela ── -->
+<div class="d-none d-md-block card border-0 shadow-sm">
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0">
       <thead class="table-light">
@@ -52,8 +118,8 @@ $rotulos = [
       </thead>
       <tbody>
         <?php foreach ($taxas as $taxa):
-          $statusEf = $taxa->estaVencido() ? 'vencido' : $taxa->status;
-          $info     = $rotulos[$statusEf] ?? $rotulos['pendente'];
+          $statusEf   = $taxa->estaVencido() ? 'vencido' : $taxa->status;
+          $info       = $rotulos[$statusEf] ?? $rotulos['pendente'];
           $podeEnviar = in_array($statusEf, ['pendente', 'vencido'], true);
           $aguardando = $statusEf === 'aguardando';
         ?>
@@ -76,19 +142,17 @@ $rotulos = [
                   <i class="bi bi-paperclip"></i>
                 </a>
               <?php endif; ?>
-
               <?php if ($podeEnviar): ?>
                 <button type="button"
                         class="btn btn-primary btn-sm py-0 px-2 btn-pagar"
                         data-taxa-id="<?= (int)$taxa->id ?>"
                         data-competencia="<?= htmlspecialchars($taxa->competenciaFormatada()) ?>"
                         data-valor="<?= dinheiro($taxa->valor) ?>"
-                        data-bs-toggle="modal" data-bs-target="#modalPagar"
-                        title="Enviar comprovante">
+                        data-bs-toggle="modal" data-bs-target="#modalPagar">
                   <i class="bi bi-send me-1"></i>Pagar
                 </button>
               <?php elseif ($aguardando): ?>
-                <span class="text-warning-emphasis" style="font-size:.78rem;">
+                <span class="text-primary" style="font-size:.78rem;">
                   <i class="bi bi-hourglass-split"></i> Análise
                 </span>
               <?php endif; ?>
@@ -117,7 +181,6 @@ $rotulos = [
         </div>
 
         <div class="modal-body pt-3">
-
           <div class="mb-3">
             <label class="form-label fw-semibold">Forma de pagamento <span class="text-danger">*</span></label>
             <select name="forma_pagamento" class="form-select" required>
@@ -130,14 +193,12 @@ $rotulos = [
               <option value="credito">Cartão de crédito</option>
             </select>
           </div>
-
           <div class="mb-1">
             <label class="form-label fw-semibold">Comprovante <span class="text-danger">*</span></label>
             <input type="file" name="comprovante" class="form-control"
                    accept=".pdf,.jpg,.jpeg,.png" required>
             <div class="form-text">PDF, JPG ou PNG · máx. 10 MB</div>
           </div>
-
         </div>
 
         <div class="modal-footer border-0 pt-0">
@@ -157,7 +218,6 @@ document.querySelectorAll('.btn-pagar').forEach(function (btn) {
     document.getElementById('modal-taxa-id').value = this.dataset.taxaId;
     document.getElementById('modal-competencia-info').textContent =
       this.dataset.competencia + ' · ' + this.dataset.valor;
-    // Limpa campos do modal ao reabrir
     document.querySelector('#modalPagar select[name="forma_pagamento"]').value = '';
     document.querySelector('#modalPagar input[type="file"]').value = '';
   });
