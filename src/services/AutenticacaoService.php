@@ -27,6 +27,7 @@ class AutenticacaoService
                 'nome'   => $usuario->nome,
                 'email'  => $usuario->email,
                 'perfil' => $usuario->perfil,
+                'foto'   => $usuario->foto,
             ],
         ];
 

@@ -91,8 +91,8 @@ class UsuarioRepository
     private function inserir(Usuario $usuario): int
     {
         $stmt = $this->conexao->prepare(
-            'INSERT INTO usuarios (nome, email, senha, perfil, ativo, telefone, cpf, data_nascimento, observacoes)
-             VALUES (:nome, :email, :senha, :perfil, :ativo, :telefone, :cpf, :data_nascimento, :observacoes)'
+            'INSERT INTO usuarios (nome, email, senha, perfil, ativo, telefone, cpf, data_nascimento, observacoes, foto)
+             VALUES (:nome, :email, :senha, :perfil, :ativo, :telefone, :cpf, :data_nascimento, :observacoes, :foto)'
         );
         $stmt->execute($this->parametros($usuario));
         return (int) $this->conexao->lastInsertId();
@@ -103,7 +103,8 @@ class UsuarioRepository
         $stmt = $this->conexao->prepare(
             'UPDATE usuarios
              SET nome = :nome, email = :email, senha = :senha, perfil = :perfil, ativo = :ativo,
-                 telefone = :telefone, cpf = :cpf, data_nascimento = :data_nascimento, observacoes = :observacoes
+                 telefone = :telefone, cpf = :cpf, data_nascimento = :data_nascimento, observacoes = :observacoes,
+                 foto = :foto
              WHERE id = :id'
         );
         $stmt->execute([...$this->parametros($usuario), ':id' => $usuario->id]);
@@ -121,6 +122,7 @@ class UsuarioRepository
             ':cpf'             => $usuario->cpf            ?: null,
             ':data_nascimento' => $usuario->dataNascimento ?: null,
             ':observacoes'     => $usuario->observacoes    ?: null,
+            ':foto'            => $usuario->foto           ?: null,
         ];
     }
 

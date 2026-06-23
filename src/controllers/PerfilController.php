@@ -45,6 +45,39 @@ class PerfilController
         $usuario->email    = $email;
         $usuario->telefone = $telefone;
 
+        // Upload de foto de perfil
+        if (!empty($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+            $ext   = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
+            $bytes = $_FILES['foto']['size'];
+            if ($bytes > 2 * 1024 * 1024) {
+                Sessao::flash('erro', 'A foto deve ter no máximo 2 MB.');
+                Roteador::redirecionar('/perfil');
+                return;
+            }
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)) {
+                $dir = RAIZ . '/public/uploads/fotos';
+                if (!is_dir($dir)) mkdir($dir, 0755, true);
+                // Remove foto anterior
+                if ($usuario->foto && file_exists(RAIZ . '/public/uploads/' . $usuario->foto)) {
+                    @unlink(RAIZ . '/public/uploads/' . $usuario->foto);
+                }
+                $nome_arquivo = 'fotos/usuario_' . $id . '_' . time() . '.' . $ext;
+                if (move_uploaded_file($_FILES['foto']['tmp_name'], RAIZ . '/public/uploads/' . $nome_arquivo)) {
+                    $usuario->foto = $nome_arquivo;
+                    $_SESSION['usuario']['foto'] = $nome_arquivo;
+                }
+            }
+        }
+
+        // Remover foto
+        if (isset($_POST['remover_foto']) && $usuario->foto) {
+            if (file_exists(RAIZ . '/public/uploads/' . $usuario->foto)) {
+                @unlink(RAIZ . '/public/uploads/' . $usuario->foto);
+            }
+            $usuario->foto = null;
+            $_SESSION['usuario']['foto'] = null;
+        }
+
         // Troca de senha (opcional)
         $senhaAtual = $_POST['senha_atual']  ?? '';
         $senhaNova  = $_POST['senha_nova']   ?? '';
@@ -70,8 +103,6 @@ class PerfilController
         }
 
         $this->repo->salvar($usuario);
-
-        // Atualiza sessão com novo nome
         $_SESSION['usuario']['nome'] = $usuario->nome;
 
         Sessao::flash('sucesso', 'Perfil atualizado com sucesso.');

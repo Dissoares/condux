@@ -20,6 +20,7 @@ class Usuario
         public ?string          $cpf            = null,
         public ?string          $dataNascimento = null,
         public ?string          $observacoes    = null,
+        public ?string          $foto           = null,
     ) {}
 
     public static function fromArray(array $dados): self
@@ -36,6 +37,7 @@ class Usuario
             cpf:            $dados['cpf']              ?? null,
             dataNascimento: $dados['data_nascimento']  ?? null,
             observacoes:    $dados['observacoes']      ?? null,
+            foto:           $dados['foto']              ?? null,
         );
     }
 
@@ -53,6 +55,7 @@ class Usuario
             'cpf'             => $this->cpf,
             'data_nascimento' => $this->dataNascimento,
             'observacoes'     => $this->observacoes,
+            'foto'            => $this->foto,
         ];
     }
 

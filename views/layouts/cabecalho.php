@@ -7,8 +7,9 @@ $uriAtual  = strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
 $segAtivo  = trim(substr($uriAtual, strlen(BASE_URL)), '/');
 $segAtivo  = explode('/', $segAtivo)[0] ?? '';
 
-$inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
-$ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
+$inicialNome  = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
+$_fotoUsuario = !empty($usuarioAtual['foto']) ? url('uploads/' . $usuarioAtual['foto']) . '?v=' . time() : null;
+$ePainel      = ($segAtivo === '' || $segAtivo === 'painel');
 
 // Configurações dinâmicas da plataforma
 require_once RAIZ . '/src/repository/ConfiguracaoRepository.php';
@@ -85,7 +86,13 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
     <?php endif; ?>
 
     <button class="condux-top-user-btn" id="conduxUserBtn" type="button" title="Meu perfil">
-      <div class="condux-avatar-sm"><?= $inicialNome ?></div>
+      <div class="condux-avatar-sm">
+        <?php if ($_fotoUsuario): ?>
+          <img src="<?= $_fotoUsuario ?>" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+        <?php else: ?>
+          <?= $inicialNome ?>
+        <?php endif; ?>
+      </div>
     </button>
     <div class="condux-user-drop" id="conduxUserDrop">
       <div class="condux-user-drop-info">
@@ -249,7 +256,13 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
 
   <!-- Usuário + toggle de tema (desktop) -->
   <div class="condux-usuario">
-    <div class="condux-avatar"><?= $inicialNome ?></div>
+    <div class="condux-avatar overflow-hidden">
+      <?php if ($_fotoUsuario): ?>
+        <img src="<?= $_fotoUsuario ?>" alt="" style="width:100%;height:100%;object-fit:cover;">
+      <?php else: ?>
+        <?= $inicialNome ?>
+      <?php endif; ?>
+    </div>
     <div class="flex-grow-1 overflow-hidden">
       <div class="text-white fw-semibold" style="font-size:.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
         <?= htmlspecialchars($usuarioAtual['nome'] ?? '') ?>
