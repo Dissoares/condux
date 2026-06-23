@@ -191,6 +191,67 @@ class TaxaCondominialController
         }
     }
 
+    public function enviarCobranca(): void
+    {
+        $taxaId    = (int) ($_GET['id']        ?? 0);
+        $unidadeId = (int) ($_GET['unidade_id'] ?? 0);
+        $origem    = $_GET['origem'] ?? 'modal';
+
+        $taxa    = $this->taxaService->buscarTaxa($taxaId);
+        $morador = $unidadeId ? $this->moradorRepository->emailResponsavelDaUnidade($unidadeId) : null;
+
+        if (!$taxa || !$morador) {
+            Sessao::flash('erro', 'Taxa ou morador não encontrado.');
+            Roteador::redirecionar($origem === 'modal' ? '/unidades' : "/taxas/unidade/{$unidadeId}");
+            return;
+        }
+
+        $diasAtraso = max(0, (int) floor((time() - strtotime($taxa->vencimento)) / 86400));
+
+        $enviouEmail = false;
+        $enviouPush  = false;
+
+        try {
+            require_once RAIZ . '/src/services/EmailService.php';
+            $email = new EmailService();
+            $enviouEmail = $email->taxaCondominialVencida(
+                $morador['email'],
+                $morador['nome'],
+                $taxa->competencia,
+                $taxa->valor,
+                $diasAtraso
+            );
+        } catch (\Throwable) {}
+
+        try {
+            require_once RAIZ . '/src/services/PushNotificationService.php';
+            require_once RAIZ . '/src/repository/PushSubscriptionRepository.php';
+            $push = new PushNotificationService(new PushSubscriptionRepository(Conexao::obter()));
+            if ($push->estaConfigurado() && isset($morador['usuario_id'])) {
+                $push->enviarParaUsuario((int) $morador['usuario_id'], [
+                    'title' => '⚠️ Taxa em atraso',
+                    'body'  => "Taxa de {$taxa->competenciaFormatada()} — R$ " . number_format($taxa->valor, 2, ',', '.') . ' está em atraso há ' . $diasAtraso . ' dia' . ($diasAtraso !== 1 ? 's' : '') . '.',
+                    'url'   => url('minhas-taxas'),
+                    'tag'   => 'cobranca-' . $taxa->id,
+                ]);
+                $enviouPush = true;
+            }
+        } catch (\Throwable) {}
+
+        if ($enviouEmail || $enviouPush) {
+            $canais = array_filter(['e-mail' => $enviouEmail, 'push' => $enviouPush]);
+            Sessao::flash('sucesso', 'Cobrança enviada via ' . implode(' e ', array_keys($canais)) . '.');
+        } else {
+            Sessao::flash('erro', 'Não foi possível enviar a cobrança. Verifique as configurações de e-mail e push.');
+        }
+
+        if ($origem === 'modal') {
+            Roteador::redirecionar('/unidades');
+        } else {
+            Roteador::redirecionar("/taxas/unidade/{$unidadeId}?competencia={$taxa->competencia}");
+        }
+    }
+
     public function listarMinhasTaxas(): void
     {
         $unidadeId = $this->obterUnidadeDoMoradorLogado();

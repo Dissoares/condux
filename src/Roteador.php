@@ -214,6 +214,12 @@ class Roteador
             $ctrl->aprovarComprovante();
             return;
         }
+        // GET /taxas/{id}/cobrar
+        if ($seg[2] === 'cobrar') {
+            $_GET['id'] = (int) $seg[1];
+            $ctrl->enviarCobranca();
+            return;
+        }
         // POST /taxas/marcar-pago
         if ($seg[1] === 'marcar-pago' && $metodo === 'POST') {
             $ctrl->marcarPago();

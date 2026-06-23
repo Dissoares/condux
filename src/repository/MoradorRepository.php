@@ -71,7 +71,7 @@ class MoradorRepository
     public function emailResponsavelDaUnidade(int $unidadeId): ?array
     {
         $stmt = $this->conexao->prepare(
-            "SELECT u.nome, u.email, m.unidade_id
+            "SELECT u.id AS usuario_id, u.nome, u.email, m.unidade_id
              FROM moradores m
              JOIN usuarios u ON u.id = m.usuario_id
              WHERE m.unidade_id = :uid AND m.ativo = 1 AND m.responsavel = 1

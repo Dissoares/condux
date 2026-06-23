@@ -132,6 +132,20 @@ class PushNotificationService
     }
 
     /**
+     * Envia push para as subscriptions de um usuário específico.
+     * @param array{title:string, body:string, url?:string, tag?:string} $payload
+     */
+    public function enviarParaUsuario(int $usuarioId, array $payload): void
+    {
+        if (!$this->estaConfigurado()) return;
+
+        $subscriptions = $this->subRepo->listarPorUsuario($usuarioId);
+        if (empty($subscriptions)) return;
+
+        $this->despachar($subscriptions, $payload);
+    }
+
+    /**
      * Envia uma notificação push para todos os assinantes.
      * @param array{title:string, body:string, url?:string, tag?:string} $payload
      */
@@ -142,6 +156,11 @@ class PushNotificationService
         $subscriptions = $this->subRepo->listarTodas();
         if (empty($subscriptions)) return;
 
+        $this->despachar($subscriptions, $payload);
+    }
+
+    private function despachar(array $subscriptions, array $payload): void
+    {
         $webPush = new WebPush([
             'VAPID' => [
                 'subject'    => $this->vapid['subject'],
@@ -151,22 +170,19 @@ class PushNotificationService
         ]);
 
         foreach ($subscriptions as $sub) {
-            $subscription = Subscription::create([
-                'endpoint'        => $sub['endpoint'],
-                'contentEncoding' => 'aesgcm',
-                'keys' => [
-                    'p256dh' => $sub['p256dh'],
-                    'auth'   => $sub['auth'],
-                ],
-            ]);
-            $webPush->queueNotification($subscription, json_encode($payload));
+            $webPush->queueNotification(
+                Subscription::create([
+                    'endpoint'        => $sub['endpoint'],
+                    'contentEncoding' => 'aesgcm',
+                    'keys' => ['p256dh' => $sub['p256dh'], 'auth' => $sub['auth']],
+                ]),
+                json_encode($payload)
+            );
         }
 
         foreach ($webPush->flush() as $report) {
             if ($report->isSubscriptionExpired()) {
-                $this->subRepo->remover(
-                    (string) $report->getRequest()->getUri()
-                );
+                $this->subRepo->remover((string) $report->getRequest()->getUri());
             }
         }
     }

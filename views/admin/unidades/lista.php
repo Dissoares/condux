@@ -519,6 +519,16 @@ function rotuloBadgeStatus(string $status): string {
                                onclick="return confirm('Aprovar pagamento de <?= htmlspecialchars($t->competenciaFormatada()) ?>?')">
                               <i class="bi bi-check-lg"></i>
                             </a>
+                          <?php elseif ($statusEfetivo === 'vencido'): ?>
+                            <a href="<?= url("taxas/{$t->id}/cobrar?unidade_id={$uid}&origem=modal") ?>"
+                               class="btn btn-warning btn-sm py-0 px-2"
+                               title="Enviar cobrança (e-mail + push)"
+                               onclick="return confirm('Enviar cobrança para o responsável da unidade?')">
+                              <i class="bi bi-bell-fill"></i>
+                            </a>
+                            <a href="<?= $urlDetalhe ?>" class="btn btn-outline-primary btn-sm py-0 px-2" title="Registrar pagamento">
+                              <i class="bi bi-cash-coin"></i>
+                            </a>
                           <?php elseif ($statusEfetivo !== 'pago' && $statusEfetivo !== 'isento'): ?>
                             <a href="<?= $urlDetalhe ?>" class="btn btn-outline-primary btn-sm py-0 px-2" title="Registrar pagamento">
                               <i class="bi bi-cash-coin"></i>

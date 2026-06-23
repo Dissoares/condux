@@ -42,4 +42,14 @@ class PushSubscriptionRepository
             'SELECT endpoint, p256dh, auth FROM push_subscriptions'
         )->fetchAll();
     }
+
+    /** @return array[] — subscriptions de um usuário específico */
+    public function listarPorUsuario(int $usuarioId): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE usuario_id = :uid'
+        );
+        $stmt->execute([':uid' => $usuarioId]);
+        return $stmt->fetchAll();
+    }
 }
