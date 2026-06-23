@@ -137,19 +137,30 @@ $qtdAtrasadas  = (int)   ($totais['total_atrasadas'] ?? 0);
 <!-- Totais da competência -->
 <?php if ($valorTotal > 0): ?>
 <div class="row g-2 mb-3">
-  <?php foreach ([
-    [$fmtVal($valorTotal),    'Total do mês',  'primary'],
-    [$fmtVal($valorPago),     'Pago',          'success'],
-    [$fmtVal($valorPendente - $valorAtrasado), 'Pendente', 'warning'],
-    [$fmtVal($valorAtrasado), 'Atrasado',      'danger'],
-  ] as [$val, $lbl, $cor]): ?>
   <div class="col-6 col-md-3">
-    <div class="card border-0 shadow-sm text-center py-2">
-      <div class="fw-bold text-<?= $cor ?>" style="font-size:1rem;"><?= $val ?></div>
-      <div class="text-body-secondary" style="font-size:.7rem;"><?= $lbl ?></div>
+    <div class="card border-0 shadow-sm text-center py-2 px-1">
+      <div class="fw-bold text-primary" style="font-size:.95rem;"><?= $fmtVal($valorTotal) ?></div>
+      <div class="text-body-secondary" style="font-size:.7rem;">Total do mês</div>
     </div>
   </div>
-  <?php endforeach; ?>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-2 px-1">
+      <div class="fw-bold text-success" style="font-size:.95rem;"><?= $fmtVal($valorPago) ?></div>
+      <div class="text-body-secondary" style="font-size:.7rem;">Pago</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-2 px-1">
+      <div class="fw-bold text-warning" style="font-size:.95rem;"><?= $fmtVal($valorPendente - $valorAtrasado) ?></div>
+      <div class="text-body-secondary" style="font-size:.7rem;">Pendente</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-2 px-1">
+      <div class="fw-bold text-danger" style="font-size:.95rem;"><?= $fmtVal($valorAtrasado) ?></div>
+      <div class="text-body-secondary" style="font-size:.7rem;">Atrasado</div>
+    </div>
+  </div>
 </div>
 <?php endif; ?>
 
@@ -168,34 +179,99 @@ $qtdAtrasadas  = (int)   ($totais['total_atrasadas'] ?? 0);
 </div>
 <?php else: ?>
 
-<?php
-// Agrupar por categoria
-$porCategoria = [];
-foreach ($contas as $c) {
-    $porCategoria[$c->categoria][] = $c;
-}
-// Ordenar: atrasadas/pendentes primeiro, depois pagas
-uksort($porCategoria, fn($a, $b) => strcmp($a, $b));
-?>
+<!-- ── Mobile: lista de cards ─────────────────────────── -->
+<div class="d-md-none card border-0 shadow-sm overflow-hidden">
+  <?php foreach ($contas as $i => $c): ?>
+  <?php $atrasada = $c->estaAtrasada(); ?>
+  <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?> <?= $atrasada ? 'border-start border-danger border-3' : ($c->status === 'pago' ? 'border-start border-success border-3' : 'border-start border-warning border-3') ?>">
+    <div class="d-flex align-items-center gap-3">
 
-<div class="card border-0 shadow-sm">
+      <!-- Ícone -->
+      <div class="cat-icon flex-shrink-0 bg-<?= $c->corCategoria() ?>-subtle text-<?= $c->corCategoria() ?>-emphasis">
+        <i class="bi <?= $c->iconeCategoria() ?>"></i>
+      </div>
+
+      <!-- Info -->
+      <div class="flex-grow-1 min-width-0">
+        <div class="fw-semibold" style="font-size:.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          <?= htmlspecialchars($c->descricao) ?>
+        </div>
+        <div class="text-body-secondary" style="font-size:.75rem;">
+          <?= $c->rotuloCategoria() ?>
+          <?php if ($c->fornecedor): ?> · <?= htmlspecialchars($c->fornecedor) ?><?php endif; ?>
+          <?php if ($c->dataVencimento): ?> · venc. <?= $fmtData($c->dataVencimento) ?><?php endif; ?>
+        </div>
+      </div>
+
+      <!-- Valor + Status -->
+      <div class="text-end flex-shrink-0">
+        <div class="fw-bold" style="font-size:.95rem; white-space:nowrap;"><?= $fmtVal($c->valor) ?></div>
+        <div class="mt-1">
+          <?php if ($c->status === 'pago'): ?>
+            <span class="badge badge-pago" style="font-size:.65rem;">Pago</span>
+          <?php elseif ($atrasada): ?>
+            <span class="badge badge-vencido" style="font-size:.65rem;">Atrasada</span>
+          <?php else: ?>
+            <span class="badge badge-pendente" style="font-size:.65rem;">Pendente</span>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="d-flex gap-2 mt-2 justify-content-end">
+      <?php if ($c->anexo): ?>
+        <a href="<?= url('uploads/' . $c->anexo) ?>" target="_blank"
+           class="btn btn-outline-secondary btn-sm py-0 px-2" title="Comprovante">
+          <i class="bi bi-paperclip"></i>
+        </a>
+      <?php endif; ?>
+      <?php if ($c->status !== 'pago'): ?>
+      <form action="<?= url('contas/pagar') ?>" method="POST" class="d-inline">
+        <input type="hidden" name="id"             value="<?= $c->id ?>">
+        <input type="hidden" name="comp"           value="<?= htmlspecialchars($compFiltro) ?>">
+        <input type="hidden" name="data_pagamento" value="<?= $hoje ?>">
+        <button type="submit" class="btn btn-success btn-sm py-0 px-3"
+                onclick="return confirm('Marcar como pago hoje?')">
+          <i class="bi bi-check2"></i> Pago
+        </button>
+      </form>
+      <?php endif; ?>
+      <a href="<?= url('contas/' . $c->id . '/excluir?comp=' . urlencode($compFiltro)) ?>"
+         onclick="return confirm('Remover esta conta?')"
+         class="btn btn-outline-danger btn-sm py-0 px-2">
+        <i class="bi bi-trash"></i>
+      </a>
+    </div>
+  </div>
+  <?php endforeach; ?>
+
+  <!-- Total -->
+  <div class="border-top bg-body-tertiary px-3 py-2 d-flex justify-content-between align-items-center">
+    <span class="fw-semibold text-body-secondary" style="font-size:.8rem;">TOTAL</span>
+    <span class="fw-bold"><?= $fmtVal($valorTotal) ?></span>
+  </div>
+</div>
+
+<!-- ── Desktop: tabela ────────────────────────────────── -->
+<div class="d-none d-md-block card border-0 shadow-sm">
   <div class="table-responsive">
     <table class="table table-hover mb-0">
       <thead class="table-light">
         <tr>
-          <th style="width:32px;"></th>
+          <th style="width:36px;"></th>
           <th>Conta</th>
-          <th class="d-none d-md-table-cell">Fornecedor</th>
+          <th>Fornecedor</th>
           <th>Valor</th>
-          <th class="d-none d-md-table-cell">Vencimento</th>
+          <th>Vencimento</th>
           <th>Status</th>
-          <th style="width:120px;"></th>
+          <th style="width:110px;"></th>
         </tr>
       </thead>
       <tbody>
         <?php foreach ($contas as $c): ?>
         <?php $atrasada = $c->estaAtrasada(); ?>
-        <tr class="conta-row <?= $atrasada ? 'table-danger bg-opacity-25' : ($c->status === 'pago' ? '' : '') ?>">
+        <tr class="conta-row">
           <td>
             <div class="cat-icon bg-<?= $c->corCategoria() ?>-subtle text-<?= $c->corCategoria() ?>-emphasis">
               <i class="bi <?= $c->iconeCategoria() ?>"></i>
@@ -205,32 +281,29 @@ uksort($porCategoria, fn($a, $b) => strcmp($a, $b));
             <div class="fw-semibold"><?= htmlspecialchars($c->descricao) ?></div>
             <div class="text-body-secondary" style="font-size:.75rem;"><?= $c->rotuloCategoria() ?></div>
           </td>
-          <td class="d-none d-md-table-cell text-body-secondary">
-            <?= htmlspecialchars($c->fornecedor ?? '—') ?>
-          </td>
+          <td class="text-body-secondary"><?= htmlspecialchars($c->fornecedor ?? '—') ?></td>
           <td class="fw-semibold"><?= $fmtVal($c->valor) ?></td>
-          <td class="d-none d-md-table-cell">
+          <td>
             <?php if ($c->dataVencimento): ?>
               <span class="<?= $atrasada ? 'text-danger fw-semibold' : 'text-body-secondary' ?>">
                 <?= $fmtData($c->dataVencimento) ?>
               </span>
-            <?php else: ?><span class="text-body-secondary">—</span>
-            <?php endif; ?>
+            <?php else: ?><span class="text-body-secondary">—</span><?php endif; ?>
           </td>
           <td>
             <?php if ($c->status === 'pago'): ?>
-              <span class="badge bg-success-subtle text-success-emphasis" style="font-size:.7rem;">Pago</span>
+              <span class="badge badge-pago">Pago</span>
               <?php if ($c->dataPagamento): ?>
                 <div class="text-body-secondary" style="font-size:.7rem;"><?= $fmtData($c->dataPagamento) ?></div>
               <?php endif; ?>
             <?php elseif ($atrasada): ?>
-              <span class="badge bg-danger-subtle text-danger-emphasis" style="font-size:.7rem;">Atrasada</span>
+              <span class="badge badge-vencido">Atrasada</span>
             <?php else: ?>
-              <span class="badge bg-warning-subtle text-warning-emphasis" style="font-size:.7rem;">Pendente</span>
+              <span class="badge badge-pendente">Pendente</span>
             <?php endif; ?>
             <?php if ($c->anexo): ?>
               <a href="<?= url('uploads/' . $c->anexo) ?>" target="_blank"
-                 class="ms-1 text-primary" title="Ver comprovante" style="font-size:.75rem;">
+                 class="ms-1 text-primary" style="font-size:.75rem;" title="Comprovante">
                 <i class="bi bi-paperclip"></i>
               </a>
             <?php endif; ?>
@@ -242,8 +315,8 @@ uksort($porCategoria, fn($a, $b) => strcmp($a, $b));
                 <input type="hidden" name="id"             value="<?= $c->id ?>">
                 <input type="hidden" name="comp"           value="<?= htmlspecialchars($compFiltro) ?>">
                 <input type="hidden" name="data_pagamento" value="<?= $hoje ?>">
-                <button type="submit" class="btn btn-success btn-sm py-0 px-2" title="Marcar como pago"
-                        onclick="return confirm('Marcar como pago hoje?')">
+                <button type="submit" class="btn btn-success btn-sm py-0 px-2"
+                        title="Marcar como pago" onclick="return confirm('Marcar como pago hoje?')">
                   <i class="bi bi-check2"></i>
                 </button>
               </form>
@@ -268,6 +341,7 @@ uksort($porCategoria, fn($a, $b) => strcmp($a, $b));
     </table>
   </div>
 </div>
+
 <?php endif; ?>
 
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>
