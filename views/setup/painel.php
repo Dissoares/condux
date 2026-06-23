@@ -34,13 +34,18 @@ $config = require RAIZ . '/config/banco.php';
   <?php if (!empty($resultadoExec)): ?>
   <div class="card border-0 shadow-sm mb-4"><div class="card-body">
     <h6 class="fw-semibold border-bottom pb-2 mb-3">Resultado da execução</h6>
-    <?php foreach ((array) $resultadoExec as $item): ?>
-      <div class="alert alert-<?= $item['sucesso'] ? 'success' : 'danger' ?> py-2 d-flex align-items-start gap-2 mb-2">
-        <i class="bi bi-<?= $item['sucesso'] ? 'check-circle-fill' : 'x-circle-fill' ?> flex-shrink-0 mt-1"></i>
+    <?php foreach ((array) $resultadoExec as $item):
+      if (!is_array($item)) continue;
+      $sucesso = (bool) ($item['sucesso'] ?? false);
+      $nome    = $item['nome'] ?? '—';
+      $erro    = $item['erro'] ?? null;
+    ?>
+      <div class="alert alert-<?= $sucesso ? 'success' : 'danger' ?> py-2 d-flex align-items-start gap-2 mb-2">
+        <i class="bi bi-<?= $sucesso ? 'check-circle-fill' : 'x-circle-fill' ?> flex-shrink-0 mt-1"></i>
         <div>
-          <strong><?= htmlspecialchars($item['nome']) ?></strong>
-          <?php if ($item['erro']): ?>
-            <br><small><?= htmlspecialchars($item['erro']) ?></small>
+          <strong><?= htmlspecialchars($nome) ?></strong>
+          <?php if ($erro): ?>
+            <br><small><?= htmlspecialchars($erro) ?></small>
           <?php endif; ?>
         </div>
       </div>

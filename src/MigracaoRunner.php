@@ -57,8 +57,17 @@ class MigracaoRunner
             }
 
             try {
-                $sql = file_get_contents($arquivo);
-                $this->conexao->exec($sql);
+                $sql        = file_get_contents($arquivo);
+                $statements = array_filter(
+                    array_map('trim', explode(';', $sql)),
+                    fn($s) => $s !== '' && !preg_match('/^--/m', $s) || trim(preg_replace('/--[^\n]*/', '', $s)) !== ''
+                );
+                foreach ($statements as $stmt) {
+                    $stmt = trim(preg_replace('/--[^\n]*/', '', $stmt));
+                    if ($stmt !== '') {
+                        $this->conexao->exec($stmt);
+                    }
+                }
                 $this->registrarExecucao($nome);
                 $resultado[] = ['nome' => $nome, 'sucesso' => true, 'erro' => null];
             } catch (PDOException $e) {
