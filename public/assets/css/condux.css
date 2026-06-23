@@ -10,26 +10,26 @@
   --condux-sombra-lg: 0 4px 6px rgba(0,0,0,.05), 0 10px 30px rgba(0,0,0,.1);
 }
 
-/* ── Paleta dark — redefine variáveis Bootstrap ─────── */
+/* ── Paleta dark suave (dim) ────────────────────────── */
 [data-bs-theme="dark"] {
-  --bs-body-bg:                    #0d1117;
-  --bs-body-bg-rgb:                13, 17, 23;
-  --bs-secondary-bg:               #161b22;
-  --bs-secondary-bg-rgb:           22, 27, 34;
-  --bs-tertiary-bg:                #1c2128;
-  --bs-tertiary-bg-rgb:            28, 33, 40;
-  --bs-card-bg:                    #161b22;
-  --bs-card-cap-bg:                #1c2128;
-  --bs-border-color:               #30363d;
-  --bs-border-color-translucent:   rgba(48, 54, 61, .8);
-  --bs-body-color:                 #e6edf3;
-  --bs-body-color-rgb:             230, 237, 243;
-  --bs-secondary-color:            rgba(139, 148, 158, .9);
-  --bs-emphasis-color:             #f0f6fc;
-  --bs-link-color:                 #58a6ff;
-  --bs-link-hover-color:           #79c0ff;
-  --condux-sombra:    0 1px 3px rgba(0,0,0,.5), 0 4px 16px rgba(0,0,0,.5);
-  --condux-sombra-lg: 0 4px 8px rgba(0,0,0,.6), 0 16px 40px rgba(0,0,0,.7);
+  --bs-body-bg:                    #1e2130;
+  --bs-body-bg-rgb:                30, 33, 48;
+  --bs-secondary-bg:               #252840;
+  --bs-secondary-bg-rgb:           37, 40, 64;
+  --bs-tertiary-bg:                #2a2e45;
+  --bs-tertiary-bg-rgb:            42, 46, 69;
+  --bs-card-bg:                    #252840;
+  --bs-card-cap-bg:                #2a2e45;
+  --bs-border-color:               #363a56;
+  --bs-border-color-translucent:   rgba(54, 58, 86, .7);
+  --bs-body-color:                 #c8ccdf;
+  --bs-body-color-rgb:             200, 204, 223;
+  --bs-secondary-color:            rgba(139, 144, 172, .9);
+  --bs-emphasis-color:             #e4e6f4;
+  --bs-link-color:                 #7aadff;
+  --bs-link-hover-color:           #99c0ff;
+  --condux-sombra:    0 1px 4px rgba(0,0,0,.25), 0 4px 16px rgba(0,0,0,.25);
+  --condux-sombra-lg: 0 4px 12px rgba(0,0,0,.35), 0 16px 40px rgba(0,0,0,.35);
 }
 
 /* ── Fundo da página ────────────────────────────────── */
@@ -37,7 +37,7 @@ body {
   background-color: #f0f4f8;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
-[data-bs-theme="dark"] body { background-color: #0d1117; }
+[data-bs-theme="dark"] body { background-color: #1e2130; }
 
 /* ── Sidebar ────────────────────────────────────────── */
 .condux-sidebar {
@@ -159,20 +159,20 @@ body {
 }
 
 [data-bs-theme="dark"] .card {
-  background-color: #161b22 !important;
-  border: 1px solid #30363d !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,.5), 0 4px 16px rgba(0,0,0,.5) !important;
+  background-color: #252840 !important;
+  border: 1px solid #363a56 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2), 0 4px 16px rgba(0,0,0,.2) !important;
 }
 [data-bs-theme="dark"] .card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,.6), 0 16px 40px rgba(0,0,0,.7) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.3) !important;
 }
 [data-bs-theme="dark"] .card-header {
-  background-color: #1c2128 !important;
-  border-bottom: 1px solid #30363d !important;
+  background-color: #2a2e45 !important;
+  border-bottom: 1px solid #363a56 !important;
 }
 [data-bs-theme="dark"] .card-footer {
-  background-color: #1c2128 !important;
-  border-top: 1px solid #30363d !important;
+  background-color: #2a2e45 !important;
+  border-top: 1px solid #363a56 !important;
 }
 
 /* Cards de estatística com gradiente */
@@ -244,16 +244,16 @@ body {
 
 /* Dark: thead sem fundo claro */
 [data-bs-theme="dark"] .table-light {
-  --bs-table-bg:            #1c2128;
-  --bs-table-border-color:  #30363d;
-  --bs-table-color:         #8b949e;
+  --bs-table-bg:            #2a2e45;
+  --bs-table-border-color:  #363a56;
+  --bs-table-color:         #8b90b8;
 }
 [data-bs-theme="dark"] .table {
-  --bs-table-border-color:  #30363d;
-  color: #e6edf3;
+  --bs-table-border-color:  #363a56;
+  color: #c8ccdf;
 }
 [data-bs-theme="dark"] .table > :not(caption) > * > * {
-  border-bottom-color: #21262d;
+  border-bottom-color: #2e3250;
 }
 
 /* ── Formulários ────────────────────────────────────── */
@@ -269,25 +269,25 @@ body {
 }
 [data-bs-theme="dark"] .form-control,
 [data-bs-theme="dark"] .form-select {
-  background-color: #0d1117;
-  border-color: #30363d;
-  color: #e6edf3;
+  background-color: #1e2130;
+  border-color: #363a56;
+  color: #c8ccdf;
 }
-[data-bs-theme="dark"] .form-control::placeholder { color: #6e7681; }
+[data-bs-theme="dark"] .form-control::placeholder { color: #6b6f90; }
 [data-bs-theme="dark"] .form-control:focus,
 [data-bs-theme="dark"] .form-select:focus {
-  background-color: #0d1117;
-  border-color: #58a6ff;
-  color: #e6edf3;
-  box-shadow: 0 0 0 3px rgba(88,166,255,.15) !important;
+  background-color: #1e2130;
+  border-color: #7aadff;
+  color: #c8ccdf;
+  box-shadow: 0 0 0 3px rgba(122,173,255,.15) !important;
 }
 [data-bs-theme="dark"] .form-check-input {
-  background-color: #21262d;
-  border-color: #30363d;
+  background-color: #2a2e45;
+  border-color: #363a56;
 }
 [data-bs-theme="dark"] .form-check-input:checked {
-  background-color: #1f6feb;
-  border-color: #1f6feb;
+  background-color: #5584d4;
+  border-color: #5584d4;
 }
 .form-label { font-size: .82rem; font-weight: 600; margin-bottom: .35rem; color: var(--bs-body-color); }
 .form-text  { font-size: .77rem; }
@@ -318,36 +318,36 @@ body {
 
 /* Botões no dark */
 [data-bs-theme="dark"] .btn-outline-secondary {
-  border-color: #30363d;
-  color: #8b949e;
+  border-color: #363a56;
+  color: #8b90b8;
 }
 [data-bs-theme="dark"] .btn-outline-secondary:hover {
-  background-color: #21262d;
-  border-color: #8b949e;
-  color: #c9d1d9;
+  background-color: #2a2e45;
+  border-color: #8b90b8;
+  color: #c8ccdf;
 }
 [data-bs-theme="dark"] .btn-outline-primary {
-  border-color: #1f6feb;
-  color: #58a6ff;
+  border-color: #5584d4;
+  color: #7aadff;
 }
 [data-bs-theme="dark"] .btn-outline-primary:hover {
-  background-color: #1f6feb;
+  background-color: #5584d4;
   color: #fff;
 }
 [data-bs-theme="dark"] .btn-outline-danger {
-  border-color: #da3633;
-  color: #f85149;
+  border-color: #c0392b;
+  color: #e87365;
 }
 [data-bs-theme="dark"] .btn-outline-danger:hover {
-  background-color: #da3633;
+  background-color: #c0392b;
   color: #fff;
 }
 [data-bs-theme="dark"] .btn-outline-success {
-  border-color: #238636;
-  color: #3fb950;
+  border-color: #27ae60;
+  color: #52c788;
 }
 [data-bs-theme="dark"] .btn-outline-success:hover {
-  background-color: #238636;
+  background-color: #27ae60;
   color: #fff;
 }
 
@@ -370,16 +370,16 @@ body {
 .badge-pendente_aprovacao { background: #fef3c7 !important; color: #92400e !important; }
 .badge-sem_taxa     { background: #f3f4f6 !important; color: #6b7280 !important; }
 
-[data-bs-theme="dark"] .badge-pago         { background: #065f46 !important; color: #a7f3d0 !important; }
-[data-bs-theme="dark"] .badge-pendente     { background: #78350f !important; color: #fde68a !important; }
-[data-bs-theme="dark"] .badge-vencido      { background: #7f1d1d !important; color: #fca5a5 !important; }
-[data-bs-theme="dark"] .badge-isento       { background: #312e81 !important; color: #c7d2fe !important; }
-[data-bs-theme="dark"] .badge-aguardando   { background: #713f12 !important; color: #fef08a !important; }
-[data-bs-theme="dark"] .badge-aprovado     { background: #065f46 !important; color: #a7f3d0 !important; }
-[data-bs-theme="dark"] .badge-em_andamento { background: #1e3a8a !important; color: #bfdbfe !important; }
-[data-bs-theme="dark"] .badge-concluido    { background: #065f46 !important; color: #a7f3d0 !important; }
-[data-bs-theme="dark"] .badge-cancelado    { background: #374151 !important; color: #d1d5db !important; }
-[data-bs-theme="dark"] .badge-sem_taxa     { background: #1f2937 !important; color: #9ca3af !important; }
+[data-bs-theme="dark"] .badge-pago         { background: #1a3d2b !important; color: #6ee7a8 !important; }
+[data-bs-theme="dark"] .badge-pendente     { background: #3d2e10 !important; color: #f5cc6a !important; }
+[data-bs-theme="dark"] .badge-vencido      { background: #3d1515 !important; color: #f28b82 !important; }
+[data-bs-theme="dark"] .badge-isento       { background: #26275a !important; color: #a5b4fc !important; }
+[data-bs-theme="dark"] .badge-aguardando   { background: #3a2f0e !important; color: #fde68a !important; }
+[data-bs-theme="dark"] .badge-aprovado     { background: #1a3d2b !important; color: #6ee7a8 !important; }
+[data-bs-theme="dark"] .badge-em_andamento { background: #1e2f5c !important; color: #93c5fd !important; }
+[data-bs-theme="dark"] .badge-concluido    { background: #1a3d2b !important; color: #6ee7a8 !important; }
+[data-bs-theme="dark"] .badge-cancelado    { background: #2e3050 !important; color: #a0a3c4 !important; }
+[data-bs-theme="dark"] .badge-sem_taxa     { background: #252840 !important; color: #7b7fa0 !important; }
 
 /* ── Alertas ────────────────────────────────────────── */
 .alert {
@@ -391,50 +391,50 @@ body {
 .alert-danger  { background: #fee2e2; color: #991b1b; }
 .alert-warning { background: #fef3c7; color: #92400e; }
 .alert-info    { background: #dbeafe; color: #1e3a8a; }
-[data-bs-theme="dark"] .alert-success { background: #0f2d1a; color: #3fb950; border: 1px solid #1a4731; }
-[data-bs-theme="dark"] .alert-danger  { background: #2d0f0f; color: #f85149; border: 1px solid #471a1a; }
-[data-bs-theme="dark"] .alert-warning { background: #2d1f00; color: #d29922; border: 1px solid #47330a; }
-[data-bs-theme="dark"] .alert-info    { background: #0d1f3c; color: #58a6ff; border: 1px solid #1a3060; }
+[data-bs-theme="dark"] .alert-success { background: #1a3228; color: #6ee7a8; border: 1px solid #2a4f3a; }
+[data-bs-theme="dark"] .alert-danger  { background: #321a1a; color: #f28b82; border: 1px solid #4f2a2a; }
+[data-bs-theme="dark"] .alert-warning { background: #32270f; color: #f5cc6a; border: 1px solid #4f3a1a; }
+[data-bs-theme="dark"] .alert-info    { background: #1a2240; color: #7aadff; border: 1px solid #2a3660; }
 
 /* Progress bar dark */
 [data-bs-theme="dark"] .progress {
-  background-color: #21262d;
+  background-color: #2a2e45;
 }
 
 /* Input group dark */
 [data-bs-theme="dark"] .input-group-text {
-  background-color: #21262d;
-  border-color: #30363d;
-  color: #8b949e;
+  background-color: #2a2e45;
+  border-color: #363a56;
+  color: #8b90b8;
 }
 
 /* Dropdown dark */
 [data-bs-theme="dark"] .dropdown-menu {
-  background-color: #161b22;
-  border-color: #30363d;
+  background-color: #252840;
+  border-color: #363a56;
 }
-[data-bs-theme="dark"] .dropdown-item { color: #c9d1d9; }
-[data-bs-theme="dark"] .dropdown-item:hover { background-color: #21262d; color: #e6edf3; }
-[data-bs-theme="dark"] .dropdown-divider { border-color: #30363d; }
+[data-bs-theme="dark"] .dropdown-item { color: #c8ccdf; }
+[data-bs-theme="dark"] .dropdown-item:hover { background-color: #2a2e45; color: #e4e6f4; }
+[data-bs-theme="dark"] .dropdown-divider { border-color: #363a56; }
 
 /* Modal dark */
 [data-bs-theme="dark"] .modal-content {
-  background-color: #161b22;
-  border-color: #30363d;
+  background-color: #252840;
+  border-color: #363a56;
 }
 [data-bs-theme="dark"] .modal-header,
 [data-bs-theme="dark"] .modal-footer {
-  border-color: #30363d;
-  background-color: #1c2128;
+  border-color: #363a56;
+  background-color: #2a2e45;
 }
 
 /* List group dark */
 [data-bs-theme="dark"] .list-group-item {
-  background-color: #161b22;
-  border-color: #30363d;
-  color: #e6edf3;
+  background-color: #252840;
+  border-color: #363a56;
+  color: #c8ccdf;
 }
-[data-bs-theme="dark"] .list-group-item:hover { background-color: #1c2128; }
+[data-bs-theme="dark"] .list-group-item:hover { background-color: #2a2e45; }
 
 /* ── Cabeçalho de página ────────────────────────────── */
 .condux-page-header {
@@ -652,9 +652,9 @@ body {
     -webkit-backdrop-filter: blur(12px);
   }
   [data-bs-theme="dark"] .condux-bottom-nav {
-    background: rgba(22, 27, 34, .95);
-    border-top-color: #30363d;
-    box-shadow: 0 -4px 24px rgba(0,0,0,.5);
+    background: rgba(37, 40, 64, .97);
+    border-top-color: #363a56;
+    box-shadow: 0 -4px 24px rgba(0,0,0,.25);
   }
   .condux-bnav-item {
     flex: 1;
