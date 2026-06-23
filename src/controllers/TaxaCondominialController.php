@@ -275,15 +275,23 @@ class TaxaCondominialController
 
     public function enviarComprovante(): void
     {
-        $taxaId = (int) ($_POST['taxa_id'] ?? 0);
+        $taxaId         = (int) ($_POST['taxa_id']         ?? 0);
+        $formaPagamento = trim($_POST['forma_pagamento']    ?? '');
 
         if (empty($_FILES['comprovante']) || $_FILES['comprovante']['error'] !== UPLOAD_ERR_OK) {
-            Sessao::flash('erro', 'Selecione um arquivo válido.');
+            Sessao::flash('erro', 'Selecione um arquivo de comprovante válido.');
             Roteador::redirecionar('/minhas-taxas');
+            return;
+        }
+
+        if (!$formaPagamento) {
+            Sessao::flash('erro', 'Selecione a forma de pagamento.');
+            Roteador::redirecionar('/minhas-taxas');
+            return;
         }
 
         try {
-            $this->taxaService->enviarComprovante($taxaId, $_FILES['comprovante']);
+            $this->taxaService->enviarComprovante($taxaId, $formaPagamento, $_FILES['comprovante']);
             Sessao::flash('sucesso', 'Comprovante enviado! Aguarde a aprovação do síndico.');
         } catch (InvalidArgumentException|RuntimeException $e) {
             Sessao::flash('erro', $e->getMessage());

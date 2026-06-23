@@ -129,7 +129,7 @@ class TaxaCondominialService
      * Morador envia comprovante — salva arquivo e muda status para aguardando aprovação.
      * Retorna o caminho salvo.
      */
-    public function enviarComprovante(int $taxaId, array $arquivoUpload): string
+    public function enviarComprovante(int $taxaId, string $formaPagamento, array $arquivoUpload): string
     {
         $taxa = $this->taxaRepository->buscarPorId($taxaId);
 
@@ -137,11 +137,16 @@ class TaxaCondominialService
             throw new InvalidArgumentException('Taxa não encontrada.');
         }
 
+        if ($taxa->status === TaxaCondominial::STATUS_PAGO) {
+            throw new InvalidArgumentException('Esta taxa já está paga.');
+        }
+
         $caminho = $this->salvarArquivoComprovante($arquivoUpload);
 
-        $taxa->comprovante = $caminho;
-        $taxa->status      = TaxaCondominial::STATUS_AGUARDANDO;
-        $taxa->observacao  = 'Comprovante enviado — aguardando aprovação do síndico.';
+        $taxa->comprovante    = $caminho;
+        $taxa->formaPagamento = $formaPagamento ?: null;
+        $taxa->status         = TaxaCondominial::STATUS_AGUARDANDO;
+        $taxa->observacao     = 'Comprovante enviado pelo condômino — aguardando aprovação do síndico.';
 
         $this->taxaRepository->salvar($taxa);
 
