@@ -526,11 +526,11 @@ function rotuloBadgeStatus(string $status): string {
                                onclick="return confirm('Enviar cobrança para o responsável da unidade?')">
                               <i class="bi bi-bell-fill"></i>
                             </a>
-                            <a href="<?= $urlDetalhe ?>" class="btn btn-outline-primary btn-sm py-0 px-2" title="Registrar pagamento">
+                            <a href="<?= $urlDetalhe ?>" class="btn btn-outline-success btn-sm py-0 px-2" title="Registrar pagamento">
                               <i class="bi bi-cash-coin"></i>
                             </a>
                           <?php elseif ($statusEfetivo !== 'pago' && $statusEfetivo !== 'isento'): ?>
-                            <a href="<?= $urlDetalhe ?>" class="btn btn-outline-primary btn-sm py-0 px-2" title="Registrar pagamento">
+                            <a href="<?= $urlDetalhe ?>" class="btn btn-outline-success btn-sm py-0 px-2" title="Registrar pagamento">
                               <i class="bi bi-cash-coin"></i>
                             </a>
                           <?php endif; ?>
