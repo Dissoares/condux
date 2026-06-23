@@ -34,95 +34,98 @@ $logoUrl = !empty($config['app_logo'])
     </div>
     <div class="card-body p-4">
 
+      <!-- Nome e descrição -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-5">
+          <label class="form-label fw-semibold">Nome da plataforma *</label>
+          <input type="text" name="app_nome" class="form-control" required maxlength="80"
+                 value="<?= htmlspecialchars($config['app_nome'] ?? 'Condux') ?>"
+                 placeholder="Ex: Condomínio Sol Nascente">
+          <div class="form-text">Exibido no cabeçalho e e-mails.</div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Nome curto</label>
+          <input type="text" name="app_nome_curto" class="form-control" maxlength="20"
+                 value="<?= htmlspecialchars($config['app_nome_curto'] ?? 'Condux') ?>"
+                 placeholder="Ex: Sol Nasc.">
+          <div class="form-text">Usado no PWA e título do browser.</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Descrição</label>
+          <input type="text" name="app_descricao" class="form-control" maxlength="150"
+                 value="<?= htmlspecialchars($config['app_descricao'] ?? '') ?>"
+                 placeholder="Ex: Gestão — Cond. Sol Nascente">
+          <div class="form-text">Aparece no manifesto PWA e na tela de login.</div>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <!-- Imagens -->
       <div class="row g-4">
 
-        <!-- Logo (header/sidebar) -->
-        <div class="col-md-4">
-          <label class="form-label fw-semibold">Logo <span class="text-body-secondary fw-normal">(header/sidebar)</span></label>
-          <div class="mb-3">
-            <?php if ($logoUrl): ?>
-              <div class="mb-2 p-3 rounded-2 bg-body-tertiary d-inline-flex align-items-center justify-content-center"
-                   style="min-width:120px; min-height:60px;">
-                <img src="<?= $logoUrl ?>" alt="Logo atual"
-                     style="max-height:60px; max-width:200px; object-fit:contain;">
-              </div>
-              <div>
+        <!-- Logo header/sidebar -->
+        <div class="col-md-6">
+          <p class="fw-semibold mb-3" style="font-size:.85rem; text-transform:uppercase; letter-spacing:.06em; color:var(--bs-body-secondary);">
+            <i class="bi bi-image"></i> Logo — Header e Sidebar
+          </p>
+          <div class="d-flex align-items-start gap-3">
+            <!-- Preview -->
+            <div id="logo-preview-wrap"
+                 class="flex-shrink-0 rounded-2 bg-body-tertiary d-flex align-items-center justify-content-center"
+                 style="width:140px; height:72px; overflow:hidden;">
+              <?php if ($logoUrl): ?>
+                <img id="logo-preview-img" src="<?= $logoUrl ?>" alt="Logo"
+                     style="max-width:128px; max-height:56px; object-fit:contain;">
+              <?php else: ?>
+                <i class="bi bi-image opacity-25 fs-4"></i>
+              <?php endif; ?>
+            </div>
+            <div class="flex-grow-1">
+              <input type="file" name="logo" class="form-control form-control-sm mb-2"
+                     accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                     id="logo-input">
+              <div class="form-text">PNG, JPG, SVG ou WebP · <strong>400×120 px</strong> · máx. 2 MB · fundo transparente recomendado.</div>
+              <?php if ($logoUrl): ?>
                 <label class="d-flex align-items-center gap-2 mt-2" style="cursor:pointer; font-size:.82rem;">
                   <input type="checkbox" name="remover_logo" class="form-check-input mt-0">
                   <span class="text-danger">Remover logo atual</span>
                 </label>
-              </div>
-            <?php else: ?>
-              <div class="p-3 rounded-2 bg-body-tertiary d-inline-flex align-items-center justify-content-center mb-2"
-                   style="min-width:120px; min-height:60px; color:var(--bs-body-secondary)">
-                <i class="bi bi-image fs-3 opacity-25"></i>
-              </div>
-            <?php endif; ?>
-          </div>
-          <input type="file" name="logo" class="form-control form-control-sm"
-                 accept="image/png,image/jpeg,image/svg+xml,image/webp"
-                 id="logo-input">
-          <div class="form-text">
-            PNG, JPG, SVG ou WebP. Recomendado: <strong>400×120 px</strong> (3:1), fundo transparente. Máx. 2 MB.
+              <?php endif; ?>
+            </div>
           </div>
         </div>
 
-        <!-- Ícone do App (PWA) -->
-        <div class="col-md-4">
-          <label class="form-label fw-semibold">Ícone do App <span class="text-body-secondary fw-normal">(PWA — tela inicial)</span></label>
-          <div class="mb-3">
-            <?php
-            $iconePwa = RAIZ . '/public/icons/icon-512.png';
-            $iconeUrl = file_exists($iconePwa) ? url('icons/icon-512.png') . '?v=' . filemtime($iconePwa) : null;
-            ?>
-            <?php if ($iconeUrl): ?>
-              <div class="mb-2 p-3 rounded-2 bg-body-tertiary d-inline-flex align-items-center justify-content-center"
-                   style="min-width:72px; min-height:72px;">
-                <img src="<?= $iconeUrl ?>" alt="Ícone PWA"
-                     style="width:64px; height:64px; border-radius:12px; object-fit:cover;">
-              </div>
-            <?php else: ?>
-              <div class="p-3 rounded-2 bg-body-tertiary d-inline-flex align-items-center justify-content-center mb-2"
-                   style="min-width:72px; min-height:72px; color:var(--bs-body-secondary)">
-                <i class="bi bi-phone fs-3 opacity-25"></i>
-              </div>
-            <?php endif; ?>
-          </div>
-          <input type="file" name="icone_pwa" class="form-control form-control-sm"
-                 accept="image/png,image/jpeg,image/webp"
-                 id="icone-pwa-input">
-          <div class="form-text">
-            PNG, JPG ou WebP. <strong>Quadrado obrigatório</strong> (ex: 512×512 px).<br>
-            Gera automaticamente os ícones de 192 px e 512 px para instalação.
+        <!-- Ícone PWA -->
+        <?php
+        $iconePwa = RAIZ . '/public/icons/icon-512.png';
+        $iconeUrl = file_exists($iconePwa) ? url('icons/icon-512.png') . '?v=' . filemtime($iconePwa) : null;
+        ?>
+        <div class="col-md-6">
+          <p class="fw-semibold mb-3" style="font-size:.85rem; text-transform:uppercase; letter-spacing:.06em; color:var(--bs-body-secondary);">
+            <i class="bi bi-phone"></i> Ícone do App — Tela inicial (PWA)
+          </p>
+          <div class="d-flex align-items-start gap-3">
+            <!-- Preview -->
+            <div id="icone-pwa-preview-wrap"
+                 class="flex-shrink-0 rounded-3 bg-body-tertiary d-flex align-items-center justify-content-center"
+                 style="width:72px; height:72px; overflow:hidden;">
+              <?php if ($iconeUrl): ?>
+                <img id="icone-pwa-preview-img" src="<?= $iconeUrl ?>" alt="Ícone PWA"
+                     style="width:72px; height:72px; object-fit:cover; border-radius:14px;">
+              <?php else: ?>
+                <i class="bi bi-app opacity-25 fs-4"></i>
+              <?php endif; ?>
+            </div>
+            <div class="flex-grow-1">
+              <input type="file" name="icone_pwa" class="form-control form-control-sm mb-2"
+                     accept="image/png,image/jpeg,image/webp"
+                     id="icone-pwa-input">
+              <div class="form-text">PNG, JPG ou WebP · <strong>quadrado</strong> (512×512 px ideal) · máx. 2 MB.<br>Gera icon-192 e icon-512 automaticamente.</div>
+            </div>
           </div>
         </div>
 
-        <!-- Nomes e descrição -->
-        <div class="col-md-8">
-          <div class="row g-3">
-            <div class="col-sm-7">
-              <label class="form-label fw-semibold">Nome da plataforma *</label>
-              <input type="text" name="app_nome" class="form-control" required maxlength="80"
-                     value="<?= htmlspecialchars($config['app_nome'] ?? 'Condux') ?>"
-                     placeholder="Ex: Condomínio Sol Nascente">
-              <div class="form-text">Exibido no cabeçalho e e-mails.</div>
-            </div>
-            <div class="col-sm-5">
-              <label class="form-label fw-semibold">Nome curto</label>
-              <input type="text" name="app_nome_curto" class="form-control" maxlength="20"
-                     value="<?= htmlspecialchars($config['app_nome_curto'] ?? 'Condux') ?>"
-                     placeholder="Ex: Sol Nasc.">
-              <div class="form-text">Usado no PWA e título do browser.</div>
-            </div>
-            <div class="col-12">
-              <label class="form-label fw-semibold">Descrição</label>
-              <input type="text" name="app_descricao" class="form-control" maxlength="150"
-                     value="<?= htmlspecialchars($config['app_descricao'] ?? '') ?>"
-                     placeholder="Ex: Sistema de gestão — Condomínio Sol Nascente">
-              <div class="form-text">Aparece no manifesto PWA e na tela de login.</div>
-            </div>
-          </div>
-        </div>
       </div>
 
     </div>
@@ -288,34 +291,22 @@ document.querySelector('[name="app_nome"]')?.addEventListener('input', function(
 // Init
 previewCores();
 
-// Preview de logo ao selecionar arquivo
+// Preview de logo
 document.getElementById('logo-input')?.addEventListener('change', function() {
   var f = this.files[0];
   if (!f) return;
-  var url = URL.createObjectURL(f);
-  var prev = document.createElement('img');
-  prev.src = url;
-  prev.style.cssText = 'max-height:60px; max-width:200px; object-fit:contain;';
-  var container = this.previousElementSibling;
-  if (container) {
-    container.innerHTML = '';
-    container.appendChild(prev);
-  }
+  var objectUrl = URL.createObjectURL(f);
+  var wrap = document.getElementById('logo-preview-wrap');
+  wrap.innerHTML = '<img src="' + objectUrl + '" style="max-width:128px; max-height:56px; object-fit:contain;">';
 });
 
 // Preview ícone PWA
 document.getElementById('icone-pwa-input')?.addEventListener('change', function() {
   var f = this.files[0];
   if (!f) return;
-  var url = URL.createObjectURL(f);
-  var prev = document.createElement('img');
-  prev.src = url;
-  prev.style.cssText = 'width:64px; height:64px; border-radius:12px; object-fit:cover;';
-  var container = this.previousElementSibling;
-  if (container) {
-    container.innerHTML = '';
-    container.appendChild(prev);
-  }
+  var objectUrl = URL.createObjectURL(f);
+  var wrap = document.getElementById('icone-pwa-preview-wrap');
+  wrap.innerHTML = '<img src="' + objectUrl + '" style="width:72px; height:72px; object-fit:cover; border-radius:14px;">';
 });
 </script>
 
