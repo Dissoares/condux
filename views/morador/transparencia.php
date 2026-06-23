@@ -97,11 +97,11 @@ function fmt(float $v): string {
       </thead>
       <tbody>
         <?php foreach ($contas as $c):
-          $cat = Conta::$categorias[$c->categoria] ?? ['label' => $c->categoria, 'icon' => 'receipt', 'color' => '#6b7280'];
+          $cat = Conta::$categorias[$c->categoria] ?? ['Outros', 'bi-three-dots', 'secondary'];
         ?>
         <tr>
           <td class="ps-3">
-            <i class="bi bi-<?= $cat['icon'] ?>" style="color:<?= $cat['color'] ?>; font-size:1.1rem;"></i>
+            <i class="bi <?= $cat[1] ?> text-<?= $cat[2] ?>" style="font-size:1.1rem;"></i>
           </td>
           <td>
             <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($c->descricao) ?></div>
