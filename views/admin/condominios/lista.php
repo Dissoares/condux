@@ -126,10 +126,29 @@ function papeisBadges(array $c): string {
         <?php foreach ($condominios as $c): ?>
         <tr>
           <td>
-            <div class="fw-semibold"><?= htmlspecialchars($c['nome']) ?></div>
-            <?php if (!empty($c['cpf'])): ?>
-              <div class="text-body-secondary" style="font-size:.75rem;">CPF: <?= htmlspecialchars($c['cpf']) ?></div>
-            <?php endif; ?>
+            <div class="d-flex align-items-center gap-3">
+              <?php
+                $foto   = $c['foto'] ?? null;
+                $inicialAvatar = strtoupper(mb_substr($c['nome'], 0, 1));
+              ?>
+              <?php if ($foto): ?>
+                <img src="<?= url('uploads/' . htmlspecialchars($foto)) ?>"
+                     alt="<?= htmlspecialchars($inicialAvatar) ?>"
+                     class="rounded-circle flex-shrink-0"
+                     style="width:38px;height:38px;object-fit:cover;">
+              <?php else: ?>
+                <div class="flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle fw-bold"
+                     style="width:38px;height:38px;background:var(--condux-primaria,#1a3c5e);color:#fff;font-size:.95rem;">
+                  <?= $inicialAvatar ?>
+                </div>
+              <?php endif; ?>
+              <div>
+                <div class="fw-semibold"><?= htmlspecialchars($c['nome']) ?></div>
+                <?php if (!empty($c['cpf'])): ?>
+                  <div class="text-body-secondary" style="font-size:.75rem;">CPF: <?= htmlspecialchars($c['cpf']) ?></div>
+                <?php endif; ?>
+              </div>
+            </div>
           </td>
           <td class="text-body-secondary" style="font-size:.875rem;">
             <?php if (!empty($c['telefone'])): ?>
