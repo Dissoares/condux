@@ -129,7 +129,11 @@ class TaxaExtraRepository
                 SUM(teu.status = "vencido" OR (teu.status = "pendente" AND te.vencimento < CURDATE())) AS total_atrasadas,
                 SUM(CASE WHEN teu.status = "pendente" AND te.vencimento < CURDATE() THEN te.valor
                          WHEN teu.status = "vencido" THEN te.valor ELSE 0 END) AS valor_atrasado,
-                SUM(CASE WHEN teu.status = "pendente" AND te.vencimento >= CURDATE() THEN te.valor ELSE 0 END) AS valor_pendente
+                SUM(CASE WHEN teu.status = "pendente" AND te.vencimento >= CURDATE() THEN te.valor ELSE 0 END) AS valor_pendente,
+                SUM(CASE WHEN teu.status = "pago" AND DATE_FORMAT(te.vencimento, "%Y-%m") = DATE_FORMAT(NOW(), "%Y-%m") THEN te.valor ELSE 0 END) AS valor_arrecadado_mes,
+                SUM(teu.status = "pendente" AND DATE_FORMAT(te.vencimento, "%Y-%m") = DATE_FORMAT(NOW(), "%Y-%m")) AS total_pendentes_mes,
+                SUM(CASE WHEN teu.status = "pendente" AND DATE_FORMAT(te.vencimento, "%Y-%m") = DATE_FORMAT(NOW(), "%Y-%m") THEN te.valor ELSE 0 END) AS valor_pendente_mes,
+                COUNT(teu.id) AS total_cobranças
              FROM taxas_extras_unidades teu
              JOIN taxas_extras te ON te.id = teu.taxa_extra_id'
         );
