@@ -1,5 +1,5 @@
 <?php
-/** @var TaxaCondominial[] $taxas @var array $resumo @var string $competencia */
+/** @var array[] $competencias @var string|null $mensagem @var string|null $erroMensagem */
 $tituloPagina = 'Taxa Condominial';
 require_once RAIZ . '/views/layouts/cabecalho.php';
 ?>
@@ -22,107 +22,73 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
   </div>
 <?php endif; ?>
 
-<form method="GET" action="<?= url('taxas') ?>" class="d-flex align-items-end gap-2 mb-4">
-  <div>
-    <label for="filtro-competencia" class="form-label mb-1">Competência</label>
-    <input type="month" id="filtro-competencia" name="competencia" class="form-control"
-           value="<?= htmlspecialchars($competencia) ?>" style="width:auto;">
+<?php if (empty($competencias)): ?>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body text-center text-body-secondary py-5">
+      <i class="bi bi-calendar-x fs-1 d-block mb-2 opacity-25"></i>
+      Nenhuma taxa gerada ainda. Use o botão <strong>Gerar em lote</strong> para começar.
+    </div>
   </div>
-  <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-search"></i> Filtrar</button>
-</form>
+<?php else: ?>
+<div class="row g-3">
+  <?php foreach ($competencias as $c):
+    $atrasadas  = (int) $c['total_atrasadas'];
+    $pendentes  = (int) $c['total_pendentes'];
+    $pagas      = (int) $c['total_pagas'];
+    $total      = (int) $c['total'];
+    $arrecadado = (float) $c['valor_arrecadado'];
+    $comp       = $c['competencia'];
+    $nome       = formatarCompetencia($comp);
+  ?>
+  <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+    <a href="<?= url('taxas?competencia=' . $comp) ?>" class="text-decoration-none">
+      <div class="card border-0 shadow-sm h-100 card-hover">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-start justify-content-between mb-3">
+            <div>
+              <div class="fw-bold fs-6"><?= $nome ?></div>
+              <div class="text-body-secondary" style="font-size:.75rem;"><?= $total ?> unidade<?= $total !== 1 ? 's' : '' ?></div>
+            </div>
+            <?php if ($atrasadas > 0): ?>
+              <span class="badge bg-danger"><?= $atrasadas ?> atrasada<?= $atrasadas !== 1 ? 's' : '' ?></span>
+            <?php elseif ($pendentes > 0): ?>
+              <span class="badge bg-warning text-dark"><?= $pendentes ?> pendente<?= $pendentes !== 1 ? 's' : '' ?></span>
+            <?php else: ?>
+              <span class="badge bg-success">Em dia</span>
+            <?php endif; ?>
+          </div>
 
-<div class="row g-2 g-md-3 mb-4">
-  <div class="col-4">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body p-2 p-md-3 d-flex align-items-center gap-2 gap-md-3">
-        <div class="rounded-circle d-none d-sm-flex align-items-center justify-content-center flex-shrink-0 bg-success bg-opacity-10 text-success" style="width:40px;height:40px;font-size:1.1rem;">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="fs-5 fw-bold lh-1"><?= $resumo['total_pagas'] ?? 0 ?></div>
-          <div class="text-body-secondary text-truncate" style="font-size:.72rem;">Pagas</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-4">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body p-2 p-md-3 d-flex align-items-center gap-2 gap-md-3">
-        <div class="rounded-circle d-none d-sm-flex align-items-center justify-content-center flex-shrink-0 bg-warning bg-opacity-10 text-warning" style="width:40px;height:40px;font-size:1.1rem;">
-          <i class="bi bi-clock-fill"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="fs-5 fw-bold lh-1"><?= $resumo['total_pendentes'] ?? 0 ?></div>
-          <div class="text-body-secondary text-truncate" style="font-size:.72rem;">Pendentes</div>
+          <div class="d-flex gap-3 mb-3" style="font-size:.8rem;">
+            <div class="d-flex align-items-center gap-1 text-success">
+              <i class="bi bi-check-circle-fill"></i> <?= $pagas ?>
+            </div>
+            <?php if ($atrasadas > 0): ?>
+            <div class="d-flex align-items-center gap-1 text-danger">
+              <i class="bi bi-exclamation-circle-fill"></i> <?= $atrasadas ?>
+            </div>
+            <?php endif; ?>
+            <?php if ($pendentes > 0): ?>
+            <div class="d-flex align-items-center gap-1 text-warning">
+              <i class="bi bi-clock-fill"></i> <?= $pendentes ?>
+            </div>
+            <?php endif; ?>
+          </div>
+
+          <div class="border-top pt-2 mt-auto">
+            <div class="text-body-secondary" style="font-size:.7rem;">Arrecadado</div>
+            <div class="fw-semibold" style="font-size:.9rem;"><?= dinheiro($arrecadado) ?></div>
+          </div>
         </div>
       </div>
-    </div>
+    </a>
   </div>
-  <div class="col-4">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body p-2 p-md-3 d-flex align-items-center gap-2 gap-md-3">
-        <div class="rounded-circle d-none d-sm-flex align-items-center justify-content-center flex-shrink-0 bg-primary bg-opacity-10 text-primary" style="width:40px;height:40px;font-size:1.1rem;">
-          <i class="bi bi-cash"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="fw-bold lh-1" style="font-size:.9rem;"><?= dinheiro((float)($resumo['valor_arrecadado'] ?? 0)) ?></div>
-          <div class="text-body-secondary text-truncate" style="font-size:.72rem;">Arrecadado</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <?php endforeach; ?>
 </div>
 
-<div class="card border-0 shadow-sm">
-  <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
-      <thead class="table-light">
-        <tr>
-          <th>Unidade</th>
-          <th class="d-none d-sm-table-cell">Competência</th>
-          <th>Valor</th>
-          <th class="d-none d-md-table-cell">Vencimento</th>
-          <th>Status</th>
-          <th class="d-none d-md-table-cell">Comprovante</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php if (empty($taxas)): ?>
-          <tr><td colspan="7" class="text-center text-body-secondary py-4">Nenhuma taxa encontrada.</td></tr>
-        <?php else: ?>
-          <?php foreach ($taxas as $taxa): ?>
-          <tr>
-            <td><?= htmlspecialchars($taxa->identificacaoUnidade ?? '—') ?></td>
-            <td class="d-none d-sm-table-cell"><?= htmlspecialchars($taxa->competenciaFormatada()) ?></td>
-            <td><?= dinheiro($taxa->valor) ?></td>
-            <td class="d-none d-md-table-cell"><?= dataBR($taxa->vencimento) ?></td>
-            <?php $statusEf = $taxa->estaVencido() ? 'vencido' : $taxa->status; ?>
-            <td><span class="badge rounded-pill badge-<?= $statusEf ?>"><?= ['pago'=>'Pago','vencido'=>'Atrasado','isento'=>'Isento'][$statusEf] ?? 'Pendente' ?></span></td>
-            <td class="d-none d-md-table-cell">
-              <?php if ($taxa->comprovante): ?>
-                <a href="<?= url('uploads/' . $taxa->comprovante) ?>" target="_blank" class="btn btn-outline-secondary btn-sm">
-                  <i class="bi bi-paperclip"></i> Ver
-                </a>
-              <?php else: ?>
-                <span class="text-body-tertiary">—</span>
-              <?php endif; ?>
-            </td>
-            <td>
-              <?php if ($taxa->comprovante && $taxa->status !== 'pago'): ?>
-                <a href="<?= url("taxas/{$taxa->id}/aprovar?competencia={$competencia}") ?>"
-                   class="btn btn-success btn-sm"
-                   onclick="return confirm('Aprovar este pagamento?')">
-                  <i class="bi bi-check-lg"></i> Aprovar
-                </a>
-              <?php endif; ?>
-            </td>
-          </tr>
-          <?php endforeach; ?>
-        <?php endif; ?>
-      </tbody>
-    </table>
-  </div>
-</div>
+<style>
+.card-hover { transition: transform .12s, box-shadow .12s; }
+.card-hover:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.1) !important; }
+</style>
+<?php endif; ?>
 
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>
