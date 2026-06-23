@@ -39,15 +39,29 @@ class TaxaCondominialController
         if (!empty($_GET['aguardando'])) {
             $aguardando = $this->taxaService->listarAguardandoAprovacao();
             require_once RAIZ . '/views/admin/taxas/aguardando.php';
-        } elseif (isset($_GET['competencia']) && $_GET['competencia'] !== '') {
+            return;
+        }
+
+        if (isset($_GET['competencia']) && $_GET['competencia'] !== '') {
             $competencia = $_GET['competencia'];
             $unidades    = $this->taxaService->listarUnidadesComStatusPorCompetencia($competencia);
             $resumo      = $this->taxaService->resumoPorCompetencia($competencia);
             require_once RAIZ . '/views/admin/taxas/por-competencia.php';
-        } else {
-            $competencias = $this->taxaService->listarCompetencias();
-            require_once RAIZ . '/views/admin/taxas/lista.php';
+            return;
         }
+
+        if (isset($_GET['ano']) && preg_match('/^\d{4}$/', $_GET['ano'])) {
+            $ano          = $_GET['ano'];
+            $competencias = $this->taxaService->listarCompetenciasPorAno($ano);
+            $anos         = null;
+            require_once RAIZ . '/views/admin/taxas/lista.php';
+            return;
+        }
+
+        $anos         = $this->taxaService->resumoAnos();
+        $ano          = null;
+        $competencias = null;
+        require_once RAIZ . '/views/admin/taxas/lista.php';
     }
 
     public function detalheUnidade(): void

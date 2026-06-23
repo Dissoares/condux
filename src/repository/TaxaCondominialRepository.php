@@ -333,6 +333,44 @@ class TaxaCondominialRepository
     }
 
     /** Retorna uma linha por competência com totais — para o grid de meses */
+    public function resumoAnos(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT
+                LEFT(competencia, 4)                                                              AS ano,
+                COUNT(DISTINCT competencia)                                                        AS total_meses,
+                COUNT(*)                                                                           AS total,
+                SUM(status = "pago")                                                               AS total_pagas,
+                SUM(status = "vencido" OR (status = "pendente" AND vencimento < CURDATE()))        AS total_atrasadas,
+                SUM(status = "aguardando" OR (status = "pendente" AND vencimento >= CURDATE()))    AS total_pendentes,
+                SUM(CASE WHEN status = "pago" THEN valor ELSE 0 END)                              AS valor_arrecadado
+             FROM taxas_condominiais
+             GROUP BY ano
+             ORDER BY ano DESC'
+        );
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function listarCompetenciasPorAno(string $ano): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT
+                competencia,
+                COUNT(*) AS total,
+                SUM(status = "pago") AS total_pagas,
+                SUM(status = "vencido" OR (status = "pendente" AND vencimento < CURDATE())) AS total_atrasadas,
+                SUM(status = "aguardando" OR (status = "pendente" AND vencimento >= CURDATE())) AS total_pendentes,
+                SUM(status = "aguardando") AS total_aguardando,
+                SUM(CASE WHEN status = "pago" THEN valor ELSE 0 END) AS valor_arrecadado
+             FROM taxas_condominiais
+             WHERE LEFT(competencia, 4) = :ano
+             GROUP BY competencia
+             ORDER BY competencia DESC'
+        );
+        $stmt->execute([':ano' => $ano]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function listarCompetencias(): array
     {
         $stmt = $this->conexao->query(

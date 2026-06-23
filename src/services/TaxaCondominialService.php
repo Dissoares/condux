@@ -56,6 +56,16 @@ class TaxaCondominialService
         return $this->taxaRepository->resumoPorCompetencia($competencia);
     }
 
+    public function resumoAnos(): array
+    {
+        return $this->taxaRepository->resumoAnos();
+    }
+
+    public function listarCompetenciasPorAno(string $ano): array
+    {
+        return $this->taxaRepository->listarCompetenciasPorAno($ano);
+    }
+
     public function listarCompetencias(): array
     {
         return $this->taxaRepository->listarCompetencias();
