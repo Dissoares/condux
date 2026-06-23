@@ -163,9 +163,12 @@
 
   /* ── Drawer (sidebar) mobile ── */
   document.addEventListener('DOMContentLoaded', function () {
-    var sidebar = document.getElementById('barraLateral');
-    var overlay = document.getElementById('conduxOverlay');
-    var maisBtn = document.getElementById('conduxMaisBtn');
+    var sidebar    = document.getElementById('barraLateral');
+    var overlay    = document.getElementById('conduxOverlay');
+    var maisBtn    = document.getElementById('conduxMaisBtn');
+    var hamburger  = document.getElementById('conduxHamburger');
+    var userBtn    = document.getElementById('conduxUserBtn');
+    var userDrop   = document.getElementById('conduxUserDrop');
 
     function abrirDrawer()  {
       sidebar.classList.add('aberta');
@@ -178,13 +181,30 @@
       if (maisBtn) maisBtn.classList.remove('ativo');
     }
 
-    if (maisBtn)  maisBtn.addEventListener('click', function () {
+    if (maisBtn)   maisBtn.addEventListener('click', function () {
       sidebar.classList.contains('aberta') ? fecharDrawer() : abrirDrawer();
     });
-    if (overlay)  overlay.addEventListener('click', fecharDrawer);
-    if (sidebar)  sidebar.querySelectorAll('a').forEach(function (a) {
+    if (hamburger) hamburger.addEventListener('click', function () {
+      sidebar.classList.contains('aberta') ? fecharDrawer() : abrirDrawer();
+    });
+    if (overlay)   overlay.addEventListener('click', fecharDrawer);
+    if (sidebar)   sidebar.querySelectorAll('a').forEach(function (a) {
       a.addEventListener('click', fecharDrawer);
     });
+
+    /* Dropdown usuário */
+    if (userBtn && userDrop) {
+      userBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        userDrop.classList.toggle('aberto');
+      });
+      document.addEventListener('click', function () {
+        userDrop.classList.remove('aberto');
+      });
+      userDrop.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    }
   });
 </script>
 </body>

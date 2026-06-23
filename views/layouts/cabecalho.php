@@ -54,19 +54,45 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
 
 <!-- ══ Mobile: header fixo no topo ══════════════════════ -->
 <header class="condux-top-bar" id="conduxTopBar">
+
+  <!-- Esquerda: tema + hamburger -->
+  <div class="condux-top-bar-esq">
+    <button class="condux-top-btn condux-btn-tema" onclick="conduxToggleTema()" title="Alternar tema">
+      <i class="bi bi-moon-fill condux-tema-icone"></i>
+    </button>
+    <button class="condux-top-btn" id="conduxHamburger" title="Menu">
+      <i class="bi bi-list" style="font-size:1.4rem; line-height:1;"></i>
+    </button>
+  </div>
+
+  <!-- Centro: logo -->
   <a href="<?= url('painel') ?>" class="condux-logo-mobile">
     <?php if ($_logoUrl): ?>
-      <img src="<?= $_logoUrl ?>" alt="<?= $_appCurto ?>" style="max-height:28px; max-width:120px; object-fit:contain;">
+      <img src="<?= $_logoUrl ?>" alt="<?= $_appCurto ?>"
+           style="max-height:28px; max-width:110px; object-fit:contain; display:block;">
     <?php else: ?>
       <?= $_appNome ?>
     <?php endif; ?>
   </a>
-  <div class="condux-top-bar-acoes">
-    <button class="condux-top-btn condux-btn-tema" onclick="conduxToggleTema()" title="Tema">
-      <i class="bi bi-moon-fill condux-tema-icone"></i>
+
+  <!-- Direita: usuário + dropdown sair -->
+  <div class="condux-top-bar-dir">
+    <button class="condux-top-user-btn" id="conduxUserBtn" type="button">
+      <span class="condux-top-username"><?= htmlspecialchars(mb_substr($usuarioAtual['nome'] ?? 'Usuário', 0, 13)) ?></span>
+      <div class="condux-avatar-sm"><?= $inicialNome ?></div>
     </button>
-    <div class="condux-avatar-sm"><?= $inicialNome ?></div>
+    <div class="condux-user-drop" id="conduxUserDrop">
+      <div class="condux-user-drop-info">
+        <strong><?= htmlspecialchars($usuarioAtual['nome'] ?? '') ?></strong>
+        <small style="text-transform:capitalize; opacity:.7;"><?= htmlspecialchars($usuarioAtual['perfil'] ?? '') ?></small>
+      </div>
+      <div class="condux-user-drop-divider"></div>
+      <a href="<?= url('sair') ?>" class="condux-user-drop-item">
+        <i class="bi bi-box-arrow-right"></i> Sair
+      </a>
+    </div>
   </div>
+
 </header>
 
 <!-- ══ Sidebar (desktop sempre visível; mobile = drawer) ═ -->

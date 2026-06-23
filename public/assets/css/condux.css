@@ -588,53 +588,126 @@ body {
 
   /* ── Top header ── */
   .condux-top-bar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     position: fixed;
     top: 0; left: 0; right: 0;
     height: 56px;
     background: linear-gradient(90deg, var(--condux-escura), var(--condux-primaria));
-    padding: 0 1rem;
+    padding: 0 .75rem;
     z-index: 1030;
     box-shadow: 0 2px 12px rgba(0,0,0,.25);
   }
-  .condux-logo-mobile {
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: #fff;
-    text-decoration: none;
-    letter-spacing: -.3px;
-  }
-  .condux-logo-mobile span { color: var(--condux-acento); }
-  .condux-top-bar-acoes {
+  .condux-top-bar-esq {
     display: flex;
     align-items: center;
-    gap: .65rem;
+    gap: .25rem;
+    justify-content: flex-start;
+  }
+  .condux-top-bar-dir {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+  }
+  .condux-logo-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.3px;
   }
   .condux-top-btn {
     background: none;
     border: none;
-    color: rgba(255,255,255,.75);
+    color: rgba(255,255,255,.8);
     font-size: 1.05rem;
-    padding: .3rem;
+    padding: .35rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: color .15s;
     -webkit-tap-highlight-color: transparent;
+    border-radius: .4rem;
   }
-  .condux-top-btn:hover { color: var(--condux-acento); }
+  .condux-top-btn:hover,
+  .condux-top-btn:active { color: var(--condux-acento); }
   .condux-avatar-sm {
-    width: 32px; height: 32px;
+    width: 30px; height: 30px;
     border-radius: 50%;
     background: var(--condux-acento);
     color: var(--condux-escura);
     font-weight: 800;
-    font-size: .8rem;
+    font-size: .75rem;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
+  }
+  /* Botão usuário (nome + avatar) */
+  .condux-top-user-btn {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    cursor: pointer;
+    padding: .2rem .3rem;
+    border-radius: .4rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .condux-top-username {
+    color: rgba(255,255,255,.85);
+    font-size: .75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Dropdown do usuário */
+  .condux-user-drop {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 180px;
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: .6rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    z-index: 1050;
+    overflow: hidden;
+  }
+  .condux-user-drop.aberto { display: block; }
+  .condux-user-drop-info {
+    padding: .75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .1rem;
+    font-size: .82rem;
+    color: var(--bs-body-color);
+  }
+  .condux-user-drop-divider {
+    height: 1px;
+    background: var(--bs-border-color);
+  }
+  .condux-user-drop-item {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .65rem 1rem;
+    font-size: .85rem;
+    color: #dc3545;
+    text-decoration: none;
+    transition: background .12s;
+  }
+  .condux-user-drop-item:hover {
+    background: rgba(220, 53, 69, .08);
+    color: #dc3545;
   }
 
   /* ── Bottom nav ── */
