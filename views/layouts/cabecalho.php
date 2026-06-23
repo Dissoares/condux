@@ -18,6 +18,14 @@ $_badgeTicket = $ehAdmin
     ? $_ticketRepo->contarAbertos()
     : $_ticketRepo->contarRespostasParaMorador((int)($usuarioAtual['id'] ?? 0));
 
+// Comprovantes aguardando aprovação (só para admin)
+$_badgeComprovantes = 0;
+if ($ehAdmin) {
+    require_once RAIZ . '/src/repository/TaxaCondominialRepository.php';
+    $_badgeComprovantes = (new TaxaCondominialRepository(Conexao::obter()))->contarAguardandoAprovacao();
+}
+$_badgeTotal = $_badgeTicket + $_badgeComprovantes;
+
 // Configurações dinâmicas da plataforma
 require_once RAIZ . '/src/repository/ConfiguracaoRepository.php';
 $_cfg = (new ConfiguracaoRepository(Conexao::obter()))->todas();
@@ -92,12 +100,41 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
     <button id="condux-install-btn" class="condux-top-btn" title="Instalar app" style="display:none;">
       <i class="bi bi-download" style="font-size:.95rem;"></i>
     </button>
+    <?php if ($ehAdmin): ?>
+    <div class="dropdown">
+      <button class="condux-top-btn condux-bell-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notificações" style="position:relative;">
+        <i class="bi bi-bell<?= $_badgeTotal > 0 ? '-fill' : '' ?>"></i>
+        <?php if ($_badgeTotal > 0): ?>
+          <span class="condux-badge-sino"><?= $_badgeTotal > 9 ? '9+' : $_badgeTotal ?></span>
+        <?php endif; ?>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow" style="min-width:230px;">
+        <li>
+          <a href="<?= url('tickets') ?>" class="dropdown-item d-flex align-items-center justify-content-between py-2">
+            <span><i class="bi bi-ticket-perforated me-2 text-danger"></i>Tickets abertos</span>
+            <?php if ($_badgeTicket > 0): ?>
+              <span class="badge bg-danger rounded-pill"><?= $_badgeTicket ?></span>
+            <?php endif; ?>
+          </a>
+        </li>
+        <li>
+          <a href="<?= url('taxas?aguardando=1') ?>" class="dropdown-item d-flex align-items-center justify-content-between py-2">
+            <span><i class="bi bi-receipt me-2 text-primary"></i>Comprovantes</span>
+            <?php if ($_badgeComprovantes > 0): ?>
+              <span class="badge bg-primary rounded-pill"><?= $_badgeComprovantes ?></span>
+            <?php endif; ?>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <?php else: ?>
     <a href="<?= url('tickets') ?>" class="condux-top-btn condux-bell-btn" title="Tickets / Notificações" style="position:relative;">
       <i class="bi bi-bell<?= $_badgeTicket > 0 ? '-fill' : '' ?>"></i>
       <?php if ($_badgeTicket > 0): ?>
         <span class="condux-badge-sino"><?= $_badgeTicket > 9 ? '9+' : $_badgeTicket ?></span>
       <?php endif; ?>
     </a>
+    <?php endif; ?>
     <?php if (file_exists(RAIZ . '/config/vapid.php')): ?>
     <button id="condux-push-btn" class="condux-top-btn condux-push-off d-none d-lg-inline-flex" title="Push">
       <i class="bi bi-bell-slash" style="font-size:.85rem;"></i>
@@ -304,12 +341,42 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
             style="color:rgba(255,255,255,.6); font-size:1rem;">
       <i class="bi bi-moon-fill condux-tema-icone"></i>
     </button>
+    <?php if ($ehAdmin): ?>
+    <div class="dropdown">
+      <button class="condux-sidebar-bell" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notificações"
+              style="background:none;border:none;padding:0;cursor:pointer;position:relative;">
+        <i class="bi bi-bell<?= $_badgeTotal > 0 ? '-fill' : '' ?>"></i>
+        <?php if ($_badgeTotal > 0): ?>
+          <span class="condux-badge-sino"><?= $_badgeTotal > 9 ? '9+' : $_badgeTotal ?></span>
+        <?php endif; ?>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow" style="min-width:230px;">
+        <li>
+          <a href="<?= url('tickets') ?>" class="dropdown-item d-flex align-items-center justify-content-between py-2">
+            <span><i class="bi bi-ticket-perforated me-2 text-danger"></i>Tickets abertos</span>
+            <?php if ($_badgeTicket > 0): ?>
+              <span class="badge bg-danger rounded-pill"><?= $_badgeTicket ?></span>
+            <?php endif; ?>
+          </a>
+        </li>
+        <li>
+          <a href="<?= url('taxas?aguardando=1') ?>" class="dropdown-item d-flex align-items-center justify-content-between py-2">
+            <span><i class="bi bi-receipt me-2 text-primary"></i>Comprovantes</span>
+            <?php if ($_badgeComprovantes > 0): ?>
+              <span class="badge bg-primary rounded-pill"><?= $_badgeComprovantes ?></span>
+            <?php endif; ?>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <?php else: ?>
     <a href="<?= url('tickets') ?>" title="Tickets" class="condux-sidebar-bell" style="position:relative;">
       <i class="bi bi-bell<?= $_badgeTicket > 0 ? '-fill' : '' ?>"></i>
       <?php if ($_badgeTicket > 0): ?>
         <span class="condux-badge-sino"><?= $_badgeTicket > 9 ? '9+' : $_badgeTicket ?></span>
       <?php endif; ?>
     </a>
+    <?php endif; ?>
     <a href="<?= url('sair') ?>" title="Sair" style="color:rgba(255,255,255,.6); font-size:1rem;">
       <i class="bi bi-box-arrow-right"></i>
     </a>
