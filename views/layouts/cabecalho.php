@@ -238,17 +238,17 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
     <i class="bi bi-speedometer2"></i>
     <span>Início</span>
   </a>
-  <a href="<?= url('unidades') ?>" class="condux-bnav-item <?= $segAtivo === 'unidades' ? 'ativo' : '' ?>">
-    <i class="bi bi-building"></i>
-    <span>Unidades</span>
-  </a>
-  <a href="<?= url('condominios') ?>" class="condux-bnav-item <?= $segAtivo === 'condominios' ? 'ativo' : '' ?>">
-    <i class="bi bi-people"></i>
-    <span>Condôminos</span>
+  <a href="<?= url('comunicados') ?>" class="condux-bnav-item <?= $segAtivo === 'comunicados' ? 'ativo' : '' ?>">
+    <i class="bi bi-megaphone"></i>
+    <span>Avisos</span>
   </a>
   <a href="<?= url('taxas') ?>" class="condux-bnav-item <?= $segAtivo === 'taxas' ? 'ativo' : '' ?>">
     <i class="bi bi-cash-stack"></i>
     <span>Taxas</span>
+  </a>
+  <a href="<?= url('contas') ?>" class="condux-bnav-item <?= $segAtivo === 'contas' ? 'ativo' : '' ?>">
+    <i class="bi bi-receipt"></i>
+    <span>Contas</span>
   </a>
   <button class="condux-bnav-item" id="conduxMaisBtn" aria-label="Mais opções">
     <i class="bi bi-grid"></i>
