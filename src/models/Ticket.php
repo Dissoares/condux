@@ -127,4 +127,11 @@ class Ticket
         return !in_array($this->perfilUltimaMsg, ['sindico', 'subsindico'], true)
                && $this->perfilUltimaMsg !== null;
     }
+
+    /** Ticket tem resposta nova da equipe que o morador ainda não respondeu */
+    public function temRespostaNovaDaEquipe(): bool
+    {
+        if ($this->estaFechado()) return false;
+        return in_array($this->perfilUltimaMsg, ['sindico', 'subsindico'], true);
+    }
 }

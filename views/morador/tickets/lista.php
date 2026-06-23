@@ -36,10 +36,21 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
      class="d-block px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?> text-decoration-none
             border-start border-3 border-<?= $t->corStatus() ?>">
     <div class="d-flex align-items-start gap-3">
-      <div class="flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle
-                  bg-<?= $t->corStatus() ?>-subtle text-<?= $t->corStatus() ?>-emphasis"
-           style="width:40px; height:40px; font-size:1rem;">
-        <i class="bi <?= $t->iconeCategoria() ?>"></i>
+      <div class="flex-shrink-0 position-relative">
+        <div class="d-flex align-items-center justify-content-center rounded-circle
+                    bg-<?= $t->corStatus() ?>-subtle text-<?= $t->corStatus() ?>-emphasis"
+             style="width:40px; height:40px; font-size:1rem;">
+          <i class="bi <?= $t->iconeCategoria() ?>"></i>
+        </div>
+        <?php if ($t->temRespostaNovaDaEquipe()): ?>
+          <span class="condux-nova-msg" title="Nova resposta da equipe" style="
+            position:absolute; top:-3px; right:-3px;
+            width:14px; height:14px; border-radius:50%;
+            background:#e53935; border:2px solid var(--bs-body-bg);
+            display:flex; align-items:center; justify-content:center;">
+            <i class="bi bi-chat-fill" style="font-size:.45rem; color:#fff;"></i>
+          </span>
+        <?php endif; ?>
       </div>
       <div class="flex-grow-1 min-width-0">
         <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
