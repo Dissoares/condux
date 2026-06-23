@@ -68,6 +68,7 @@ class Roteador
             'prestadoras'      => self::rotasPrestadoras($seg, $metodo, $ehAdmin),
             'funcionarios'     => self::rotasFuncionarios($seg, $metodo, $ehAdmin),
             'folha-pagamento'  => self::rotasFolhaPagamento($ehAdmin),
+            'contas'           => self::rotasContas($seg, $metodo, $ehAdmin),
             'minhas-taxas'     => self::rotasMinhasTaxas($seg, $metodo),
             'transparencia'=> self::rotasTransparencia($seg),
             'relatorios'   => self::carregarRelatorio(),
@@ -367,6 +368,28 @@ class Roteador
         if (!$ehAdmin) { self::naoAutorizado(); return; }
         require_once RAIZ . '/src/controllers/FuncionarioController.php';
         (new FuncionarioController())->folhaPagamento();
+    }
+
+    // ── Contas ────────────────────────────────────────────────────────────
+
+    private static function rotasContas(array $seg, string $metodo, bool $ehAdmin): void
+    {
+        if (!$ehAdmin) { self::naoAutorizado(); return; }
+        require_once RAIZ . '/src/controllers/ContaController.php';
+        $ctrl = new ContaController();
+
+        if ($seg[1] === 'salvar' && $metodo === 'POST') { $ctrl->salvar(); return; }
+        if ($seg[1] === 'pagar'  && $metodo === 'POST') { $ctrl->marcarPago(); return; }
+
+        $id = (int) ($seg[1] ?? 0);
+        if ($id > 0 && $seg[2] === 'excluir') {
+            $_GET['id']   = $id;
+            $_GET['comp'] = $_GET['comp'] ?? date('Y-m');
+            $ctrl->excluir();
+            return;
+        }
+
+        $ctrl->listar();
     }
 
     // ── Minhas taxas (morador) ────────────────────────────────────────────

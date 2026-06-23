@@ -86,6 +86,11 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
           <i class="bi bi-people"></i> Folha de Pagamento
         </a>
       </li>
+      <li class="nav-item">
+        <a href="<?= url('contas') ?>" class="nav-link <?= $segAtivo === 'contas' ? 'ativo' : '' ?>">
+          <i class="bi bi-receipt"></i> Contas
+        </a>
+      </li>
 
       <p class="condux-nav-label">Obras</p>
       <li class="nav-item">
