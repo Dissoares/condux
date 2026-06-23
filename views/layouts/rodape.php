@@ -31,8 +31,19 @@
       var opts   = Array.from(dropdown.querySelectorAll('.condux-picker-opt'));
       var vazio  = dropdown.querySelector('.condux-picker-vazio');
 
-      function abrir() { dropdown.classList.add('aberto'); }
-      function fechar() { dropdown.classList.remove('aberto'); }
+      function abrir() {
+        var rect = input.getBoundingClientRect();
+        dropdown.style.position = 'fixed';
+        dropdown.style.top      = (rect.bottom + 3) + 'px';
+        dropdown.style.left     = rect.left + 'px';
+        dropdown.style.width    = rect.width + 'px';
+        dropdown.style.right    = 'auto';
+        dropdown.classList.add('aberto');
+      }
+      function fechar() {
+        dropdown.classList.remove('aberto');
+        dropdown.style.cssText = '';
+      }
 
       function filtrar(termo) {
         var t = termo.toLowerCase().trim();

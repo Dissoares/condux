@@ -848,7 +848,7 @@ body {
   position: absolute;
   top: calc(100% + 3px);
   left: 0; right: 0;
-  z-index: 1055;
+  z-index: 1100;
   max-height: 220px;
   overflow-y: auto;
   background: var(--bs-body-bg);
