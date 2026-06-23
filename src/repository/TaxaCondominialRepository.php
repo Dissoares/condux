@@ -240,7 +240,7 @@ class TaxaCondominialRepository
              FROM unidades u
              LEFT JOIN taxas_condominiais tc
                     ON tc.unidade_id = u.id AND tc.competencia = :competencia
-             WHERE u.ativa = 1
+             WHERE u.ativo = 1
              ORDER BY u.bloco, u.numero'
         );
         $stmt->execute([':competencia' => $competencia]);
