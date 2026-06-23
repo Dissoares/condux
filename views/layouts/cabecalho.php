@@ -70,9 +70,11 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
   <a href="<?= url('painel') ?>" class="condux-logo-mobile">
     <?php if ($_logoUrl): ?>
       <img src="<?= $_logoUrl ?>" alt="<?= $_appCurto ?>"
-           style="max-height:28px; max-width:110px; object-fit:contain; display:block;">
+           style="max-height:28px; max-width:110px; object-fit:contain; display:block;"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+      <span style="display:none;"><?= $_appCurto ?></span>
     <?php else: ?>
-      <?= $_appNome ?>
+      <span><?= $_appCurto ?></span>
     <?php endif; ?>
   </a>
 
