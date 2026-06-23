@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 60" fill="none">
+
+  <!-- Ícone: edifício estilizado -->
+  <g>
+    <!-- Torre esquerda (alta) -->
+    <rect x="2" y="10" width="19" height="46" rx="2.5" fill="white" opacity=".95"/>
+    <!-- Torre direita (média) -->
+    <rect x="25" y="20" width="16" height="36" rx="2.5" fill="white" opacity=".8"/>
+    <!-- Janelas torre esquerda -->
+    <rect x="6"  y="15" width="4.5" height="4.5" rx="1" fill="#f0a500"/>
+    <rect x="13" y="15" width="4.5" height="4.5" rx="1" fill="#f0a500"/>
+    <rect x="6"  y="24" width="4.5" height="4.5" rx="1" fill="#f0a500"/>
+    <rect x="13" y="24" width="4.5" height="4.5" rx="1" fill="#f0a500"/>
+    <rect x="6"  y="33" width="4.5" height="4.5" rx="1" fill="#f0a500"/>
+    <rect x="13" y="33" width="4.5" height="4.5" rx="1" fill="#f0a500"/>
+    <rect x="6"  y="42" width="4.5" height="4.5" rx="1" fill="rgba(255,255,255,.3)"/>
+    <rect x="13" y="42" width="4.5" height="4.5" rx="1" fill="rgba(255,255,255,.3)"/>
+    <!-- Janelas torre direita -->
+    <rect x="28.5" y="25" width="4"   height="4" rx="1" fill="#f0a500"/>
+    <rect x="34.5" y="25" width="4"   height="4" rx="1" fill="#f0a500"/>
+    <rect x="28.5" y="33" width="4"   height="4" rx="1" fill="#f0a500"/>
+    <rect x="34.5" y="33" width="4"   height="4" rx="1" fill="#f0a500"/>
+    <!-- Base -->
+    <rect x="0" y="55" width="44" height="3" rx="1.5" fill="white" opacity=".6"/>
+  </g>
+
+  <!-- Texto: Con + dux -->
+  <text font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="34" font-weight="800" y="47" x="52" letter-spacing="-0.5">
+    <tspan fill="white">Con</tspan><tspan fill="#f0a500">dux</tspan>
+  </text>
+
+</svg>
