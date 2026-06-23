@@ -270,7 +270,7 @@ $eArrec  = (float) ($resumoExtras['valor_atrasado']  ?? 0);
         </div>
       <?php else: ?>
       <div class="list-group list-group-flush">
-        <?php foreach (array_slice($vistoriasAVencer, 0, 5) as $v):
+        <?php foreach ($vistoriasAVencer as $v):
           $diasRestantes = (int) round((strtotime($v->validade) - time()) / 86400);
           $cor = $diasRestantes <= 15 ? 'danger' : ($diasRestantes <= 30 ? 'warning' : 'secondary');
         ?>
