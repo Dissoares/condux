@@ -9,6 +9,16 @@ $segAtivo  = explode('/', $segAtivo)[0] ?? '';
 
 $inicialNome = strtoupper(mb_substr($usuarioAtual['nome'] ?? 'U', 0, 1));
 $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
+
+// Configurações dinâmicas da plataforma
+require_once RAIZ . '/src/repository/ConfiguracaoRepository.php';
+$_cfg = (new ConfiguracaoRepository(Conexao::obter()))->todas();
+$_appNome    = htmlspecialchars($_cfg['app_nome']      ?? 'Condux');
+$_appCurto   = htmlspecialchars($_cfg['app_nome_curto'] ?? 'Condux');
+$_corPrimaria = htmlspecialchars($_cfg['cor_primaria']  ?? '#1a3c5e');
+$_corEscura   = htmlspecialchars($_cfg['cor_escura']    ?? '#0f2540');
+$_corAcento   = htmlspecialchars($_cfg['cor_acento']    ?? '#f0a500');
+$_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) : null;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR" data-bs-theme="light">
@@ -21,23 +31,36 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= htmlspecialchars($tituloPagina ?? 'Condux') ?> — Condux</title>
-  <meta name="theme-color" content="#1a2236">
+  <title><?= htmlspecialchars($tituloPagina ?? 'Condux') ?> — <?= $_appCurto ?></title>
+  <meta name="theme-color" content="<?= $_corPrimaria ?>">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Condux">
+  <meta name="apple-mobile-web-app-title" content="<?= $_appCurto ?>">
   <link rel="manifest" href="<?= url('manifest.json') ?>">
   <link rel="apple-touch-icon" href="<?= url('icons/icon-192.png') ?>">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="<?= url('assets/css/condux.css') ?>">
+  <style>
+    :root {
+      --condux-primaria: <?= $_corPrimaria ?>;
+      --condux-escura:   <?= $_corEscura ?>;
+      --condux-acento:   <?= $_corAcento ?>;
+    }
+  </style>
 </head>
 <body>
 
 <!-- ══ Mobile: header fixo no topo ══════════════════════ -->
 <header class="condux-top-bar" id="conduxTopBar">
-  <a href="<?= url('painel') ?>" class="condux-logo-mobile">Con<span>dux</span></a>
+  <a href="<?= url('painel') ?>" class="condux-logo-mobile">
+    <?php if ($_logoUrl): ?>
+      <img src="<?= $_logoUrl ?>" alt="<?= $_appCurto ?>" style="max-height:28px; max-width:120px; object-fit:contain;">
+    <?php else: ?>
+      <?= $_appNome ?>
+    <?php endif; ?>
+  </a>
   <div class="condux-top-bar-acoes">
     <button class="condux-top-btn condux-btn-tema" onclick="conduxToggleTema()" title="Tema">
       <i class="bi bi-moon-fill condux-tema-icone"></i>
@@ -48,7 +71,14 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
 
 <!-- ══ Sidebar (desktop sempre visível; mobile = drawer) ═ -->
 <aside class="condux-sidebar" id="barraLateral">
-  <a href="<?= url('painel') ?>" class="condux-logo d-block">Con<span>dux</span></a>
+  <a href="<?= url('painel') ?>" class="condux-logo d-block">
+    <?php if ($_logoUrl): ?>
+      <img src="<?= $_logoUrl ?>" alt="<?= $_appCurto ?>"
+           style="max-height:36px; max-width:160px; object-fit:contain; display:block;">
+    <?php else: ?>
+      <?= $_appNome ?>
+    <?php endif; ?>
+  </a>
 
   <nav class="flex-grow-1 pb-2">
     <ul class="nav flex-column">
@@ -118,6 +148,13 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
       <li class="nav-item">
         <a href="<?= url('vistorias') ?>" class="nav-link <?= $segAtivo === 'vistorias' ? 'ativo' : '' ?>">
           <i class="bi bi-clipboard-check"></i> Vistorias
+        </a>
+      </li>
+
+      <p class="condux-nav-label">Sistema</p>
+      <li class="nav-item">
+        <a href="<?= url('configuracoes') ?>" class="nav-link <?= $segAtivo === 'configuracoes' ? 'ativo' : '' ?>">
+          <i class="bi bi-gear"></i> Configurações
         </a>
       </li>
 

@@ -72,6 +72,7 @@ class Roteador
             'contas'           => self::rotasContas($seg, $metodo, $ehAdmin),
             'comunicados'      => self::rotasComunicados($seg, $metodo, $ehAdmin),
             'push'             => self::rotasPush($seg, $metodo),
+            'configuracoes'    => self::rotasConfiguracoes($seg, $metodo, $ehAdmin),
             'minhas-taxas'     => self::rotasMinhasTaxas($seg, $metodo),
             'transparencia'=> self::rotasTransparencia($seg),
             'relatorios'   => self::carregarRelatorio(),
@@ -429,6 +430,20 @@ class Roteador
             'vapid-public-key' => $ctrl->vapidKey(),
             default          => self::naoEncontrado(),
         };
+    }
+
+    // ── Configurações da plataforma ───────────────────────────────────────
+
+    private static function rotasConfiguracoes(array $seg, string $metodo, bool $ehAdmin): void
+    {
+        if (!$ehAdmin) { self::naoAutorizado(); return; }
+        require_once RAIZ . '/src/controllers/ConfiguracaoController.php';
+        $ctrl = new ConfiguracaoController();
+        if ($seg[1] === 'salvar' && $metodo === 'POST') {
+            $ctrl->salvar();
+        } else {
+            $ctrl->exibir();
+        }
     }
 
     // ── Minhas taxas (morador) ────────────────────────────────────────────
