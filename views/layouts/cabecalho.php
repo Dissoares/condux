@@ -107,6 +107,9 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
 
 <!-- ══ Sidebar (desktop sempre visível; mobile = drawer) ═ -->
 <aside class="condux-sidebar" id="barraLateral">
+  <button class="condux-sidebar-fechar d-lg-none" id="conduxSidebarFechar" title="Fechar menu">
+    <i class="bi bi-x-lg"></i>
+  </button>
   <a href="<?= url('painel') ?>" class="condux-logo d-block">
     <?php if ($_logoUrl): ?>
       <img src="<?= $_logoUrl ?>" alt="<?= $_appCurto ?>"

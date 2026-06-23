@@ -163,12 +163,13 @@
 
   /* ── Drawer (sidebar) mobile ── */
   document.addEventListener('DOMContentLoaded', function () {
-    var sidebar    = document.getElementById('barraLateral');
-    var overlay    = document.getElementById('conduxOverlay');
-    var maisBtn    = document.getElementById('conduxMaisBtn');
-    var hamburger  = document.getElementById('conduxHamburger');
-    var userBtn    = document.getElementById('conduxUserBtn');
-    var userDrop   = document.getElementById('conduxUserDrop');
+    var sidebar        = document.getElementById('barraLateral');
+    var overlay        = document.getElementById('conduxOverlay');
+    var maisBtn        = document.getElementById('conduxMaisBtn');
+    var hamburger      = document.getElementById('conduxHamburger');
+    var sidebarFechar  = document.getElementById('conduxSidebarFechar');
+    var userBtn        = document.getElementById('conduxUserBtn');
+    var userDrop       = document.getElementById('conduxUserDrop');
 
     function abrirDrawer()  {
       sidebar.classList.add('aberta');
@@ -187,7 +188,8 @@
     if (hamburger) hamburger.addEventListener('click', function () {
       sidebar.classList.contains('aberta') ? fecharDrawer() : abrirDrawer();
     });
-    if (overlay)   overlay.addEventListener('click', fecharDrawer);
+    if (sidebarFechar) sidebarFechar.addEventListener('click', fecharDrawer);
+    if (overlay)       overlay.addEventListener('click', fecharDrawer);
     if (sidebar)   sidebar.querySelectorAll('a').forEach(function (a) {
       a.addEventListener('click', fecharDrawer);
     });
