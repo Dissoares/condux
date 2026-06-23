@@ -161,6 +161,32 @@
     });
   }());
 
+  /* ── PWA Install prompt ── */
+  (function () {
+    var deferred = null;
+    var btn = document.getElementById('condux-install-btn');
+    if (!btn) return;
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferred = e;
+      btn.style.display = 'flex';
+    });
+
+    btn.addEventListener('click', function () {
+      if (!deferred) return;
+      deferred.prompt();
+      deferred.userChoice.then(function () {
+        btn.style.display = 'none';
+        deferred = null;
+      });
+    });
+
+    window.addEventListener('appinstalled', function () {
+      btn.style.display = 'none';
+    });
+  }());
+
   /* ── Drawer (sidebar) mobile ── */
   document.addEventListener('DOMContentLoaded', function () {
     var sidebar        = document.getElementById('barraLateral');

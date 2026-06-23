@@ -89,6 +89,9 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
   <!-- Direita: sininho + avatar com dropdown -->
   <div class="condux-top-bar-dir">
 
+    <button id="condux-install-btn" class="condux-top-btn" title="Instalar app" style="display:none;">
+      <i class="bi bi-download" style="font-size:.95rem;"></i>
+    </button>
     <a href="<?= url('tickets') ?>" class="condux-top-btn condux-bell-btn" title="Tickets / Notificações" style="position:relative;">
       <i class="bi bi-bell<?= $_badgeTicket > 0 ? '-fill' : '' ?>"></i>
       <?php if ($_badgeTicket > 0): ?>
