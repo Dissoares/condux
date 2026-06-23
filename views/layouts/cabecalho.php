@@ -310,13 +310,6 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
         <span class="condux-badge-sino"><?= $_badgeTicket > 9 ? '9+' : $_badgeTicket ?></span>
       <?php endif; ?>
     </a>
-    <?php if (file_exists(RAIZ . '/config/vapid.php')): ?>
-    <button id="condux-push-btn" class="btn btn-link p-0 border-0 condux-push-off"
-            title="Ativar notificações"
-            style="color:rgba(255,255,255,.6); font-size:1rem;">
-      <i class="bi bi-bell-slash" style="font-size:.8rem;"></i>
-    </button>
-    <?php endif; ?>
     <a href="<?= url('sair') ?>" title="Sair" style="color:rgba(255,255,255,.6); font-size:1rem;">
       <i class="bi bi-box-arrow-right"></i>
     </a>
