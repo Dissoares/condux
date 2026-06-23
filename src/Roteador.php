@@ -469,11 +469,8 @@ class Roteador
 
     private static function rotasTransparencia(array $seg): void
     {
-        require_once RAIZ . '/src/controllers/ProjetoController.php';
-        $ctrl = new ProjetoController();
-
-        if ($seg[1] !== null) { $_GET['id'] = (int) $seg[1]; $ctrl->ver(); return; }
-        $ctrl->listar();
+        require_once RAIZ . '/src/controllers/TransparenciaController.php';
+        (new TransparenciaController())->exibir();
     }
 
     // ── Relatório ─────────────────────────────────────────────────────────
