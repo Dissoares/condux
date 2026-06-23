@@ -9,6 +9,7 @@ require_once __DIR__ . '/../repository/ProjetoRepository.php';
 require_once __DIR__ . '/../repository/MoradorRepository.php';
 require_once __DIR__ . '/../repository/PrestadoraRepository.php';
 require_once __DIR__ . '/../repository/VistoriaRepository.php';
+require_once __DIR__ . '/../repository/FuncionarioRepository.php';
 
 class PainelAdminController
 {
@@ -18,18 +19,20 @@ class PainelAdminController
     private ProjetoRepository         $projetoRepo;
     private MoradorRepository         $moradorRepo;
     private PrestadoraRepository      $prestadoraRepo;
-    private VistoriaRepository        $vistoriaRepo;
+    private VistoriaRepository         $vistoriaRepo;
+    private FuncionarioRepository      $funcionarioRepo;
 
     public function __construct()
     {
         $pdo = Conexao::obter();
-        $this->unidadeRepo    = new UnidadeRepository($pdo);
-        $this->taxaRepo       = new TaxaCondominialRepository($pdo);
-        $this->extraRepo      = new TaxaExtraRepository($pdo);
-        $this->projetoRepo    = new ProjetoRepository($pdo);
-        $this->moradorRepo    = new MoradorRepository($pdo);
-        $this->prestadoraRepo = new PrestadoraRepository($pdo);
-        $this->vistoriaRepo   = new VistoriaRepository($pdo);
+        $this->unidadeRepo     = new UnidadeRepository($pdo);
+        $this->taxaRepo        = new TaxaCondominialRepository($pdo);
+        $this->extraRepo       = new TaxaExtraRepository($pdo);
+        $this->projetoRepo     = new ProjetoRepository($pdo);
+        $this->moradorRepo     = new MoradorRepository($pdo);
+        $this->prestadoraRepo  = new PrestadoraRepository($pdo);
+        $this->vistoriaRepo    = new VistoriaRepository($pdo);
+        $this->funcionarioRepo = new FuncionarioRepository($pdo);
     }
 
     public function exibirPainel(): void
@@ -53,9 +56,10 @@ class PainelAdminController
         $qtdAguardando = $this->taxaRepo->contarAguardandoAprovacao();
 
         // Contadores
-        $totalUnidades    = count($this->unidadeRepo->listarAtivas());
-        $totalMoradores   = $this->moradorRepo->contarAtivos();
-        $totalPrestadoras = count($this->prestadoraRepo->listarAtivas());
+        $totalUnidades     = count($this->unidadeRepo->listarAtivas());
+        $totalMoradores    = $this->moradorRepo->contarAtivos();
+        $totalPrestadoras  = count($this->prestadoraRepo->listarAtivas());
+        $totalFuncionarios = $this->funcionarioRepo->contarAtivos();
 
         require_once RAIZ . '/views/admin/painel.php';
     }

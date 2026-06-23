@@ -10,6 +10,7 @@
  * @var int        $totalUnidades
  * @var int        $totalMoradores
  * @var int        $totalPrestadoras
+ * @var int        $totalFuncionarios
  */
 $tituloPagina = 'Painel';
 require_once RAIZ . '/views/layouts/cabecalho.php';
@@ -379,8 +380,9 @@ $totalArrecadadoMes = $mArrecadado + $eArrecadado;
 
   <?php foreach ([
     ['icon'=>'bi-people-fill',     'cor'=>'info',      'label'=>'Moradores',           'valor'=>$totalMoradores,          'link'=>'condominios'],
+    ['icon'=>'bi-person-badge',    'cor'=>'primary',   'label'=>'Funcionários',        'valor'=>$totalFuncionarios,       'link'=>'funcionarios'],
     ['icon'=>'bi-hammer',          'cor'=>'secondary', 'label'=>'Prestadoras',         'valor'=>$totalPrestadoras,        'link'=>'prestadoras'],
-    ['icon'=>'bi-kanban-fill',     'cor'=>'primary',   'label'=>'Projetos ativos',     'valor'=>$totalProjetosAtivos,     'link'=>'projetos'],
+    ['icon'=>'bi-kanban-fill',     'cor'=>'success',   'label'=>'Projetos ativos',     'valor'=>$totalProjetosAtivos,     'link'=>'projetos'],
     ['icon'=>'bi-clipboard-check', 'cor'=>count($vistoriasAVencer)>0?'warning':'secondary',
                                                         'label'=>'Vistorias agendadas','valor'=>count($vistoriasAVencer),'link'=>'vistorias'],
   ] as $s): ?>
