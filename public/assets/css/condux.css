@@ -583,6 +583,9 @@ body {
     padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px) + .75rem);
   }
 
+  /* Header da sidebar oculto no mobile (top bar já exibe o nome) */
+  .condux-logo { display: none; }
+
   /* ── Top header ── */
   .condux-top-bar {
     display: flex;
