@@ -213,4 +213,32 @@ class TaxaExtraRepository
         $stmt->execute([':id' => $taxaExtraId]);
         return $stmt->fetch() ?: ['pagas' => 0, 'pendentes' => 0, 'total' => 0];
     }
+
+    /** Parcelas de taxa extra vencidas sem aviso enviado. */
+    public function listarVencidasSemAviso(): array
+    {
+        return $this->conexao->query(
+            "SELECT teu.id, teu.unidade_id, teu.valor, teu.vencimento,
+                    te.nome AS nome_parcela,
+                    u.nome AS nome_morador, u.email AS email_morador,
+                    DATEDIFF(CURDATE(), teu.vencimento) AS dias_atraso
+             FROM taxa_extra_unidade teu
+             JOIN taxas_extras te ON te.id = teu.taxa_extra_id
+             JOIN unidades un ON un.id = teu.unidade_id
+             JOIN moradores m  ON m.unidade_id = un.id AND m.ativo = 1 AND m.responsavel = 1
+             JOIN usuarios  u  ON u.id = m.usuario_id
+             WHERE teu.status IN ('pendente','vencido')
+               AND teu.vencimento < CURDATE()
+               AND (teu.aviso_vencida_em IS NULL)
+               AND u.email IS NOT NULL AND u.email <> ''
+             ORDER BY teu.vencimento"
+        )->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function marcarAvisoVencidaEnviado(int $id): void
+    {
+        $this->conexao->prepare(
+            'UPDATE taxa_extra_unidade SET aviso_vencida_em = NOW() WHERE id = :id'
+        )->execute([':id' => $id]);
+    }
 }

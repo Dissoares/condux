@@ -337,4 +337,30 @@ class TaxaCondominialRepository
         $linha = $stmt->fetch();
         return $linha ? TaxaCondominial::fromArray($linha) : null;
     }
+
+    /** Taxas vencidas (pendentes/vencidas) que ainda não receberam aviso por e-mail. */
+    public function listarVencidasSemAviso(): array
+    {
+        return $this->conexao->query(
+            "SELECT tc.id, tc.unidade_id, tc.competencia, tc.valor, tc.vencimento,
+                    u.nome AS nome_morador, u.email AS email_morador,
+                    DATEDIFF(CURDATE(), tc.vencimento) AS dias_atraso
+             FROM taxas_condominiais tc
+             JOIN unidades un ON un.id = tc.unidade_id
+             JOIN moradores m  ON m.unidade_id = un.id AND m.ativo = 1 AND m.responsavel = 1
+             JOIN usuarios  u  ON u.id = m.usuario_id
+             WHERE tc.status IN ('pendente','vencido')
+               AND tc.vencimento < CURDATE()
+               AND (tc.aviso_vencida_em IS NULL)
+               AND u.email IS NOT NULL AND u.email <> ''
+             ORDER BY tc.vencimento"
+        )->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function marcarAvisoVencidaEnviado(int $taxaId): void
+    {
+        $this->conexao->prepare(
+            'UPDATE taxas_condominiais SET aviso_vencida_em = NOW() WHERE id = :id'
+        )->execute([':id' => $taxaId]);
+    }
 }

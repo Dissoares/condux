@@ -44,6 +44,45 @@ class MoradorRepository
         return array_map(fn($l) => Morador::fromArray($l), $stmt->fetchAll());
     }
 
+    /**
+     * Retorna [['nome'=>..., 'email'=>..., 'unidade_id'=>...]] dos responsáveis de cada unidade.
+     * Usado para envio de e-mails em lote.
+     * @param int[] $unidadeIds
+     */
+    public function emailsResponsaveisPorUnidades(array $unidadeIds): array
+    {
+        if (empty($unidadeIds)) return [];
+        $placeholders = implode(',', array_fill(0, count($unidadeIds), '?'));
+        $stmt = $this->conexao->prepare(
+            "SELECT u.nome, u.email, m.unidade_id
+             FROM moradores m
+             JOIN usuarios u ON u.id = m.usuario_id
+             WHERE m.unidade_id IN ({$placeholders}) AND m.ativo = 1 AND m.responsavel = 1
+               AND u.email IS NOT NULL AND u.email <> ''
+             ORDER BY m.unidade_id"
+        );
+        $stmt->execute(array_values($unidadeIds));
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Retorna [['nome'=>..., 'email'=>..., 'unidade_id'=>...]] do responsável de uma unidade.
+     */
+    public function emailResponsavelDaUnidade(int $unidadeId): ?array
+    {
+        $stmt = $this->conexao->prepare(
+            "SELECT u.nome, u.email, m.unidade_id
+             FROM moradores m
+             JOIN usuarios u ON u.id = m.usuario_id
+             WHERE m.unidade_id = :uid AND m.ativo = 1 AND m.responsavel = 1
+               AND u.email IS NOT NULL AND u.email <> ''
+             LIMIT 1"
+        );
+        $stmt->execute([':uid' => $unidadeId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
     /** @return Morador[] */
     public function listarTodos(): array
     {

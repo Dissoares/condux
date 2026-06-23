@@ -239,6 +239,61 @@ $logoUrl = !empty($config['app_logo'])
     </div>
   </div>
 
+  <!-- ── E-mail / SMTP ─────────────────────────────────────────────── -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent fw-semibold py-3">
+      <i class="bi bi-envelope"></i> E-mail (SMTP)
+    </div>
+    <div class="card-body p-4">
+      <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" name="email_ativo" id="emailAtivo" value="1"
+               <?= ($config['email_ativo'] ?? '0') === '1' ? 'checked' : '' ?>>
+        <label class="form-check-label fw-semibold" for="emailAtivo">Envio de e-mails ativo</label>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Servidor SMTP</label>
+          <input type="text" name="email_smtp_host" class="form-control"
+                 placeholder="smtp.gmail.com" value="<?= htmlspecialchars($config['email_smtp_host'] ?? '') ?>">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Porta</label>
+          <input type="number" name="email_smtp_porta" class="form-control"
+                 value="<?= htmlspecialchars($config['email_smtp_porta'] ?? '587') ?>">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Segurança</label>
+          <select name="email_smtp_seguranca" class="form-select">
+            <option value="tls" <?= ($config['email_smtp_seguranca'] ?? 'tls') === 'tls' ? 'selected' : '' ?>>TLS (porta 587)</option>
+            <option value="ssl" <?= ($config['email_smtp_seguranca'] ?? '') === 'ssl' ? 'selected' : '' ?>>SSL (porta 465)</option>
+            <option value="none" <?= ($config['email_smtp_seguranca'] ?? '') === 'none' ? 'selected' : '' ?>>Nenhuma</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Usuário SMTP</label>
+          <input type="text" name="email_smtp_usuario" class="form-control" autocomplete="off"
+                 value="<?= htmlspecialchars($config['email_smtp_usuario'] ?? '') ?>">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Senha SMTP</label>
+          <input type="password" name="email_smtp_senha" class="form-control" autocomplete="new-password"
+                 placeholder="<?= !empty($config['email_smtp_senha']) ? '(salva)' : '' ?>">
+          <div class="form-text">Deixe em branco para manter a senha atual.</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Nome do remetente</label>
+          <input type="text" name="email_remetente_nome" class="form-control"
+                 value="<?= htmlspecialchars($config['email_remetente_nome'] ?? $config['app_nome'] ?? '') ?>">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">E-mail do remetente</label>
+          <input type="email" name="email_remetente_email" class="form-control"
+                 value="<?= htmlspecialchars($config['email_remetente_email'] ?? '') ?>">
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="d-flex gap-2">
     <button type="submit" class="btn btn-primary">
       <i class="bi bi-floppy"></i> Salvar configurações

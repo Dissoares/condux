@@ -174,4 +174,35 @@ class UsuarioRepository
         $stmt->execute([':termo' => '%' . $termo . '%']);
         return $stmt->fetchAll();
     }
+
+    public function salvarTokenReset(int $id, string $token, string $expiraEm): void
+    {
+        $this->conexao->prepare(
+            'UPDATE usuarios SET reset_token = :token, reset_expira_em = :expira WHERE id = :id'
+        )->execute([':token' => $token, ':expira' => $expiraEm, ':id' => $id]);
+    }
+
+    public function buscarPorToken(string $token): ?Usuario
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT * FROM usuarios WHERE reset_token = :token AND reset_expira_em > NOW() LIMIT 1'
+        );
+        $stmt->execute([':token' => $token]);
+        $row = $stmt->fetch();
+        return $row ? Usuario::fromArray($row) : null;
+    }
+
+    public function atualizarSenha(int $id, string $hashSenha): void
+    {
+        $this->conexao->prepare(
+            'UPDATE usuarios SET senha = :senha WHERE id = :id'
+        )->execute([':senha' => $hashSenha, ':id' => $id]);
+    }
+
+    public function limparTokenReset(int $id): void
+    {
+        $this->conexao->prepare(
+            'UPDATE usuarios SET reset_token = NULL, reset_expira_em = NULL WHERE id = :id'
+        )->execute([':id' => $id]);
+    }
 }

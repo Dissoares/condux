@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once RAIZ . '/src/repository/TicketRepository.php';
 require_once RAIZ . '/src/repository/UsuarioRepository.php';
+require_once RAIZ . '/src/services/EmailService.php';
 
 class TicketController
 {
@@ -118,6 +119,14 @@ class TicketController
         }
 
         $this->repo->adicionarMensagem($id, (int) $this->usuario['id'], $texto, $interno);
+
+        // Notifica por e-mail: admin respondeu → avisa o morador
+        if ($this->ehAdmin && !$interno) {
+            $dono = (new UsuarioRepository(Conexao::obter()))->buscarPorId($ticket->usuarioId);
+            if ($dono && $dono->email) {
+                (new EmailService())->ticketRespondido($dono->email, $dono->nome, $ticket->titulo, $id);
+            }
+        }
 
         // Admin: atualiza status se informado
         if ($this->ehAdmin && !empty($_POST['status'])) {

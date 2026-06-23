@@ -43,6 +43,11 @@
         <i class="bi bi-box-arrow-in-right"></i> Entrar
       </button>
     </form>
+    <div class="text-center mt-3">
+      <a href="<?= url('esqueci-senha') ?>" class="text-body-secondary" style="font-size:.83rem;">
+        Esqueci minha senha
+      </a>
+    </div>
 
   </div>
 </div>

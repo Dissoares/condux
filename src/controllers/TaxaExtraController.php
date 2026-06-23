@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once RAIZ . '/src/repository/TaxaExtraRepository.php';
 require_once RAIZ . '/src/repository/ProjetoRepository.php';
 require_once RAIZ . '/src/repository/UnidadeRepository.php';
+require_once RAIZ . '/src/services/EmailService.php';
 
 class TaxaExtraController
 {
@@ -82,6 +83,21 @@ class TaxaExtraController
             ]);
 
             $this->repo->atribuirParaUnidades($id, $unidadeIds);
+        }
+
+        // E-mail: avisa todos os moradores responsáveis sobre as parcelas abertas
+        $email = new EmailService();
+        if ($email->ativo()) {
+            require_once RAIZ . '/src/repository/MoradorRepository.php';
+            $moradorRepo = new MoradorRepository(Conexao::obter());
+            $vencBase2   = new DateTimeImmutable($primeiroVenc);
+            foreach ($moradorRepo->emailsResponsaveisPorUnidades($unidadeIds) as $m) {
+                for ($i = 1; $i <= $totalParcelas; $i++) {
+                    $venc = $vencBase2->modify('+' . ($i - 1) . ' months')->format('Y-m-d');
+                    $nome = $projeto->nome . " — Parcela {$i}/{$totalParcelas}";
+                    $email->taxaExtraAberta($m['email'], $m['nome'], $nome, $valorParcela, $venc);
+                }
+            }
         }
 
         Roteador::redirecionar('taxas-extra?msg=gerado&parcelas=' . $totalParcelas);

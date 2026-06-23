@@ -42,6 +42,24 @@ class Roteador
             return;
         }
 
+        if ($seg[0] === 'esqueci-senha') {
+            require_once RAIZ . '/src/controllers/AutenticacaoController.php';
+            $ctrl = new AutenticacaoController();
+            $seg[1] === 'enviar' && $metodo === 'POST'
+                ? $ctrl->enviarRecuperacao()
+                : $ctrl->esqueciSenha();
+            return;
+        }
+
+        if ($seg[0] === 'redefinir-senha') {
+            require_once RAIZ . '/src/controllers/AutenticacaoController.php';
+            $ctrl = new AutenticacaoController();
+            $seg[1] === 'salvar' && $metodo === 'POST'
+                ? $ctrl->salvarNovaSenha()
+                : $ctrl->redefinirSenha();
+            return;
+        }
+
         // ── Proteção de autenticação ─────────────────────────────────────
         if (!Sessao::estaAutenticado()) {
             self::redirecionar('/login');
@@ -177,6 +195,11 @@ class Roteador
         // GET /taxas/gerar-lote-auto — geração automática do mês atual com config salva
         if ($seg[1] === 'gerar-lote-auto') {
             $ctrl->gerarLoteAutomatico();
+            return;
+        }
+        // GET /taxas/avisar-vencidas — pseudo-cron: envia e-mail de cobrança para vencidas sem aviso
+        if ($seg[1] === 'avisar-vencidas') {
+            $ctrl->avisarVencidas();
             return;
         }
         // GET /taxas/unidade/{id}

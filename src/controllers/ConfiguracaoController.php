@@ -33,7 +33,20 @@ class ConfiguracaoController
             'cor_primaria'   => $this->validarCor($_POST['cor_primaria'] ?? '', '#1a3c5e'),
             'cor_escura'     => $this->validarCor($_POST['cor_escura']   ?? '', '#0f2540'),
             'cor_acento'     => $this->validarCor($_POST['cor_acento']   ?? '', '#f0a500'),
+            // E-mail / SMTP
+            'email_ativo'           => isset($_POST['email_ativo']) ? '1' : '0',
+            'email_smtp_host'       => trim($_POST['email_smtp_host']       ?? ''),
+            'email_smtp_porta'      => trim($_POST['email_smtp_porta']      ?? '587'),
+            'email_smtp_usuario'    => trim($_POST['email_smtp_usuario']    ?? ''),
+            'email_smtp_seguranca'  => trim($_POST['email_smtp_seguranca']  ?? 'tls'),
+            'email_remetente_nome'  => trim($_POST['email_remetente_nome']  ?? ''),
+            'email_remetente_email' => trim($_POST['email_remetente_email'] ?? ''),
         ];
+        // Senha SMTP: só atualiza se preenchida
+        $senhaSMTP = trim($_POST['email_smtp_senha'] ?? '');
+        if ($senhaSMTP !== '') {
+            $pares['email_smtp_senha'] = $senhaSMTP;
+        }
 
         // Upload de logo
         if (!empty($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {

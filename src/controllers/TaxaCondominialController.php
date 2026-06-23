@@ -8,6 +8,7 @@ require_once __DIR__ . '/../repository/TaxaExtraRepository.php';
 require_once __DIR__ . '/../repository/UnidadeRepository.php';
 require_once __DIR__ . '/../repository/MoradorRepository.php';
 require_once __DIR__ . '/../repository/ConfigRepository.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
 class TaxaCondominialController
 {
@@ -111,6 +112,16 @@ class TaxaCondominialController
             $total = $this->taxaService->gerarEmLote($competencia, $valor, $vencimento);
             $this->configRepo->salvar('taxa_ultima_geracao_auto', $competencia);
             Sessao::flash('sucesso', "{$total} taxas geradas automaticamente para {$competencia}.");
+
+            // E-mail para cada morador responsável
+            if ($total > 0) {
+                $email = new EmailService();
+                $unidades = $this->unidadeRepo->listarAtivas();
+                $ids      = array_map(fn($u) => $u->id, $unidades);
+                foreach ($this->moradorRepository->emailsResponsaveisPorUnidades($ids) as $m) {
+                    $email->taxaCondominialAberta($m['email'], $m['nome'], $competencia, (float)$valor, $vencimento);
+                }
+            }
         } catch (InvalidArgumentException $e) {
             Sessao::flash('erro', $e->getMessage());
         }
@@ -133,6 +144,16 @@ class TaxaCondominialController
         try {
             $this->taxaService->marcarPago($taxaId, $formaPagamento, $dataPagamento, $arquivo);
             Sessao::flash('sucesso', 'Pagamento registrado com sucesso.');
+            // E-mail de pagamento aprovado para o morador responsável
+            $morador = $this->moradorRepository->emailResponsavelDaUnidade($unidadeId);
+            if ($morador) {
+                $taxa = $this->taxaService->buscarTaxa($taxaId);
+                (new EmailService())->pagamentoAprovado(
+                    $morador['email'], $morador['nome'],
+                    $taxa ? $taxa->competencia : $competencia,
+                    $taxa ? $taxa->valor : 0
+                );
+            }
         } catch (InvalidArgumentException|RuntimeException $e) {
             Sessao::flash('erro', $e->getMessage());
         }
@@ -146,8 +167,18 @@ class TaxaCondominialController
         $unidadeId = (int) ($_GET['unidade_id'] ?? 0);
 
         try {
+            $taxa = $this->taxaService->buscarTaxa($taxaId);
             $this->taxaService->aprovarComprovante($taxaId);
             Sessao::flash('sucesso', 'Pagamento aprovado com sucesso.');
+            // E-mail de aprovação para o morador
+            if ($taxa) {
+                $morador = $this->moradorRepository->emailResponsavelDaUnidade($taxa->unidadeId);
+                if ($morador) {
+                    (new EmailService())->pagamentoAprovado(
+                        $morador['email'], $morador['nome'], $taxa->competencia, $taxa->valor
+                    );
+                }
+            }
         } catch (InvalidArgumentException $e) {
             Sessao::flash('erro', $e->getMessage());
         }
@@ -198,6 +229,38 @@ class TaxaCondominialController
         }
 
         Roteador::redirecionar('/minhas-taxas');
+    }
+
+    /** Pseudo-cron: envia e-mail de cobrança para taxas vencidas sem aviso. */
+    public function avisarVencidas(): void
+    {
+        $taxaRepo = new TaxaCondominialRepository(Conexao::obter());
+        $extraRepo = new TaxaExtraRepository(Conexao::obter());
+        $email    = new EmailService();
+        $total    = 0;
+
+        foreach ($taxaRepo->listarVencidasSemAviso() as $row) {
+            if ($email->taxaCondominialVencida(
+                $row['email_morador'], $row['nome_morador'],
+                $row['competencia'], (float) $row['valor'], (int) $row['dias_atraso']
+            )) {
+                $taxaRepo->marcarAvisoVencidaEnviado((int) $row['id']);
+                $total++;
+            }
+        }
+
+        foreach ($extraRepo->listarVencidasSemAviso() as $row) {
+            if ($email->taxaExtraVencida(
+                $row['email_morador'], $row['nome_morador'],
+                $row['nome_parcela'], (float) $row['valor'], (int) $row['dias_atraso']
+            )) {
+                $extraRepo->marcarAvisoVencidaEnviado((int) $row['id']);
+                $total++;
+            }
+        }
+
+        Sessao::flash('sucesso', "{$total} aviso(s) de vencimento enviado(s) por e-mail.");
+        Roteador::redirecionar('/taxas');
     }
 
     private function obterUnidadeDoMoradorLogado(): ?int
