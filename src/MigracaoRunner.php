@@ -65,7 +65,10 @@ class MigracaoRunner
                 foreach ($statements as $stmt) {
                     $stmt = trim(preg_replace('/--[^\n]*/', '', $stmt));
                     if ($stmt !== '') {
-                        $this->conexao->exec($stmt);
+                        $result = $this->conexao->query($stmt);
+                        if ($result instanceof PDOStatement) {
+                            $result->closeCursor();
+                        }
                     }
                 }
                 $this->registrarExecucao($nome);
