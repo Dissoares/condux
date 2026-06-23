@@ -48,10 +48,10 @@ class FuncionarioRepository
         if ($f->id === null) {
             $stmt = $this->conexao->prepare(
                 'INSERT INTO funcionarios
-                 (nome, cargo, cpf, departamento, telefone, email, salario,
+                 (nome, cargo, cpf, departamento, telefone, email, salario, dia_pagamento,
                   data_admissao, data_demissao, observacoes, ativo)
                  VALUES
-                 (:nome, :cargo, :cpf, :departamento, :telefone, :email, :salario,
+                 (:nome, :cargo, :cpf, :departamento, :telefone, :email, :salario, :dia_pagamento,
                   :data_admissao, :data_demissao, :observacoes, :ativo)'
             );
         } else {
@@ -59,7 +59,7 @@ class FuncionarioRepository
                 'UPDATE funcionarios SET
                  nome = :nome, cargo = :cargo, cpf = :cpf,
                  departamento = :departamento, telefone = :telefone,
-                 email = :email, salario = :salario,
+                 email = :email, salario = :salario, dia_pagamento = :dia_pagamento,
                  data_admissao = :data_admissao, data_demissao = :data_demissao,
                  observacoes = :observacoes, ativo = :ativo
                  WHERE id = :id'
@@ -73,8 +73,9 @@ class FuncionarioRepository
             ':departamento'  => $f->departamento,
             ':telefone'      => $f->telefone,
             ':email'         => $f->email,
-            ':salario'       => $f->salario,
-            ':data_admissao' => $f->dataAdmissao ?: null,
+            ':salario'        => $f->salario,
+            ':dia_pagamento'  => $f->diaPagamento,
+            ':data_admissao'  => $f->dataAdmissao ?: null,
             ':data_demissao' => $f->dataDemissao ?: null,
             ':observacoes'   => $f->observacoes,
             ':ativo'         => $f->ativo ? 1 : 0,

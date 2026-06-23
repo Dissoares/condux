@@ -323,8 +323,38 @@ class Roteador
         if ($seg[1] === 'salvar' && $metodo === 'POST')    { $ctrl->salvar();    return; }
 
         $id = (int) $seg[1];
+
         if ($seg[2] === 'editar')  { $_GET['id'] = $id; $ctrl->formulario(); return; }
         if ($seg[2] === 'excluir') { $_GET['id'] = $id; $ctrl->excluir();    return; }
+
+        // POST /funcionarios/{id}/pagamentos
+        if ($seg[2] === 'pagamentos' && $metodo === 'POST') {
+            $_POST['funcionario_id'] = $id;
+            $ctrl->registrarPagamento();
+            return;
+        }
+        // GET /funcionarios/{id}/pagamentos/{pid}/excluir
+        if ($seg[2] === 'pagamentos' && $seg[4] === 'excluir') {
+            $_GET['funcionario_id'] = $id;
+            $_GET['id']             = (int) $seg[3];
+            $ctrl->excluirPagamento();
+            return;
+        }
+        // POST /funcionarios/{id}/ocorrencias
+        if ($seg[2] === 'ocorrencias' && $metodo === 'POST') {
+            $_POST['funcionario_id'] = $id;
+            $ctrl->registrarOcorrencia();
+            return;
+        }
+        // GET /funcionarios/{id}/ocorrencias/{oid}/excluir
+        if ($seg[2] === 'ocorrencias' && $seg[4] === 'excluir') {
+            $_GET['funcionario_id'] = $id;
+            $_GET['id']             = (int) $seg[3];
+            $ctrl->excluirOcorrencia();
+            return;
+        }
+
+        if ($id > 0) { $_GET['id'] = $id; $ctrl->ver(); return; }
 
         self::naoEncontrado();
     }

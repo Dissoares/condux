@@ -73,7 +73,13 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
                  placeholder="0,00"
                  value="<?= $funcionario?->salario !== null ? number_format($funcionario->salario, 2, ',', '.') : '' ?>">
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
+          <label class="form-label">Dia de pagamento</label>
+          <input type="number" name="dia_pagamento" class="form-control" min="1" max="31"
+                 placeholder="Ex: 5"
+                 value="<?= $funcionario?->diaPagamento ?? '' ?>">
+        </div>
+        <div class="col-sm-5">
           <label class="form-label">Data de admissão</label>
           <input type="date" name="data_admissao" class="form-control"
                  value="<?= htmlspecialchars($funcionario?->dataAdmissao ?? '') ?>">

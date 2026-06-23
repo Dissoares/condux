@@ -113,6 +113,10 @@ $inativos = array_filter($funcionarios, fn($f) => !$f->ativo);
           </td>
           <td>
             <div class="d-flex gap-1">
+              <a href="<?= url("funcionarios/{$f->id}") ?>"
+                 class="btn btn-outline-secondary btn-sm py-0 px-2" title="Ver detalhe">
+                <i class="bi bi-eye"></i>
+              </a>
               <a href="<?= url("funcionarios/{$f->id}/editar") ?>"
                  class="btn btn-outline-secondary btn-sm py-0 px-2" title="Editar">
                 <i class="bi bi-pencil"></i>
