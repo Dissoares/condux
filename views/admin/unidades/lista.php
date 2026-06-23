@@ -17,6 +17,26 @@ foreach ($unidades as $u) {
 }
 ksort($porBloco);
 
+// Paleta de cores por letra do bloco (cicla se houver mais de 8 blocos)
+$paletaBlocos = [
+    ['bg' => '#3b82f6', 'grad' => 'linear-gradient(90deg,#3b82f6,#60a5fa)'],  // azul
+    ['bg' => '#10b981', 'grad' => 'linear-gradient(90deg,#10b981,#34d399)'],  // verde
+    ['bg' => '#8b5cf6', 'grad' => 'linear-gradient(90deg,#8b5cf6,#a78bfa)'],  // violeta
+    ['bg' => '#f59e0b', 'grad' => 'linear-gradient(90deg,#f59e0b,#fcd34d)'],  // âmbar
+    ['bg' => '#ef4444', 'grad' => 'linear-gradient(90deg,#ef4444,#f87171)'],  // vermelho
+    ['bg' => '#06b6d4', 'grad' => 'linear-gradient(90deg,#06b6d4,#22d3ee)'],  // ciano
+    ['bg' => '#f97316', 'grad' => 'linear-gradient(90deg,#f97316,#fb923c)'],  // laranja
+    ['bg' => '#ec4899', 'grad' => 'linear-gradient(90deg,#ec4899,#f472b6)'],  // rosa
+];
+$corSemBloco = ['bg' => '#6b7280', 'grad' => 'linear-gradient(90deg,#6b7280,#9ca3af)'];
+$indiceCor   = 0;
+$corPorBloco = [];
+foreach (array_keys($porBloco) as $nb) {
+    $corPorBloco[$nb] = ($nb === 'Sem bloco')
+        ? $corSemBloco
+        : $paletaBlocos[$indiceCor++ % count($paletaBlocos)];
+}
+
 function rotuloBadgeStatus(string $status): string {
     return match($status) {
         'pago'    => 'Pago',
@@ -66,14 +86,14 @@ function rotuloBadgeStatus(string $status): string {
 
 <?php foreach ($porBloco as $nomeBloco => $unidadesBloco): ?>
 <?php
-  // Extrai a letra do bloco ("Bloco A" → "A", "Sem bloco" → "?")
-  $partes       = explode(' ', $nomeBloco);
-  $letraBloco   = strtoupper(end($partes));
-  $isSemBloco   = $nomeBloco === 'Sem bloco';
+  $partes     = explode(' ', $nomeBloco);
+  $letraBloco = strtoupper(end($partes));
+  $isSemBloco = $nomeBloco === 'Sem bloco';
+  $cor        = $corPorBloco[$nomeBloco];
 ?>
 <div class="mb-5">
   <div class="d-flex align-items-center gap-3 mb-4">
-    <div class="bloco-header-letra <?= $isSemBloco ? 'bloco-sem-letra' : '' ?>">
+    <div class="bloco-header-letra" style="background:<?= $cor['bg'] ?>;">
       <?= $isSemBloco ? '<i class="bi bi-question-lg"></i>' : htmlspecialchars($letraBloco) ?>
     </div>
     <div class="d-flex align-items-baseline gap-2 flex-shrink-0">
@@ -82,7 +102,7 @@ function rotuloBadgeStatus(string $status): string {
         · <?= count($unidadesBloco) ?> unidade<?= count($unidadesBloco) !== 1 ? 's' : '' ?>
       </span>
     </div>
-    <div class="flex-grow-1 border-bottom"></div>
+    <div class="flex-grow-1" style="height:2px;background:<?= $cor['grad'] ?>;border-radius:1px;opacity:.35;"></div>
   </div>
 
   <div class="row g-3">
@@ -103,8 +123,8 @@ function rotuloBadgeStatus(string $status): string {
               data-bs-toggle="modal"
               data-bs-target="#modal-unidade-<?= $uid ?>">
 
-        <!-- Faixa colorida no topo -->
-        <div class="card-ocupacao-faixa <?= $alugada ? 'faixa-alugada' : 'faixa-propria' ?>"></div>
+        <!-- Faixa colorida no topo — cor do bloco -->
+        <div class="card-ocupacao-faixa" style="background:<?= $cor['grad'] ?>;"></div>
 
         <div class="card-body p-3 d-flex flex-column gap-0">
 
