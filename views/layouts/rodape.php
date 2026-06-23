@@ -82,6 +82,85 @@
     });
   }());
 
+  /* ── PWA: Service Worker + Push Notifications ── */
+  (function () {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+    var SW_URL     = '<?= url('sw.js') ?>';
+    var VAPID_URL  = '<?= url('push/vapid-public-key') ?>';
+    var SUB_URL    = '<?= url('push/subscribe') ?>';
+    var UNSUB_URL  = '<?= url('push/unsubscribe') ?>';
+    var btn        = document.getElementById('condux-push-btn');
+
+    function urlBase64ToUint8Array(base64String) {
+      var padding = '='.repeat((4 - base64String.length % 4) % 4);
+      var base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      var raw     = atob(base64);
+      var arr     = new Uint8Array(raw.length);
+      for (var i = 0; i < raw.length; ++i) arr[i] = raw.charCodeAt(i);
+      return arr;
+    }
+
+    function atualizarBtn(inscrito) {
+      if (!btn) return;
+      if (inscrito) {
+        btn.innerHTML = '<i class="bi bi-bell-slash"></i>';
+        btn.title     = 'Desativar notificações';
+        btn.classList.remove('condux-push-off');
+        btn.classList.add('condux-push-on');
+      } else {
+        btn.innerHTML = '<i class="bi bi-bell"></i>';
+        btn.title     = 'Ativar notificações';
+        btn.classList.add('condux-push-off');
+        btn.classList.remove('condux-push-on');
+      }
+    }
+
+    navigator.serviceWorker.register(SW_URL).then(function (reg) {
+      reg.pushManager.getSubscription().then(function (sub) {
+        atualizarBtn(!!sub);
+      });
+
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        reg.pushManager.getSubscription().then(function (sub) {
+          if (sub) {
+            // Desinscrever
+            sub.unsubscribe().then(function () {
+              fetch(UNSUB_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({endpoint: sub.endpoint}),
+              });
+              atualizarBtn(false);
+            });
+          } else {
+            // Inscrever
+            fetch(VAPID_URL).then(function (r) { return r.json(); }).then(function (data) {
+              return reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(data.publicKey),
+              });
+            }).then(function (newSub) {
+              var json = newSub.toJSON();
+              fetch(SUB_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                  endpoint: json.endpoint,
+                  keys: { p256dh: json.keys.p256dh, auth: json.keys.auth },
+                }),
+              });
+              atualizarBtn(true);
+            }).catch(function (err) {
+              console.warn('Push subscription failed:', err);
+            });
+          }
+        });
+      });
+    });
+  }());
+
   /* ── Drawer (sidebar) mobile ── */
   document.addEventListener('DOMContentLoaded', function () {
     var sidebar = document.getElementById('barraLateral');

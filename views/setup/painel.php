@@ -155,6 +155,32 @@ $config = require RAIZ . '/config/banco.php';
     <?php endif; ?>
   </div>
 
+  <!-- Chaves VAPID para notificações push -->
+  <?php if (!$temPendentes): ?>
+  <div style="border:1px solid #374151; border-radius:.75rem; padding:1.25rem; margin-bottom:1rem;">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem;">
+      <div>
+        <div style="color:#f9fafb; font-weight:600; font-size:.9rem;"><i class="bi bi-bell"></i> Notificações Push (PWA)</div>
+        <div style="color:#9ca3af; font-size:.78rem; margin-top:.2rem;">
+          <?php if (file_exists(RAIZ . '/config/vapid.php')): ?>
+            <span style="color:#4ade80;">&#10003; Chaves VAPID geradas</span>
+          <?php else: ?>
+            Gere as chaves VAPID para habilitar push notifications
+          <?php endif; ?>
+        </div>
+      </div>
+      <form action="<?= url('setup/gerar-vapid') ?>" method="POST">
+        <button type="submit" class="btn btn-sm"
+                style="background:#374151; color:#f9fafb; font-size:.78rem;"
+                onclick="return confirm('Regenerar chaves VAPID? Subscribers existentes precisarão se inscrever novamente.')">
+          <i class="bi bi-key"></i>
+          <?= file_exists(RAIZ . '/config/vapid.php') ? 'Regenerar chaves' : 'Gerar chaves VAPID' ?>
+        </button>
+      </form>
+    </div>
+  </div>
+  <?php endif; ?>
+
   <!-- Link para o sistema após tudo ok -->
   <?php if (!$temPendentes): ?>
   <div style="text-align:center; padding:1.5rem;">

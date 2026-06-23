@@ -1,0 +1,5 @@
+/vendor/
+/config/vapid.php
+/.env
+/public/uploads/*
+!/public/uploads/.gitkeep

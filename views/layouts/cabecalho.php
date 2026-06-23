@@ -22,6 +22,13 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($tituloPagina ?? 'Condux') ?> — Condux</title>
+  <meta name="theme-color" content="#1a2236">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Condux">
+  <link rel="manifest" href="<?= url('manifest.json') ?>">
+  <link rel="apple-touch-icon" href="<?= url('icons/icon-192.png') ?>">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="<?= url('assets/css/condux.css') ?>">
@@ -173,6 +180,13 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
             style="color:rgba(255,255,255,.6); font-size:1rem;">
       <i class="bi bi-moon-fill condux-tema-icone"></i>
     </button>
+    <?php if (file_exists(RAIZ . '/config/vapid.php')): ?>
+    <button id="condux-push-btn" class="btn btn-link p-0 border-0 condux-push-off"
+            title="Ativar notificações"
+            style="color:rgba(255,255,255,.6); font-size:1rem;">
+      <i class="bi bi-bell"></i>
+    </button>
+    <?php endif; ?>
     <a href="<?= url('sair') ?>" title="Sair" style="color:rgba(255,255,255,.6); font-size:1rem;">
       <i class="bi bi-box-arrow-right"></i>
     </a>

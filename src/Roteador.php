@@ -20,9 +20,10 @@ class Roteador
             require_once RAIZ . '/src/controllers/SetupController.php';
             $ctrl = new SetupController();
             match ($seg[1]) {
-                'criar-banco' => $ctrl->criarBanco(),
-                'executar'    => $ctrl->executarMigracoes(),
-                default       => $ctrl->exibir(),
+                'criar-banco'  => $ctrl->criarBanco(),
+                'executar'     => $ctrl->executarMigracoes(),
+                'gerar-vapid'  => $ctrl->gerarVapid(),
+                default        => $ctrl->exibir(),
             };
             return;
         }
@@ -70,6 +71,7 @@ class Roteador
             'folha-pagamento'  => self::rotasFolhaPagamento($ehAdmin),
             'contas'           => self::rotasContas($seg, $metodo, $ehAdmin),
             'comunicados'      => self::rotasComunicados($seg, $metodo, $ehAdmin),
+            'push'             => self::rotasPush($seg, $metodo),
             'minhas-taxas'     => self::rotasMinhasTaxas($seg, $metodo),
             'transparencia'=> self::rotasTransparencia($seg),
             'relatorios'   => self::carregarRelatorio(),
@@ -413,6 +415,20 @@ class Roteador
 
         // Morador: apenas leitura
         $ctrl->listarMorador();
+    }
+
+    // ── Push notifications ────────────────────────────────────────────────
+
+    private static function rotasPush(array $seg, string $metodo): void
+    {
+        require_once RAIZ . '/src/controllers/PushController.php';
+        $ctrl = new PushController();
+        match ($seg[1]) {
+            'subscribe'      => $ctrl->subscribe(),
+            'unsubscribe'    => $ctrl->unsubscribe(),
+            'vapid-public-key' => $ctrl->vapidKey(),
+            default          => self::naoEncontrado(),
+        };
     }
 
     // ── Minhas taxas (morador) ────────────────────────────────────────────

@@ -3,15 +3,20 @@
 declare(strict_types=1);
 
 require_once RAIZ . '/src/repository/ComunicadoRepository.php';
+require_once RAIZ . '/src/repository/PushSubscriptionRepository.php';
+require_once RAIZ . '/src/services/PushNotificationService.php';
 
 class ComunicadoController
 {
-    private ComunicadoRepository $repo;
+    private ComunicadoRepository    $repo;
+    private PushNotificationService $push;
     private bool $ehAdmin;
 
     public function __construct()
     {
-        $this->repo    = new ComunicadoRepository(Conexao::obter());
+        $conexao       = Conexao::obter();
+        $this->repo    = new ComunicadoRepository($conexao);
+        $this->push    = new PushNotificationService(new PushSubscriptionRepository($conexao));
         $this->ehAdmin = in_array(Sessao::perfilAtual(), ['sindico', 'subsindico'], true);
     }
 
@@ -56,6 +61,17 @@ class ComunicadoController
         );
 
         $this->repo->salvar($comunicado);
+
+        // Dispara push apenas ao criar novo comunicado ativo com data de hoje ou passada
+        if ($id === 0 && $comunicado->ativo && $comunicado->dataPublicacao <= date('Y-m-d')) {
+            $this->push->enviarParaTodos([
+                'title' => 'Condux — ' . $comunicado->rotulo(),
+                'body'  => $comunicado->titulo,
+                'url'   => '/comunicados',
+                'tag'   => 'comunicado',
+            ]);
+        }
+
         Sessao::flash('sucesso', $id > 0 ? 'Comunicado atualizado.' : 'Comunicado publicado.');
         Roteador::redirecionar('/comunicados');
     }

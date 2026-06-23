@@ -12,6 +12,10 @@ unset($_scriptDir);
 
 date_default_timezone_set('America/Sao_Paulo');
 
+if (file_exists(RAIZ . '/vendor/autoload.php')) {
+    require_once RAIZ . '/vendor/autoload.php';
+}
+
 require_once RAIZ . '/src/Conexao.php';
 require_once RAIZ . '/src/Sessao.php';
 require_once RAIZ . '/src/Ajudantes.php';
