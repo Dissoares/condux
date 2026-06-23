@@ -117,7 +117,7 @@ function rotuloBadgeStatus(string $status): string {
       $inicialProp      = $nomeProprietario ? mb_strtoupper(mb_substr(explode(' ', $nomeProprietario)[0], 0, 1)) : '?';
       $inicialInq       = $nomeInquilino    ? mb_strtoupper(mb_substr(explode(' ', $nomeInquilino)[0],    0, 1)) : '?';
     ?>
-    <div class="col-sm-6 col-md-4 col-xl-3">
+    <div class="col-6 col-md-4 col-xl-3">
       <button type="button"
               class="card border-0 shadow-sm w-100 text-start btn-unidade p-0"
               data-bs-toggle="modal"
@@ -131,7 +131,7 @@ function rotuloBadgeStatus(string $status): string {
           <!-- Número + metadados -->
           <div class="mb-3">
             <div class="d-flex align-items-baseline gap-2">
-              <span class="fw-black" style="font-size:1.45rem; line-height:1;"><?= htmlspecialchars($u->numero) ?></span>
+              <span class="fw-black" style="font-size:1.25rem; line-height:1;"><?= htmlspecialchars($u->numero) ?></span>
               <?php if ($alugada): ?>
                 <span class="badge bg-warning-subtle text-warning-emphasis" style="font-size:.65rem;">
                   <i class="bi bi-key"></i> Alugado
