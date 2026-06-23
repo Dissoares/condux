@@ -42,6 +42,7 @@ class Ticket
         public ?string       $fotoUsuario        = null,
         public ?string       $nomeResponsavel    = null,
         public ?int          $totalMensagens     = null,
+        public ?string       $perfilUltimaMsg    = null,
     ) {}
 
     public static function fromArray(array $d): self
@@ -61,6 +62,7 @@ class Ticket
             fotoUsuario:     $d['foto_usuario']   ?? null,
             nomeResponsavel: $d['nome_responsavel'] ?? null,
             totalMensagens:  isset($d['total_mensagens']) ? (int) $d['total_mensagens'] : null,
+            perfilUltimaMsg: $d['perfil_ultima_msg'] ?? null,
         );
     }
 
@@ -115,5 +117,14 @@ class Ticket
     public function estaFechado(): bool
     {
         return in_array($this->status, ['resolvido', 'fechado'], true);
+    }
+
+    /** Ticket aguarda resposta do admin: sem msgs (status aberto) ou última msg é de morador */
+    public function aguardaRespostaAdmin(): bool
+    {
+        if ($this->estaFechado()) return false;
+        if ($this->status === 'aberto' && ($this->totalMensagens ?? 0) === 0) return true;
+        return !in_array($this->perfilUltimaMsg, ['sindico', 'subsindico'], true)
+               && $this->perfilUltimaMsg !== null;
     }
 }

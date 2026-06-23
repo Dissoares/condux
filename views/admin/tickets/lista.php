@@ -62,11 +62,22 @@ $em_andamento = count(array_filter($tickets, fn($t) => $t->status === 'em_andame
             condux-ticket-row border-start border-3 border-<?= $t->corStatus() ?>">
     <div class="d-flex align-items-start gap-3">
 
-      <!-- Ícone categoria -->
-      <div class="flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle
-                  bg-<?= $t->corStatus() ?>-subtle text-<?= $t->corStatus() ?>-emphasis"
-           style="width:40px; height:40px; font-size:1rem;">
-        <i class="bi <?= $t->iconeCategoria() ?>"></i>
+      <!-- Ícone categoria + badge de nova mensagem -->
+      <div class="flex-shrink-0 position-relative">
+        <div class="d-flex align-items-center justify-content-center rounded-circle
+                    bg-<?= $t->corStatus() ?>-subtle text-<?= $t->corStatus() ?>-emphasis"
+             style="width:40px; height:40px; font-size:1rem;">
+          <i class="bi <?= $t->iconeCategoria() ?>"></i>
+        </div>
+        <?php if ($t->aguardaRespostaAdmin()): ?>
+          <span class="condux-nova-msg" title="Aguarda resposta" style="
+            position:absolute; top:-3px; right:-3px;
+            width:14px; height:14px; border-radius:50%;
+            background:#e53935; border:2px solid var(--bs-body-bg);
+            display:flex; align-items:center; justify-content:center;">
+            <i class="bi bi-chat-fill" style="font-size:.45rem; color:#fff;"></i>
+          </span>
+        <?php endif; ?>
       </div>
 
       <div class="flex-grow-1 min-width-0">

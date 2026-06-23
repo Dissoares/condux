@@ -116,6 +116,15 @@ body {
 .condux-sidebar .nav-link.ativo i { opacity: 1; }
 
 /* Usuário / footer da sidebar */
+/* ── Ticket lista: badge nova mensagem ─────────────────── */
+@keyframes condux-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.35); opacity: .7; }
+}
+.condux-nova-msg {
+  animation: condux-pulse 1.6s ease-in-out infinite;
+}
+
 /* ── Badge do sininho de tickets ───────────────────────── */
 .condux-badge-sino {
   position: absolute;

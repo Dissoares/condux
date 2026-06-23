@@ -19,7 +19,13 @@ class TicketRepository
         $sql = 'SELECT t.*,
                        u.nome AS nome_usuario, u.foto AS foto_usuario,
                        r.nome AS nome_responsavel,
-                       (SELECT COUNT(*) FROM ticket_mensagens WHERE ticket_id = t.id) AS total_mensagens
+                       (SELECT COUNT(*) FROM ticket_mensagens WHERE ticket_id = t.id) AS total_mensagens,
+                       (SELECT u2.perfil
+                        FROM ticket_mensagens tm2
+                        JOIN usuarios u2 ON u2.id = tm2.usuario_id
+                        WHERE tm2.ticket_id = t.id AND tm2.interno = 0
+                        ORDER BY tm2.criado_em DESC LIMIT 1
+                       ) AS perfil_ultima_msg
                 FROM tickets t
                 JOIN usuarios u ON u.id = t.usuario_id
                 LEFT JOIN usuarios r ON r.id = t.responsavel_id
