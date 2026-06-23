@@ -659,35 +659,26 @@ body {
     border-radius: .4rem;
     -webkit-tap-highlight-color: transparent;
   }
-  .condux-top-username {
-    color: rgba(255,255,255,.85);
-    font-size: .75rem;
-    font-weight: 600;
-    white-space: nowrap;
-    max-width: 90px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   /* Dropdown do usuário */
   .condux-user-drop {
     display: none;
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    min-width: 180px;
+    min-width: 190px;
     background: var(--bs-body-bg);
     border: 1px solid var(--bs-border-color);
-    border-radius: .6rem;
-    box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    border-radius: .65rem;
+    box-shadow: 0 8px 28px rgba(0,0,0,.22);
     z-index: 1050;
     overflow: hidden;
   }
   .condux-user-drop.aberto { display: block; }
   .condux-user-drop-info {
-    padding: .75rem 1rem;
+    padding: .85rem 1rem .65rem;
     display: flex;
     flex-direction: column;
-    gap: .1rem;
+    gap: .15rem;
     font-size: .82rem;
     color: var(--bs-body-color);
   }
@@ -701,14 +692,13 @@ body {
     gap: .5rem;
     padding: .65rem 1rem;
     font-size: .85rem;
-    color: #dc3545;
+    color: var(--bs-body-color);
     text-decoration: none;
     transition: background .12s;
   }
-  .condux-user-drop-item:hover {
-    background: rgba(220, 53, 69, .08);
-    color: #dc3545;
-  }
+  .condux-user-drop-item:hover { background: var(--bs-secondary-bg); }
+  .condux-drop-sair { color: #dc3545 !important; }
+  .condux-drop-sair:hover { background: rgba(220,53,69,.08) !important; }
 
   /* ── Bottom nav ── */
   .condux-bottom-nav {

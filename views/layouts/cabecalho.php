@@ -55,13 +55,13 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
 <!-- ══ Mobile: header fixo no topo ══════════════════════ -->
 <header class="condux-top-bar" id="conduxTopBar">
 
-  <!-- Esquerda: tema + hamburger -->
+  <!-- Esquerda: hamburger + tema -->
   <div class="condux-top-bar-esq">
-    <button class="condux-top-btn condux-btn-tema" onclick="conduxToggleTema()" title="Alternar tema">
-      <i class="bi bi-moon-fill condux-tema-icone"></i>
-    </button>
     <button class="condux-top-btn" id="conduxHamburger" title="Menu">
       <i class="bi bi-list" style="font-size:1.4rem; line-height:1;"></i>
+    </button>
+    <button class="condux-top-btn condux-btn-tema" onclick="conduxToggleTema()" title="Alternar tema">
+      <i class="bi bi-moon-fill condux-tema-icone"></i>
     </button>
   </div>
 
@@ -75,19 +75,29 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
     <?php endif; ?>
   </a>
 
-  <!-- Direita: usuário + dropdown sair -->
+  <!-- Direita: sininho + avatar com dropdown -->
   <div class="condux-top-bar-dir">
-    <button class="condux-top-user-btn" id="conduxUserBtn" type="button">
-      <span class="condux-top-username"><?= htmlspecialchars(mb_substr($usuarioAtual['nome'] ?? 'Usuário', 0, 13)) ?></span>
+
+    <?php if (file_exists(RAIZ . '/config/vapid.php')): ?>
+    <button id="condux-push-btn" class="condux-top-btn condux-push-off" title="Notificações">
+      <i class="bi bi-bell"></i>
+    </button>
+    <?php endif; ?>
+
+    <button class="condux-top-user-btn" id="conduxUserBtn" type="button" title="Meu perfil">
       <div class="condux-avatar-sm"><?= $inicialNome ?></div>
     </button>
     <div class="condux-user-drop" id="conduxUserDrop">
       <div class="condux-user-drop-info">
         <strong><?= htmlspecialchars($usuarioAtual['nome'] ?? '') ?></strong>
-        <small style="text-transform:capitalize; opacity:.7;"><?= htmlspecialchars($usuarioAtual['perfil'] ?? '') ?></small>
+        <small style="text-transform:capitalize;"><?= htmlspecialchars($usuarioAtual['perfil'] ?? '') ?></small>
       </div>
       <div class="condux-user-drop-divider"></div>
-      <a href="<?= url('sair') ?>" class="condux-user-drop-item">
+      <a href="<?= url('perfil') ?>" class="condux-user-drop-item">
+        <i class="bi bi-person-circle"></i> Meu perfil
+      </a>
+      <div class="condux-user-drop-divider"></div>
+      <a href="<?= url('sair') ?>" class="condux-user-drop-item condux-drop-sair">
         <i class="bi bi-box-arrow-right"></i> Sair
       </a>
     </div>
