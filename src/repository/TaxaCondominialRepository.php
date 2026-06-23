@@ -187,6 +187,39 @@ class TaxaCondominialRepository
         return $stmt->fetch() ?: [];
     }
 
+    /** Resumo do mês atual com atrasadas e pendentes separadas */
+    public function resumoMesDetalhado(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT
+                SUM(status = "pago") AS total_pagas,
+                SUM(status = "pago" OR status = "isento") AS total_quitadas,
+                SUM(status = "vencido" OR (status = "pendente" AND vencimento < CURDATE())) AS total_atrasadas,
+                SUM(status = "pendente" AND vencimento >= CURDATE()) AS total_pendentes,
+                SUM(CASE WHEN status = "pago" THEN valor ELSE 0 END) AS valor_arrecadado,
+                SUM(CASE WHEN status = "vencido" OR (status = "pendente" AND vencimento < CURDATE()) THEN valor ELSE 0 END) AS valor_atrasado,
+                SUM(CASE WHEN status = "pendente" AND vencimento >= CURDATE() THEN valor ELSE 0 END) AS valor_pendente
+             FROM taxas_condominiais
+             WHERE competencia = DATE_FORMAT(NOW(), "%Y-%m")'
+        );
+        return $stmt->fetch() ?: [];
+    }
+
+    /** Totais globais de inadimplência (todos os meses) */
+    public function totaisGlobais(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT
+                SUM(CASE WHEN status = "vencido" OR (status = "pendente" AND vencimento < CURDATE()) THEN valor ELSE 0 END) AS valor_total_atrasado,
+                SUM(CASE WHEN status = "pendente" AND vencimento >= CURDATE() THEN valor ELSE 0 END) AS valor_total_pendente,
+                SUM(CASE WHEN status = "vencido" OR (status = "pendente" AND vencimento < CURDATE()) THEN 1 ELSE 0 END) AS qtd_atrasadas,
+                SUM(CASE WHEN status = "pendente" AND vencimento >= CURDATE() THEN 1 ELSE 0 END) AS qtd_pendentes
+             FROM taxas_condominiais
+             WHERE status NOT IN ("pago", "isento")'
+        );
+        return $stmt->fetch() ?: [];
+    }
+
     /** Resumo de uma competência específica */
     public function resumoPorCompetencia(string $competencia): array
     {

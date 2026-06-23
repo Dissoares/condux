@@ -156,4 +156,10 @@ class MoradorRepository
         );
         $stmt->execute([':id' => $id]);
     }
+
+    public function contarAtivos(): int
+    {
+        $stmt = $this->conexao->query('SELECT COUNT(*) FROM moradores WHERE ativo = 1');
+        return (int) $stmt->fetchColumn();
+    }
 }

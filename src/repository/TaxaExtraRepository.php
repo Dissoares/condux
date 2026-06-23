@@ -119,6 +119,44 @@ class TaxaExtraRepository
         return $agrupadas;
     }
 
+    /** Resumo global das taxas extras (cobranças) */
+    public function resumoGlobal(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT
+                SUM(teu.status = "pago") AS total_pagas,
+                SUM(teu.status = "pendente" AND te.vencimento >= CURDATE()) AS total_pendentes,
+                SUM(teu.status = "vencido" OR (teu.status = "pendente" AND te.vencimento < CURDATE())) AS total_atrasadas,
+                SUM(CASE WHEN teu.status = "pendente" AND te.vencimento < CURDATE() THEN te.valor
+                         WHEN teu.status = "vencido" THEN te.valor ELSE 0 END) AS valor_atrasado,
+                SUM(CASE WHEN teu.status = "pendente" AND te.vencimento >= CURDATE() THEN te.valor ELSE 0 END) AS valor_pendente
+             FROM taxas_extras_unidades teu
+             JOIN taxas_extras te ON te.id = teu.taxa_extra_id'
+        );
+        return $stmt->fetch() ?: [];
+    }
+
+    /** Últimos grupos de taxas extras com status resumido */
+    public function listarGruposComResumo(int $limite = 6): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT te.*, p.nome AS nome_projeto,
+                    SUM(teu.status = "pago")  AS pagas,
+                    COUNT(teu.id)             AS total_unidades,
+                    SUM(teu.status = "vencido" OR (teu.status = "pendente" AND te.vencimento < CURDATE())) AS atrasadas
+             FROM taxas_extras te
+             LEFT JOIN projetos p ON p.id = te.projeto_id
+             LEFT JOIN taxas_extras_unidades teu ON teu.taxa_extra_id = te.id
+             WHERE te.parcela IS NULL OR te.parcela = 1
+             GROUP BY te.id
+             ORDER BY te.vencimento DESC
+             LIMIT :limite'
+        );
+        $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     public function inserir(array $dados): int
     {
         $stmt = $this->conexao->prepare(

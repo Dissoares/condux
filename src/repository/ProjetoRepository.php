@@ -169,4 +169,11 @@ class ProjetoRepository
         $stmt->execute([':projeto_id' => $projetoId]);
         return $stmt->fetchAll();
     }
+
+    public function contarPorStatus(string $status): int
+    {
+        $stmt = $this->conexao->prepare('SELECT COUNT(*) FROM projetos WHERE status = :status');
+        $stmt->execute([':status' => $status]);
+        return (int) $stmt->fetchColumn();
+    }
 }
