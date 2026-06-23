@@ -79,10 +79,7 @@ class VistoriaRepository
         return array_map(fn($l) => Vistoria::fromArray($l), $stmt->fetchAll());
     }
 
-    /**
-     * Para o painel: agendadas (pendentes de realização) +
-     * realizadas com validade expirando em 60 dias.
-     */
+    /** Para o painel: vistorias agendadas (pendentes de realização). */
     public function listarParaPainel(): array
     {
         $stmt = $this->conexao->query(
@@ -91,10 +88,6 @@ class VistoriaRepository
              LEFT JOIN usuarios    u  ON u.id  = v.responsavel_id
              LEFT JOIN prestadoras pr ON pr.id = v.prestadora_id
              WHERE v.status = 'agendada'
-                OR (v.status = 'realizada'
-                    AND v.validade IS NOT NULL
-                    AND v.validade <= DATE_ADD(CURDATE(), INTERVAL 60 DAY)
-                    AND v.validade >= CURDATE())
              ORDER BY v.data_vistoria"
         );
         return array_map(fn($l) => Vistoria::fromArray($l), $stmt->fetchAll());

@@ -71,7 +71,7 @@ $eArrec  = (float) ($resumoExtras['valor_atrasado']  ?? 0);
     ['icon' => 'bi-people-fill',     'label' => 'Moradores',       'valor' => $totalMoradores,      'cor' => 'info',      'link' => 'condominios'],
     ['icon' => 'bi-hammer',          'label' => 'Prestadoras',     'valor' => $totalPrestadoras,    'cor' => 'secondary', 'link' => 'prestadoras'],
     ['icon' => 'bi-kanban-fill',     'label' => 'Proj. ativos',    'valor' => $totalProjetosAtivos, 'cor' => 'primary',   'link' => 'projetos'],
-    ['icon' => 'bi-clipboard-check', 'label' => 'Vistorias a vencer', 'valor' => count($vistoriasAVencer), 'cor' => count($vistoriasAVencer) > 0 ? 'warning' : 'secondary', 'link' => 'vistorias'],
+    ['icon' => 'bi-clipboard-check', 'label' => 'Vistorias agendadas', 'valor' => count($vistoriasAVencer), 'cor' => count($vistoriasAVencer) > 0 ? 'warning' : 'secondary', 'link' => 'vistorias'],
   ];
   foreach ($quickStats as $qs): ?>
   <div class="col">
@@ -250,13 +250,13 @@ $eArrec  = (float) ($resumoExtras['valor_atrasado']  ?? 0);
     </div>
   </div>
 
-  <!-- Vistorias a vencer -->
+  <!-- Vistorias agendadas -->
   <div class="col-lg-6">
     <div class="card border-0 shadow-sm h-100">
       <div class="card-header bg-transparent d-flex align-items-center justify-content-between py-3">
         <div class="d-flex align-items-center gap-2">
           <span class="icone-secao bg-info bg-opacity-10 text-info"><i class="bi bi-clipboard-check-fill"></i></span>
-          <span class="fw-semibold">Vistorias a vencer</span>
+          <span class="fw-semibold">Vistorias agendadas</span>
           <?php if (!empty($vistoriasAVencer)): ?>
             <span class="badge bg-warning text-dark"><?= count($vistoriasAVencer) ?></span>
           <?php endif; ?>
@@ -271,28 +271,17 @@ $eArrec  = (float) ($resumoExtras['valor_atrasado']  ?? 0);
       <?php else: ?>
       <div class="list-group list-group-flush">
         <?php foreach ($vistoriasAVencer as $v):
-          if ($v->status === 'agendada') {
-              $dataRef = $v->dataVistoria;
-              $dias    = (int) round((strtotime($dataRef) - time()) / 86400);
-              $cor     = $dias < 0 ? 'danger' : ($dias <= 7 ? 'warning' : 'secondary');
-              $badge   = $dias < 0 ? abs($dias) . 'd atraso' : $dias . 'd';
-          } else {
-              $dataRef = $v->validade;
-              $dias    = (int) round((strtotime($dataRef) - time()) / 86400);
-              $cor     = $dias <= 15 ? 'danger' : ($dias <= 30 ? 'warning' : 'secondary');
-              $badge   = $dias . 'd';
-          }
+          $dias = (int) round((strtotime($v->dataVistoria) - time()) / 86400);
+          $cor  = $dias < 0 ? 'danger' : ($dias <= 7 ? 'warning' : 'secondary');
+          $badge = $dias < 0 ? abs($dias) . 'd atraso' : $dias . 'd';
         ?>
         <a href="<?= url("vistorias/{$v->id}") ?>"
            class="list-group-item list-group-item-action border-0 py-2 px-3">
           <div class="d-flex justify-content-between align-items-start">
             <div>
-              <div class="d-flex align-items-center gap-2">
-                <span class="fw-semibold" style="font-size:.85rem;"><?= htmlspecialchars($v->rotuloTipo()) ?></span>
-                <span class="badge rounded-pill badge-<?= $v->status ?>" style="font-size:.65rem;"><?= $v->rotuloStatus() ?></span>
-              </div>
+              <div class="fw-semibold" style="font-size:.85rem;"><?= htmlspecialchars($v->rotuloTipo()) ?></div>
               <div class="text-body-secondary" style="font-size:.75rem;">
-                <?= dataBR($dataRef) ?> · <?= htmlspecialchars($v->nomePrestadora ?? $v->nomeResponsavel ?? '—') ?>
+                <?= dataBR($v->dataVistoria) ?> · <?= htmlspecialchars($v->nomePrestadora ?? $v->nomeResponsavel ?? '—') ?>
               </div>
             </div>
             <span class="badge bg-<?= $cor ?> flex-shrink-0 ms-2"><?= $badge ?></span>
