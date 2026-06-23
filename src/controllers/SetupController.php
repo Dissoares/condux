@@ -81,13 +81,13 @@ class SetupController
         require_once RAIZ . '/src/services/PushNotificationService.php';
         try {
             PushNotificationService::gerarChaves();
-            Sessao::flash('resultado_migracoes', [[
+            Sessao::flash('resultado_migracoes', [
                 ['nome' => 'Chaves VAPID geradas em config/vapid.php', 'sucesso' => true, 'erro' => null]
-            ]]);
+            ]);
         } catch (Throwable $e) {
-            Sessao::flash('resultado_migracoes', [[
-                ['nome' => 'Erro ao gerar VAPID: ' . $e->getMessage(), 'sucesso' => false, 'erro' => $e->getMessage()]
-            ]]);
+            Sessao::flash('resultado_migracoes', [
+                ['nome' => 'Erro ao gerar VAPID', 'sucesso' => false, 'erro' => $e->getMessage()]
+            ]);
         }
         Roteador::redirecionar('/setup');
     }
