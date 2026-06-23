@@ -34,10 +34,14 @@ class FuncionarioController
     public function folhaPagamento(): void
     {
         $this->exigirAdmin();
-        $compFiltro   = trim($_GET['comp'] ?? '') ?: null;
-        $resumos      = $this->pagRepo->resumoPorCompetencia();
+        // Competência padrão = mês atual
+        $compFiltro   = trim($_GET['comp'] ?? '') ?: date('Y-m');
         $competencias = $this->pagRepo->listarCompetencias();
-        $pagamentos   = $compFiltro ? $this->pagRepo->listarFolhaConsolidada($compFiltro) : [];
+        $funcionarios = $this->repo->listarAtivos();
+        $pagamentos   = $this->pagRepo->listarFolhaConsolidada($compFiltro);
+        // Indexar por funcionario_id para lookup rápido na view
+        $pagPorFunc   = [];
+        foreach ($pagamentos as $p) { $pagPorFunc[(int)$p['funcionario_id']] = $p; }
         $mensagem     = Sessao::lerFlash('sucesso');
         $erroMensagem = Sessao::lerFlash('erro');
         require RAIZ . '/views/admin/funcionarios/folha.php';

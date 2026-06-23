@@ -1,11 +1,12 @@
 <?php
 /**
- * @var array[]     $resumos      — resumo por competência
- * @var array[]     $pagamentos   — linhas da folha filtrada (ou vazia)
- * @var string[]    $competencias — lista de YYYY-MM disponíveis
- * @var string|null $compFiltro   — competência selecionada
- * @var string|null $mensagem
- * @var string|null $erroMensagem
+ * @var Funcionario[] $funcionarios
+ * @var array[]       $pagamentos    — linhas da folha para a competência
+ * @var array[]       $pagPorFunc    — indexado por funcionario_id
+ * @var string[]      $competencias  — YYYY-MM disponíveis
+ * @var string        $compFiltro    — competência selecionada
+ * @var string|null   $mensagem
+ * @var string|null   $erroMensagem
  */
 $tituloPagina = 'Folha de Pagamento';
 require_once RAIZ . '/views/layouts/cabecalho.php';
@@ -16,15 +17,39 @@ $fmtComp = function(string $c) use ($nomesMeses): string {
     [$ano, $mes] = explode('-', $c);
     return ($nomesMeses[(int)$mes] ?? $mes) . '/' . $ano;
 };
-$fmtData = fn(?string $d) => $d ? date('d/m/Y', strtotime($d)) : '—';
-$fmtVal  = fn(?float $v)  => $v !== null ? 'R$ ' . number_format((float)$v, 2, ',', '.') : '—';
+$fmtData = fn(?string $d) => $d ? date('d/m/Y', strtotime($d)) : null;
+$fmtVal  = fn(?float $v)  => $v !== null ? 'R$ ' . number_format((float)$v, 2, ',', '.') : null;
 $hoje    = date('Y-m-d');
+
+// Totais da competência exibida
+$totalVal    = 0.0;
+$totalPagos  = 0;
+$totalPend   = 0;
+$totalAtras  = 0;
+foreach ($funcionarios as $f) {
+    $p = $pagPorFunc[$f->id] ?? null;
+    if (!$p) continue;
+    $totalVal += (float)$p['valor'];
+    if ($p['status'] === 'pago') { $totalPagos++; continue; }
+    $atrasado = !empty($p['data_prevista']) && $p['data_prevista'] < $hoje;
+    $atrasado ? $totalAtras++ : $totalPend++;
+}
 ?>
 
-<div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-  <h4 class="fw-semibold mb-0"><i class="bi bi-people"></i> Folha de Pagamento</h4>
+<style>
+.func-card { transition: box-shadow .12s; }
+.func-card:hover { box-shadow: 0 .4rem 1rem rgba(0,0,0,.1) !important; }
+.status-pill { font-size:.7rem; padding:.2em .6em; border-radius:2rem; }
+</style>
+
+<!-- Cabeçalho -->
+<div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-semibold mb-0"><i class="bi bi-people"></i> Folha de Pagamento</h4>
+    <span class="text-body-secondary" style="font-size:.82rem;"><?= $fmtComp($compFiltro) ?></span>
+  </div>
   <a href="<?= url('funcionarios') ?>" class="btn btn-outline-secondary btn-sm">
-    <i class="bi bi-person-badge"></i> Ver funcionários
+    <i class="bi bi-person-badge"></i> Funcionários
   </a>
 </div>
 
@@ -34,157 +59,140 @@ $hoje    = date('Y-m-d');
   </div>
 <?php endif; ?>
 
-<!-- ── Resumo por competência ── -->
-<?php if (!empty($resumos)): ?>
-<div class="row g-2 mb-4">
-  <?php foreach ($resumos as $r): ?>
-  <?php
-    $atrasados = (int) $r['total_atrasados'];
-    $pagas     = (int) $r['total_pagas'];
-    $total     = (int) $r['total'];
-    $pendentes = (int) $r['total_pendentes'];
-    $cor       = $atrasados > 0 ? 'danger' : ($pendentes > 0 ? 'warning' : 'success');
-    $ativo     = $compFiltro === $r['competencia'];
-  ?>
-  <div class="col-6 col-md-4 col-lg-3">
-    <a href="<?= url('folha-pagamento?comp=' . $r['competencia']) ?>" class="text-decoration-none">
-      <div class="card border-0 shadow-sm h-100 <?= $ativo ? 'border border-primary' : '' ?>"
-           style="<?= $ativo ? 'border-width:2px!important;' : '' ?>">
-        <div class="card-body py-3 px-3">
-          <div class="d-flex align-items-center justify-content-between mb-1">
-            <span class="fw-semibold" style="font-size:.9rem;"><?= $fmtComp($r['competencia']) ?></span>
-            <?php if ($atrasados > 0): ?>
-              <span class="badge bg-danger-subtle text-danger-emphasis" style="font-size:.65rem;"><?= $atrasados ?> atrasado<?= $atrasados > 1 ? 's' : '' ?></span>
-            <?php elseif ($pendentes > 0): ?>
-              <span class="badge bg-warning-subtle text-warning-emphasis" style="font-size:.65rem;"><?= $pendentes ?> pendente<?= $pendentes > 1 ? 's' : '' ?></span>
-            <?php else: ?>
-              <span class="badge bg-success-subtle text-success-emphasis" style="font-size:.65rem;">Quitado</span>
-            <?php endif; ?>
-          </div>
-          <div class="fw-bold text-<?= $cor ?>" style="font-size:1rem;"><?= $fmtVal((float)$r['valor_total']) ?></div>
-          <div class="text-body-secondary" style="font-size:.72rem;"><?= $pagas ?>/<?= $total ?> pagos</div>
-        </div>
-      </div>
-    </a>
-  </div>
-  <?php endforeach; ?>
-</div>
-<?php endif; ?>
+<!-- Filtro de competência + totais -->
+<div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+  <form method="GET" action="<?= url('folha-pagamento') ?>" class="d-flex align-items-center gap-2">
+    <label class="form-label mb-0 text-body-secondary" style="font-size:.82rem;white-space:nowrap;">Competência:</label>
+    <input type="month" name="comp" class="form-control form-control-sm" style="width:160px;"
+           value="<?= htmlspecialchars($compFiltro) ?>" onchange="this.form.submit()">
+  </form>
 
-<!-- ── Detalhe da competência selecionada ── -->
-<?php if ($compFiltro): ?>
-
-<div class="d-flex align-items-center gap-2 mb-3">
-  <h5 class="mb-0 fw-semibold"><?= $fmtComp($compFiltro) ?></h5>
-  <a href="<?= url('folha-pagamento') ?>" class="btn btn-outline-secondary btn-sm">
-    <i class="bi bi-x"></i> Limpar filtro
-  </a>
-</div>
-
-<?php if (empty($pagamentos)): ?>
-  <div class="card border-0 shadow-sm">
-    <div class="card-body text-center py-5 text-body-secondary">
-      <i class="bi bi-cash-stack fs-1 opacity-25 d-block mb-2"></i>
-      Nenhum pagamento registrado para esta competência.
+  <?php if ($funcionarios): ?>
+  <div class="d-flex gap-2 flex-wrap ms-auto">
+    <?php foreach ([
+      [$fmtVal($totalVal) ?? 'R$ 0,00', 'Total folha',  'primary'],
+      [$totalPagos,  'Pago' . ($totalPagos  !== 1 ? 's' : ''), 'success'],
+      [$totalPend,   'Pendente' . ($totalPend   !== 1 ? 's' : ''), 'warning'],
+      [$totalAtras,  'Atrasado' . ($totalAtras  !== 1 ? 's' : ''), 'danger'],
+    ] as [$val, $lbl, $cor]): ?>
+    <div class="text-center px-3 py-1 rounded-2 bg-<?= $cor ?>-subtle">
+      <div class="fw-bold text-<?= $cor ?>-emphasis" style="font-size:.95rem;"><?= $val ?></div>
+      <div class="text-<?= $cor ?>-emphasis" style="font-size:.68rem;"><?= $lbl ?></div>
     </div>
+    <?php endforeach; ?>
   </div>
-<?php else: ?>
-<?php
-  $totalValor  = array_sum(array_column($pagamentos, 'valor'));
-  $totalPagos  = count(array_filter($pagamentos, fn($p) => $p['status'] === 'pago'));
-  $totalPend   = count(array_filter($pagamentos, fn($p) => $p['status'] === 'pendente'));
-  $totalAtraso = count(array_filter($pagamentos, fn($p) => $p['status'] === 'pendente' && $p['data_prevista'] && $p['data_prevista'] < $hoje));
-?>
-
-<!-- Mini-resumo -->
-<div class="row g-2 mb-3">
-  <?php foreach ([
-    ['Total folha',  $fmtVal($totalValor),   'primary'],
-    ['Pagos',        $totalPagos,             'success'],
-    ['Pendentes',    $totalPend - $totalAtraso, 'warning'],
-    ['Atrasados',    $totalAtraso,            'danger'],
-  ] as [$lbl, $val, $cor]): ?>
-  <div class="col-6 col-md-3">
-    <div class="card border-0 shadow-sm text-center py-3">
-      <div class="fw-bold text-<?= $cor ?>" style="font-size:1.1rem;"><?= $val ?></div>
-      <div class="text-body-secondary" style="font-size:.72rem;"><?= $lbl ?></div>
-    </div>
-  </div>
-  <?php endforeach; ?>
+  <?php endif; ?>
 </div>
 
-<div class="card border-0 shadow-sm">
-  <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0" style="font-size:.875rem;">
-      <thead class="table-light">
-        <tr>
-          <th>Funcionário</th>
-          <th>Cargo</th>
-          <th>Valor</th>
-          <th>Previsto</th>
-          <th>Pago em</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php foreach ($pagamentos as $p): ?>
-        <?php
-          $atrasado = $p['status'] === 'pendente' && !empty($p['data_prevista']) && $p['data_prevista'] < $hoje;
-        ?>
-        <tr>
-          <td>
-            <a href="<?= url('funcionarios/' . $p['funcionario_id'] . '?aba=pagamentos') ?>"
-               class="text-decoration-none fw-semibold">
-              <?= htmlspecialchars($p['nome']) ?>
-            </a>
-          </td>
-          <td class="text-body-secondary"><?= htmlspecialchars($p['cargo']) ?></td>
-          <td class="fw-semibold"><?= $fmtVal((float)$p['valor']) ?></td>
-          <td><?= $fmtData($p['data_prevista']) ?></td>
-          <td><?= $fmtData($p['data_pagamento']) ?></td>
-          <td>
-            <?php if ($p['status'] === 'pago'): ?>
-              <span class="badge bg-success-subtle text-success-emphasis">Pago</span>
-            <?php elseif ($atrasado): ?>
-              <span class="badge bg-danger-subtle text-danger-emphasis">Atrasado</span>
-            <?php else: ?>
-              <span class="badge bg-warning-subtle text-warning-emphasis">Pendente</span>
-            <?php endif; ?>
-          </td>
-          <td>
-            <a href="<?= url('funcionarios/' . $p['funcionario_id'] . '?aba=pagamentos') ?>"
-               class="btn btn-outline-secondary btn-sm py-0 px-2" title="Ver no perfil">
-              <i class="bi bi-box-arrow-up-right"></i>
-            </a>
-          </td>
-        </tr>
-        <?php endforeach; ?>
-      </tbody>
-      <tfoot class="table-light">
-        <tr>
-          <td colspan="2" class="fw-semibold">Total</td>
-          <td class="fw-bold"><?= $fmtVal($totalValor) ?></td>
-          <td colspan="4"></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-</div>
-<?php endif; ?>
-
-<?php elseif (empty($resumos)): ?>
+<!-- Cards de funcionários -->
+<?php if (empty($funcionarios)): ?>
 <div class="card border-0 shadow-sm">
   <div class="card-body text-center py-5 text-body-secondary">
     <i class="bi bi-people fs-1 opacity-25 d-block mb-3"></i>
-    Nenhum pagamento registrado ainda.<br>
-    <span style="font-size:.85rem;">Acesse o perfil de um funcionário para lançar pagamentos.</span>
+    Nenhum funcionário ativo cadastrado.
     <div class="mt-3">
-      <a href="<?= url('funcionarios') ?>" class="btn btn-primary btn-sm">
-        <i class="bi bi-person-badge"></i> Ver funcionários
+      <a href="<?= url('funcionarios/novo') ?>" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg"></i> Cadastrar funcionário
       </a>
     </div>
   </div>
+</div>
+<?php else: ?>
+<div class="row g-3">
+  <?php foreach ($funcionarios as $f): ?>
+  <?php
+    $p         = $pagPorFunc[$f->id] ?? null;
+    $atrasado  = $p && $p['status'] === 'pendente' && !empty($p['data_prevista']) && $p['data_prevista'] < $hoje;
+    $pago      = $p && $p['status'] === 'pago';
+    $pendente  = $p && !$pago && !$atrasado;
+    $semReg    = !$p;
+
+    // Calcular data prevista padrão para este mês
+    $dataPrevPad = $f->diaPagamento
+        ? substr($compFiltro, 0, 8) . str_pad((string)$f->diaPagamento, 2, '0', STR_PAD_LEFT)
+        : null;
+
+    if ($atrasado)     [$corBorda, $corAvatar, $ico] = ['danger',    'danger',    'exclamation-triangle-fill'];
+    elseif ($pago)     [$corBorda, $corAvatar, $ico] = ['success',   'success',   'check-circle-fill'];
+    elseif ($pendente) [$corBorda, $corAvatar, $ico] = ['warning',   'warning',   'clock-fill'];
+    else               [$corBorda, $corAvatar, $ico] = ['secondary', 'secondary', 'dash-circle'];
+  ?>
+  <div class="col-md-6 col-lg-4">
+    <div class="card border-0 shadow-sm func-card h-100"
+         style="border-left:3px solid var(--bs-<?= $corBorda ?>)!important;">
+      <div class="card-body p-3">
+
+        <!-- Linha superior: avatar + nome + status -->
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0
+                      bg-<?= $corAvatar ?>-subtle text-<?= $corAvatar ?>-emphasis"
+               style="width:40px;height:40px;font-size:.9rem;font-weight:700;">
+            <?= mb_strtoupper(mb_substr($f->nome, 0, 1)) ?>
+          </div>
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-semibold text-truncate"><?= htmlspecialchars($f->nome) ?></div>
+            <div class="text-body-secondary" style="font-size:.78rem;"><?= htmlspecialchars($f->cargo) ?></div>
+          </div>
+          <i class="bi bi-<?= $ico ?> text-<?= $corBorda ?> flex-shrink-0 mt-1" style="font-size:1rem;"></i>
+        </div>
+
+        <!-- Salário + status -->
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div>
+            <div class="fw-bold" style="font-size:1.05rem;">
+              <?= $p ? $fmtVal((float)$p['valor']) : ($f->salario !== null ? $fmtVal($f->salario) : '—') ?>
+            </div>
+            <div class="text-body-secondary" style="font-size:.72rem;">
+              <?php if ($f->diaPagamento): ?>
+                Vence dia <?= $f->diaPagamento ?>
+              <?php endif; ?>
+            </div>
+          </div>
+          <?php if ($pago): ?>
+            <span class="badge bg-success-subtle text-success-emphasis status-pill">Pago</span>
+          <?php elseif ($atrasado): ?>
+            <span class="badge bg-danger-subtle text-danger-emphasis status-pill">Atrasado</span>
+          <?php elseif ($pendente): ?>
+            <span class="badge bg-warning-subtle text-warning-emphasis status-pill">Pendente</span>
+          <?php else: ?>
+            <span class="badge bg-secondary-subtle text-secondary-emphasis status-pill">Sem registro</span>
+          <?php endif; ?>
+        </div>
+
+        <?php if ($p && $p['data_pagamento']): ?>
+          <div class="text-success" style="font-size:.75rem;">
+            <i class="bi bi-check2 me-1"></i>Pago em <?= $fmtData($p['data_pagamento']) ?>
+          </div>
+        <?php elseif ($p && $p['data_prevista']): ?>
+          <div class="text-<?= $atrasado ? 'danger' : 'body-secondary' ?>" style="font-size:.75rem;">
+            <i class="bi bi-calendar me-1"></i>Previsto: <?= $fmtData($p['data_prevista']) ?>
+          </div>
+        <?php endif; ?>
+
+        <!-- Ações -->
+        <div class="d-flex gap-2 mt-3">
+          <?php if (!$pago): ?>
+          <form action="<?= url("funcionarios/{$f->id}/pagamentos") ?>" method="POST" class="d-flex gap-1 flex-grow-1">
+            <input type="hidden" name="competencia"    value="<?= htmlspecialchars($compFiltro) ?>">
+            <input type="hidden" name="valor"          value="<?= $f->salario !== null ? number_format($f->salario, 2, '.', '') : ($p['valor'] ?? '') ?>">
+            <input type="hidden" name="data_prevista"  value="<?= htmlspecialchars($dataPrevPad ?? $p['data_prevista'] ?? '') ?>">
+            <input type="hidden" name="data_pagamento" value="<?= $hoje ?>">
+            <?php if ($p): ?><input type="hidden" name="id" value="<?= (int)$p['id'] ?>"><?php endif; ?>
+            <button type="submit" class="btn btn-success btn-sm flex-grow-1"
+                    onclick="return confirm('Confirmar pagamento de <?= htmlspecialchars(addslashes($f->nome)) ?> hoje?')">
+              <i class="bi bi-check2"></i> Confirmar pago
+            </button>
+          </form>
+          <?php endif; ?>
+          <a href="<?= url("funcionarios/{$f->id}?aba=pagamentos") ?>"
+             class="btn btn-outline-secondary btn-sm" title="Ver histórico">
+            <i class="bi bi-clock-history"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <?php endforeach; ?>
 </div>
 <?php endif; ?>
 
