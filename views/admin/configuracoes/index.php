@@ -61,7 +61,11 @@ $logoUrl = !empty($config['app_logo'])
           <input type="file" name="logo" class="form-control form-control-sm"
                  accept="image/png,image/jpeg,image/svg+xml,image/webp"
                  id="logo-input">
-          <div class="form-text">PNG, JPG, SVG ou WebP. Recomendado: fundo transparente.</div>
+          <div class="form-text">
+            Formatos: PNG, JPG, SVG ou WebP.<br>
+            Resolução recomendada: <strong>400×120 px</strong> (proporção 3:1).<br>
+            Tamanho máximo: <strong>2 MB</strong>. Prefira fundo transparente (PNG ou SVG).
+          </div>
         </div>
 
         <!-- Nomes e descrição -->

@@ -37,7 +37,13 @@ class ConfiguracaoController
 
         // Upload de logo
         if (!empty($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-            $ext  = strtolower(pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION));
+            $ext   = strtolower(pathinfo($_FILES['logo']['name'], PATHINFO_EXTENSION));
+            $bytes = $_FILES['logo']['size'];
+            if ($bytes > 2 * 1024 * 1024) {
+                Sessao::flash('erro_configuracao', 'O logo deve ter no máximo 2 MB.');
+                Roteador::redirecionar('/configuracoes');
+                return;
+            }
             if (in_array($ext, ['png', 'jpg', 'jpeg', 'svg', 'webp'], true)) {
                 $dir  = RAIZ . '/public/uploads/configuracoes';
                 if (!is_dir($dir)) mkdir($dir, 0755, true);
