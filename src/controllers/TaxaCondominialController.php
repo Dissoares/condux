@@ -36,7 +36,10 @@ class TaxaCondominialController
         $mensagem     = Sessao::lerFlash('sucesso');
         $erroMensagem = Sessao::lerFlash('erro');
 
-        if (isset($_GET['competencia']) && $_GET['competencia'] !== '') {
+        if (!empty($_GET['aguardando'])) {
+            $aguardando = $this->taxaService->listarAguardandoAprovacao();
+            require_once RAIZ . '/views/admin/taxas/aguardando.php';
+        } elseif (isset($_GET['competencia']) && $_GET['competencia'] !== '') {
             $competencia = $_GET['competencia'];
             $unidades    = $this->taxaService->listarUnidadesComStatusPorCompetencia($competencia);
             $resumo      = $this->taxaService->resumoPorCompetencia($competencia);
@@ -293,6 +296,21 @@ class TaxaCondominialController
         try {
             $this->taxaService->enviarComprovante($taxaId, $formaPagamento, $_FILES['comprovante']);
             Sessao::flash('sucesso', 'Comprovante enviado! Aguarde a aprovação do síndico.');
+
+            // Push notification para todos os admins
+            try {
+                require_once RAIZ . '/src/services/PushNotificationService.php';
+                require_once RAIZ . '/src/repository/PushSubscriptionRepository.php';
+                $taxa = $this->taxaService->buscarTaxa($taxaId);
+                $push = new PushNotificationService(new PushSubscriptionRepository(Conexao::obter()));
+                $push->enviarParaPerfil('admin', [
+                    'title' => '📋 Comprovante para aprovar',
+                    'body'  => 'Um condômino enviou comprovante de pagamento' . ($taxa ? ' — ' . $taxa->competenciaFormatada() : '') . '. Toque para revisar.',
+                    'url'   => url('taxas?aguardando=1'),
+                    'tag'   => 'comprovante-' . $taxaId,
+                ]);
+            } catch (\Throwable) {}
+
         } catch (InvalidArgumentException|RuntimeException $e) {
             Sessao::flash('erro', $e->getMessage());
         }

@@ -157,6 +157,21 @@ class TaxaCondominialRepository
         return count($unidadeIds);
     }
 
+    /** @return TaxaCondominial[] — todas as taxas com determinado status */
+    public function listarPorStatus(string $status): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT tc.*,
+                    CONCAT("Apto ", u.numero, IF(u.bloco IS NOT NULL, CONCAT(" — Bloco ", u.bloco), "")) AS identificacao_unidade
+             FROM taxas_condominiais tc
+             JOIN unidades u ON u.id = tc.unidade_id
+             WHERE tc.status = :status
+             ORDER BY tc.competencia DESC, u.bloco, u.numero'
+        );
+        $stmt->execute([':status' => $status]);
+        return array_map(fn($l) => TaxaCondominial::fromArray($l), $stmt->fetchAll());
+    }
+
     /**
      * Retorna todas as unidades ativas com o resumo de taxas para uma competência.
      * Unidades sem taxa aparecem com taxa_id = null.

@@ -92,8 +92,8 @@ $totalArrecadadoMes = $mArrecadado + $eArrecadado;
       <div style="font-size:.8rem;" class="text-body-secondary">Condôminos enviaram comprovantes de pagamento para análise.</div>
     </div>
   </div>
-  <a href="<?= url('taxas') ?>" class="btn btn-warning btn-sm text-nowrap">
-    <i class="bi bi-eye"></i> Revisar
+  <a href="<?= url('taxas?aguardando=1') ?>" class="btn btn-warning btn-sm text-nowrap">
+    <i class="bi bi-clipboard-check"></i> Revisar
   </a>
 </div>
 <?php endif; ?>

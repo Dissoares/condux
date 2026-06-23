@@ -65,6 +65,12 @@ class TaxaCondominialService
         return $this->taxaRepository->listarUnidadesComTaxaPorCompetencia($competencia);
     }
 
+    /** @return TaxaCondominial[] */
+    public function listarAguardandoAprovacao(): array
+    {
+        return $this->taxaRepository->listarPorStatus('aguardando');
+    }
+
     /**
      * Gera (ou atualiza) taxas condominiais em lote para todas as unidades ativas.
      * Unidades sem taxa no período recebem uma nova; as que já têm taxa pendente/atrasada

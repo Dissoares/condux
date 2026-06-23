@@ -52,4 +52,17 @@ class PushSubscriptionRepository
         $stmt->execute([':uid' => $usuarioId]);
         return $stmt->fetchAll();
     }
+
+    /** @return array[] — subscriptions de todos os usuários com um perfil (ex: 'admin') */
+    public function listarPorPerfil(string $perfil): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT ps.endpoint, ps.p256dh, ps.auth
+             FROM push_subscriptions ps
+             JOIN usuarios u ON u.id = ps.usuario_id
+             WHERE u.perfil = :perfil AND u.ativo = 1'
+        );
+        $stmt->execute([':perfil' => $perfil]);
+        return $stmt->fetchAll();
+    }
 }

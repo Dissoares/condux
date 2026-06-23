@@ -132,6 +132,20 @@ class PushNotificationService
     }
 
     /**
+     * Envia push para todos os usuários de um perfil (ex: 'admin').
+     * @param array{title:string, body:string, url?:string, tag?:string} $payload
+     */
+    public function enviarParaPerfil(string $perfil, array $payload): void
+    {
+        if (!$this->estaConfigurado()) return;
+
+        $subscriptions = $this->subRepo->listarPorPerfil($perfil);
+        if (empty($subscriptions)) return;
+
+        $this->despachar($subscriptions, $payload);
+    }
+
+    /**
      * Envia push para as subscriptions de um usuário específico.
      * @param array{title:string, body:string, url?:string, tag?:string} $payload
      */
