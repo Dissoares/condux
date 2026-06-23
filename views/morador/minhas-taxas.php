@@ -46,6 +46,7 @@ $rotulos = [
           <th>Vencimento</th>
           <th>Status</th>
           <th>Forma pgto.</th>
+          <th>Pago em</th>
           <th></th>
         </tr>
       </thead>
@@ -63,6 +64,9 @@ $rotulos = [
           <td><span class="badge rounded-pill <?= $info['badge'] ?>"><?= $info['label'] ?></span></td>
           <td class="text-body-secondary" style="font-size:.85rem;">
             <?= $taxa->formaPagamento ? htmlspecialchars(ucfirst(str_replace('_', ' ', $taxa->formaPagamento))) : '—' ?>
+          </td>
+          <td class="text-body-secondary" style="font-size:.85rem;">
+            <?= $taxa->dataPagamento ? dataBR($taxa->dataPagamento) : '—' ?>
           </td>
           <td class="text-end">
             <div class="d-flex gap-1 justify-content-end align-items-center">
