@@ -87,7 +87,7 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
           <i class="bi bi-speedometer2"></i> Painel
         </a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item d-none d-lg-block">
         <a href="<?= url('comunicados') ?>" class="nav-link <?= $segAtivo === 'comunicados' ? 'ativo' : '' ?>">
           <i class="bi bi-megaphone"></i> Comunicados
         </a>
@@ -262,6 +262,10 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
   <a href="<?= url('minhas-taxas') ?>" class="condux-bnav-item <?= $segAtivo === 'minhas-taxas' ? 'ativo' : '' ?>">
     <i class="bi bi-receipt"></i>
     <span>Taxas</span>
+  </a>
+  <a href="<?= url('comunicados') ?>" class="condux-bnav-item <?= $segAtivo === 'comunicados' ? 'ativo' : '' ?>">
+    <i class="bi bi-megaphone"></i>
+    <span>Avisos</span>
   </a>
   <a href="<?= url('transparencia') ?>" class="condux-bnav-item <?= $segAtivo === 'transparencia' ? 'ativo' : '' ?>">
     <i class="bi bi-eye"></i>
