@@ -172,6 +172,11 @@ class Roteador
             $metodo === 'POST' ? $ctrl->gerarEmLote() : $ctrl->formularioGerarLote();
             return;
         }
+        // GET /taxas/gerar-lote-auto — geração automática do mês atual com config salva
+        if ($seg[1] === 'gerar-lote-auto') {
+            $ctrl->gerarLoteAutomatico();
+            return;
+        }
         // GET /taxas/unidade/{id}
         if ($seg[1] === 'unidade' && is_numeric($seg[2] ?? '')) {
             $_GET['id'] = (int) $seg[2];

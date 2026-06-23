@@ -10,6 +10,8 @@ require_once __DIR__ . '/../repository/MoradorRepository.php';
 require_once __DIR__ . '/../repository/PrestadoraRepository.php';
 require_once __DIR__ . '/../repository/VistoriaRepository.php';
 require_once __DIR__ . '/../repository/FuncionarioRepository.php';
+require_once __DIR__ . '/../repository/ConfigRepository.php';
+require_once __DIR__ . '/../services/TaxaCondominialService.php';
 
 class PainelAdminController
 {
@@ -37,6 +39,8 @@ class PainelAdminController
 
     public function exibirPainel(): void
     {
+        $this->pseudoCronGerarTaxas();
+
         // Financeiro do mês
         $resumoMes     = $this->taxaRepo->resumoMesDetalhado();
         $totaisGlobais = $this->taxaRepo->totaisGlobais();
@@ -62,5 +66,40 @@ class PainelAdminController
         $totalFuncionarios = $this->funcionarioRepo->contarAtivos();
 
         require_once RAIZ . '/views/admin/painel.php';
+    }
+
+    /**
+     * Gera automaticamente as taxas do mês atual na primeira visita admin do mês.
+     * Usa o valor e dia de vencimento salvos nas configurações.
+     * Falha silenciosa — o admin pode gerar manualmente se necessário.
+     */
+    private function pseudoCronGerarTaxas(): void
+    {
+        $competencia = date('Y-m');
+        $pdo         = Conexao::obter();
+        $configRepo  = new ConfigRepository($pdo);
+
+        if ($configRepo->obter('taxa_ultima_geracao_auto') === $competencia) {
+            return;
+        }
+
+        $dia   = (int)   $configRepo->obter('taxa_dia_vencimento', 10);
+        $valor = (float) $configRepo->obter('taxa_valor_mensal',   0);
+
+        if ($valor <= 0) {
+            return;
+        }
+
+        try {
+            $vencimento  = $competencia . '-' . str_pad((string) $dia, 2, '0', STR_PAD_LEFT);
+            $taxaService = new TaxaCondominialService(
+                new TaxaCondominialRepository($pdo),
+                new UnidadeRepository($pdo),
+            );
+            $taxaService->gerarEmLote($competencia, $valor, $vencimento);
+            $configRepo->salvar('taxa_ultima_geracao_auto', $competencia);
+        } catch (\Throwable) {
+            // Falha silenciosa
+        }
     }
 }

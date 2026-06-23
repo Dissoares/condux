@@ -60,10 +60,12 @@ class TaxaCondominialController
 
     public function formularioGerarLote(): void
     {
-        $diaVencimento = (int) $this->configRepo->obter('taxa_dia_vencimento', 10);
-        $valorMensal   = $this->configRepo->obter('taxa_valor_mensal');
-        $mensagem      = Sessao::lerFlash('sucesso');
-        $erroMensagem  = Sessao::lerFlash('erro');
+        $diaVencimento   = (int) $this->configRepo->obter('taxa_dia_vencimento', 10);
+        $valorMensal     = $this->configRepo->obter('taxa_valor_mensal');
+        $competencia     = $_GET['competencia'] ?? date('Y-m');
+        $mensagem        = Sessao::lerFlash('sucesso');
+        $erroMensagem    = Sessao::lerFlash('erro');
+        $unidadesComTaxa = $this->taxaService->listarUnidadesComTaxaPorCompetencia($competencia);
         require_once RAIZ . '/views/admin/taxas/gerar-lote.php';
     }
 
@@ -84,6 +86,36 @@ class TaxaCondominialController
             Sessao::flash('erro', $e->getMessage());
         }
         Roteador::redirecionar('/taxas/gerar-lote');
+    }
+
+    /**
+     * Geração automática do mês atual usando a configuração salva.
+     * Chamado pelo pseudo-cron do painel ou pela URL /taxas/gerar-lote-auto.
+     * Retorna o número de taxas geradas (0 se já existirem ou não configurado).
+     */
+    public function gerarLoteAutomatico(): void
+    {
+        $dia   = (int)   $this->configRepo->obter('taxa_dia_vencimento', 10);
+        $valor = (float) $this->configRepo->obter('taxa_valor_mensal',   0);
+
+        if ($valor <= 0) {
+            Sessao::flash('erro', 'Configure o valor da taxa mensal em Taxas → Gerar Lote antes de usar a geração automática.');
+            Roteador::redirecionar('/taxas/gerar-lote');
+            return;
+        }
+
+        $competencia = date('Y-m');
+        $vencimento  = $competencia . '-' . str_pad((string) $dia, 2, '0', STR_PAD_LEFT);
+
+        try {
+            $total = $this->taxaService->gerarEmLote($competencia, $valor, $vencimento);
+            $this->configRepo->salvar('taxa_ultima_geracao_auto', $competencia);
+            Sessao::flash('sucesso', "{$total} taxas geradas automaticamente para {$competencia}.");
+        } catch (InvalidArgumentException $e) {
+            Sessao::flash('erro', $e->getMessage());
+        }
+
+        Roteador::redirecionar('/taxas');
     }
 
     public function marcarPago(): void
