@@ -259,6 +259,10 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
     <i class="bi bi-house-fill"></i>
     <span>Início</span>
   </a>
+  <a href="<?= url('comunicados') ?>" class="condux-bnav-item <?= $segAtivo === 'comunicados' ? 'ativo' : '' ?>">
+    <i class="bi bi-megaphone"></i>
+    <span>Avisos</span>
+  </a>
   <a href="<?= url('minhas-taxas') ?>" class="condux-bnav-item <?= $segAtivo === 'minhas-taxas' ? 'ativo' : '' ?>">
     <i class="bi bi-receipt"></i>
     <span>Taxas</span>
