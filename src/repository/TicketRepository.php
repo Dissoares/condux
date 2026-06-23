@@ -146,18 +146,23 @@ class TicketRepository
         return (int) $stmt->fetchColumn();
     }
 
-    /** Tickets do morador que receberam resposta da equipe (status em_andamento ou resolvido) */
+    /** Tickets do morador onde a ÚLTIMA mensagem pública é da equipe (aguarda leitura/resposta). */
     public function contarRespostasParaMorador(int $usuarioId): int
     {
         $stmt = $this->conexao->prepare(
-            "SELECT COUNT(*) FROM tickets
-             WHERE usuario_id = :uid
-               AND status IN ('em_andamento','resolvido')
+            "SELECT COUNT(*) FROM tickets t
+             WHERE t.usuario_id = :uid
+               AND t.status NOT IN ('fechado')
                AND EXISTS (
                    SELECT 1 FROM ticket_mensagens tm
                    JOIN usuarios u ON u.id = tm.usuario_id
-                   WHERE tm.ticket_id = tickets.id
+                   WHERE tm.ticket_id = t.id
+                     AND tm.interno = 0
                      AND u.perfil IN ('sindico','subsindico')
+                     AND tm.id = (
+                         SELECT MAX(tm2.id) FROM ticket_mensagens tm2
+                         WHERE tm2.ticket_id = t.id AND tm2.interno = 0
+                     )
                )"
         );
         $stmt->execute([':uid' => $usuarioId]);
