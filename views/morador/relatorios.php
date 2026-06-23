@@ -4,18 +4,24 @@
  * @var int[]  $anos
  * @var array  $extrato   — linhas: competencia, valor, vencimento, status, data_pagamento, observacao
  */
-$tituloPagina = 'Meu Extrato';
-require_once RAIZ . '/views/layouts/cabecalho.php';
-
 $totalPago    = array_sum(array_column(array_filter($extrato, fn($r) => $r['status'] === 'pago'), 'valor'));
 $totalAberto  = array_sum(array_column(array_filter($extrato, fn($r) => in_array($r['status'], ['pendente','vencido'])), 'valor'));
 ?>
 
-<div class="d-flex align-items-center justify-content-between mb-4">
+<style>
+@media print {
+  .condux-sidebar, .condux-top-bar, .condux-bottom-nav, .no-print { display: none !important; }
+  .condux-conteudo { margin: 0 !important; padding: 0 !important; }
+  body { background: white !important; }
+}
+</style>
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
   <h4 class="fw-semibold mb-0"><i class="bi bi-receipt"></i> Meu extrato</h4>
 
-  <form method="GET" action="<?= url('relatorios') ?>" style="display:flex; gap:.5rem; align-items:center;">
-    <select name="ano" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+  <div class="d-flex gap-2 flex-wrap align-items-center no-print">
+    <select class="form-select form-select-sm" style="width:auto;"
+            onchange="window.location.href='<?= url('relatorios') ?>?ano='+this.value">
       <?php if (empty($anos)): ?>
         <option value="<?= $ano ?>"><?= $ano ?></option>
       <?php else: ?>
@@ -24,7 +30,14 @@ $totalAberto  = array_sum(array_column(array_filter($extrato, fn($r) => in_array
         <?php endforeach; ?>
       <?php endif; ?>
     </select>
-  </form>
+    <a href="<?= url('relatorios') ?>?acao=exportar&ano=<?= $ano ?>"
+       class="btn btn-sm btn-outline-success">
+      <i class="bi bi-file-earmark-excel"></i> Excel / CSV
+    </a>
+    <button onclick="window.print()" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-printer"></i> Imprimir / PDF
+    </button>
+  </div>
 </div>
 
 <div class="row g-3 mb-4">
@@ -79,4 +92,3 @@ $totalAberto  = array_sum(array_column(array_filter($extrato, fn($r) => in_array
   <?php endif; ?>
 </div></div>
 
-<?php require_once RAIZ . '/views/layouts/rodape.php'; ?>
