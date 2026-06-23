@@ -20,11 +20,11 @@ SET @sql = IF(
 );
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- Controle de aviso de vencimento em taxa_extra_unidade
+-- Controle de aviso de vencimento em taxas_extras_unidades
 SET @sql = IF(
     (SELECT COUNT(*) FROM information_schema.COLUMNS
-     WHERE TABLE_SCHEMA = @db AND TABLE_NAME = 'taxa_extra_unidade' AND COLUMN_NAME = 'aviso_vencida_em') = 0,
-    'ALTER TABLE taxa_extra_unidade ADD COLUMN aviso_vencida_em DATETIME NULL DEFAULT NULL',
+     WHERE TABLE_SCHEMA = @db AND TABLE_NAME = 'taxas_extras_unidades' AND COLUMN_NAME = 'aviso_vencida_em') = 0,
+    'ALTER TABLE taxas_extras_unidades ADD COLUMN aviso_vencida_em DATETIME NULL DEFAULT NULL',
     'SELECT 1'
 );
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
