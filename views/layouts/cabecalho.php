@@ -114,6 +114,13 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
         </a>
       </li>
 
+      <p class="condux-nav-label">Comunicação</p>
+      <li class="nav-item">
+        <a href="<?= url('comunicados') ?>" class="nav-link <?= $segAtivo === 'comunicados' ? 'ativo' : '' ?>">
+          <i class="bi bi-megaphone"></i> Comunicados
+        </a>
+      </li>
+
       <p class="condux-nav-label">Análises</p>
       <li class="nav-item">
         <a href="<?= url('relatorios') ?>" class="nav-link <?= $segAtivo === 'relatorios' ? 'ativo' : '' ?>">
@@ -136,6 +143,11 @@ $ePainel     = ($segAtivo === '' || $segAtivo === 'painel');
       </li>
 
       <p class="condux-nav-label">Condomínio</p>
+      <li class="nav-item">
+        <a href="<?= url('comunicados') ?>" class="nav-link <?= $segAtivo === 'comunicados' ? 'ativo' : '' ?>">
+          <i class="bi bi-megaphone"></i> Comunicados
+        </a>
+      </li>
       <li class="nav-item">
         <a href="<?= url('transparencia') ?>" class="nav-link <?= $segAtivo === 'transparencia' ? 'ativo' : '' ?>">
           <i class="bi bi-eye"></i> Transparência

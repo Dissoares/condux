@@ -101,4 +101,31 @@ $primeiroNome = explode(' ', Sessao::usuarioAtual()['nome'] ?? 'Morador')[0];
 
 <?php endif; ?>
 
+<!-- Comunicados -->
+<?php if (!empty($comunicados)): ?>
+<div class="mt-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="fw-semibold mb-0"><i class="bi bi-megaphone"></i> Comunicados</h5>
+    <a href="<?= url('comunicados') ?>" class="btn btn-outline-secondary btn-sm">Ver todos</a>
+  </div>
+  <div class="d-flex flex-column gap-2">
+    <?php foreach ($comunicados as $c): ?>
+    <?php $corCss = $c->cor() === 'purple' ? 'primary' : $c->cor(); ?>
+    <div class="card border-0 shadow-sm" style="border-left:3px solid var(--bs-<?= $corCss ?>)!important;">
+      <div class="card-body py-2 px-3 d-flex align-items-start gap-3">
+        <i class="bi <?= $c->icone() ?> text-<?= $corCss ?> mt-1 flex-shrink-0"></i>
+        <div class="flex-grow-1 min-w-0">
+          <div class="fw-semibold" style="font-size:.875rem;"><?= htmlspecialchars($c->titulo) ?></div>
+          <div class="text-body-secondary text-truncate" style="font-size:.78rem;"><?= htmlspecialchars(mb_substr($c->conteudo, 0, 100)) ?><?= mb_strlen($c->conteudo) > 100 ? '…' : '' ?></div>
+        </div>
+        <span class="text-body-secondary flex-shrink-0" style="font-size:.72rem;white-space:nowrap;">
+          <?= date('d/m', strtotime($c->dataPublicacao)) ?>
+        </span>
+      </div>
+    </div>
+    <?php endforeach; ?>
+  </div>
+</div>
+<?php endif; ?>
+
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>

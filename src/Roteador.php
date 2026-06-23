@@ -69,6 +69,7 @@ class Roteador
             'funcionarios'     => self::rotasFuncionarios($seg, $metodo, $ehAdmin),
             'folha-pagamento'  => self::rotasFolhaPagamento($ehAdmin),
             'contas'           => self::rotasContas($seg, $metodo, $ehAdmin),
+            'comunicados'      => self::rotasComunicados($seg, $metodo, $ehAdmin),
             'minhas-taxas'     => self::rotasMinhasTaxas($seg, $metodo),
             'transparencia'=> self::rotasTransparencia($seg),
             'relatorios'   => self::carregarRelatorio(),
@@ -390,6 +391,28 @@ class Roteador
         }
 
         $ctrl->listar();
+    }
+
+    // ── Comunicados ───────────────────────────────────────────────────────
+
+    private static function rotasComunicados(array $seg, string $metodo, bool $ehAdmin): void
+    {
+        require_once RAIZ . '/src/controllers/ComunicadoController.php';
+        $ctrl = new ComunicadoController();
+
+        // Admin: gestão
+        if ($ehAdmin) {
+            if ($seg[1] === 'novo')                                   { $ctrl->formulario(); return; }
+            if ($seg[1] === 'salvar' && $metodo === 'POST')           { $ctrl->salvar();     return; }
+            $id = (int) ($seg[1] ?? 0);
+            if ($id > 0 && $seg[2] === 'editar')  { $_GET['id'] = $id; $ctrl->formulario(); return; }
+            if ($id > 0 && $seg[2] === 'excluir') { $_GET['id'] = $id; $ctrl->excluir();    return; }
+            $ctrl->listarAdmin();
+            return;
+        }
+
+        // Morador: apenas leitura
+        $ctrl->listarMorador();
     }
 
     // ── Minhas taxas (morador) ────────────────────────────────────────────
