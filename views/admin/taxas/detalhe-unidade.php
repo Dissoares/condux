@@ -73,6 +73,13 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
         <div class="fw-semibold"><?= dataBR($taxaCond->dataPagamento) ?></div>
       </div>
       <?php endif; ?>
+      <?php if ($taxaCond->formaPagamento): ?>
+      <div class="col-6 col-md-3">
+        <div class="text-body-secondary mb-1" style="font-size:.75rem;">FORMA</div>
+        <?php $formas = ['pix'=>'PIX','transferencia'=>'Transferência','dinheiro'=>'Dinheiro','boleto'=>'Boleto','cartao'=>'Cartão','cheque'=>'Cheque','outro'=>'Outro']; ?>
+        <div class="fw-semibold"><?= $formas[$taxaCond->formaPagamento] ?? ucfirst($taxaCond->formaPagamento) ?></div>
+      </div>
+      <?php endif; ?>
     </div>
 
     <?php if ($taxaCond->observacao): ?>
@@ -97,14 +104,66 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
              onclick="return confirm('Confirmar aprovação do comprovante?')">
             <i class="bi bi-check-lg"></i> Aprovar comprovante
           </a>
-        <?php else: ?>
-          <a href="<?= url("taxas/{$taxaCond->id}/aprovar?competencia={$competencia}&unidade_id={$unidade->id}") ?>"
-             class="btn btn-primary btn-sm"
-             onclick="return confirm('Marcar taxa de <?= htmlspecialchars($taxaCond->competenciaFormatada()) ?> como paga?')">
-            <i class="bi bi-cash-coin"></i> Marcar como pago
-          </a>
         <?php endif; ?>
+        <button type="button" class="btn btn-primary btn-sm"
+                data-bs-toggle="modal" data-bs-target="#modalMarcarPago">
+          <i class="bi bi-cash-coin"></i> Registrar pagamento
+        </button>
       <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
+    <!-- Modal registrar pagamento -->
+    <?php if (!in_array($taxaCond->status, ['pago', 'isento'], true)): ?>
+    <div class="modal fade" id="modalMarcarPago" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-cash-coin me-2"></i>Registrar pagamento</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <form method="POST" action="<?= url('taxas/marcar-pago') ?>" enctype="multipart/form-data">
+            <div class="modal-body">
+              <input type="hidden" name="taxa_id"    value="<?= $taxaCond->id ?>">
+              <input type="hidden" name="unidade_id" value="<?= $unidade->id ?>">
+              <input type="hidden" name="competencia" value="<?= htmlspecialchars($competencia) ?>">
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Forma de pagamento <span class="text-danger">*</span></label>
+                <select name="forma_pagamento" class="form-select" required>
+                  <option value="">Selecione…</option>
+                  <option value="pix">PIX</option>
+                  <option value="transferencia">Transferência bancária</option>
+                  <option value="dinheiro">Dinheiro</option>
+                  <option value="boleto">Boleto bancário</option>
+                  <option value="cartao">Cartão</option>
+                  <option value="cheque">Cheque</option>
+                  <option value="outro">Outro</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Data do pagamento <span class="text-danger">*</span></label>
+                <input type="date" name="data_pagamento" class="form-control"
+                       value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d') ?>" required>
+              </div>
+
+              <div class="mb-1">
+                <label class="form-label fw-semibold">Comprovante <span class="text-body-secondary fw-normal">(opcional)</span></label>
+                <input type="file" name="comprovante" class="form-control"
+                       accept=".pdf,.jpg,.jpeg,.png">
+                <div class="form-text">PDF, JPG ou PNG — máx. 10 MB</div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-lg"></i> Confirmar pagamento
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
     <?php endif; ?>
   </div>

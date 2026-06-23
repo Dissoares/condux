@@ -119,15 +119,17 @@ class TaxaCondominialRepository
         $stmt = $this->conexao->prepare(
             'UPDATE taxas_condominiais SET
              status = :status, data_pagamento = :data_pagamento,
+             forma_pagamento = :forma_pagamento,
              comprovante = :comprovante, observacao = :observacao
              WHERE id = :id'
         );
         $stmt->execute([
-            ':status'         => $taxa->status,
-            ':data_pagamento' => $taxa->dataPagamento,
-            ':comprovante'    => $taxa->comprovante,
-            ':observacao'     => $taxa->observacao,
-            ':id'             => $taxa->id,
+            ':status'          => $taxa->status,
+            ':data_pagamento'  => $taxa->dataPagamento,
+            ':forma_pagamento' => $taxa->formaPagamento,
+            ':comprovante'     => $taxa->comprovante,
+            ':observacao'      => $taxa->observacao,
+            ':id'              => $taxa->id,
         ]);
     }
 

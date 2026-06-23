@@ -86,6 +86,28 @@ class TaxaCondominialController
         Roteador::redirecionar('/taxas/gerar-lote');
     }
 
+    public function marcarPago(): void
+    {
+        $taxaId        = (int) ($_POST['taxa_id']        ?? 0);
+        $unidadeId     = (int) ($_POST['unidade_id']     ?? 0);
+        $competencia   = $_POST['competencia']   ?? date('Y-m');
+        $formaPagamento = $_POST['forma_pagamento'] ?? '';
+        $dataPagamento  = $_POST['data_pagamento']  ?? date('Y-m-d');
+
+        $arquivo = (!empty($_FILES['comprovante']) && $_FILES['comprovante']['error'] === UPLOAD_ERR_OK)
+                   ? $_FILES['comprovante']
+                   : null;
+
+        try {
+            $this->taxaService->marcarPago($taxaId, $formaPagamento, $dataPagamento, $arquivo);
+            Sessao::flash('sucesso', 'Pagamento registrado com sucesso.');
+        } catch (InvalidArgumentException|RuntimeException $e) {
+            Sessao::flash('erro', $e->getMessage());
+        }
+
+        Roteador::redirecionar("/taxas/unidade/{$unidadeId}?competencia={$competencia}");
+    }
+
     public function aprovarComprovante(): void
     {
         $taxaId    = (int) ($_GET['id'] ?? 0);

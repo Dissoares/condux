@@ -81,6 +81,30 @@ class TaxaCondominialService
         );
     }
 
+    /**
+     * Síndico registra pagamento manualmente (com ou sem comprovante).
+     * @param array|null $arquivoUpload $_FILES['comprovante'] ou null
+     */
+    public function marcarPago(int $taxaId, string $formaPagamento, string $dataPagamento, ?array $arquivoUpload): void
+    {
+        $taxa = $this->taxaRepository->buscarPorId($taxaId);
+
+        if ($taxa === null) {
+            throw new InvalidArgumentException('Taxa não encontrada.');
+        }
+
+        if ($arquivoUpload && $arquivoUpload['error'] === UPLOAD_ERR_OK) {
+            $taxa->comprovante = $this->salvarArquivoComprovante($arquivoUpload);
+        }
+
+        $taxa->status         = TaxaCondominial::STATUS_PAGO;
+        $taxa->dataPagamento  = $dataPagamento;
+        $taxa->formaPagamento = $formaPagamento ?: null;
+        $taxa->observacao     = 'Pagamento registrado pelo síndico.';
+
+        $this->taxaRepository->salvar($taxa);
+    }
+
     /** Aprova comprovante enviado pelo morador e marca como pago. */
     public function aprovarComprovante(int $taxaId): void
     {

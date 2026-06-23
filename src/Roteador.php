@@ -177,6 +177,11 @@ class Roteador
             $ctrl->aprovarComprovante();
             return;
         }
+        // POST /taxas/marcar-pago
+        if ($seg[1] === 'marcar-pago' && $metodo === 'POST') {
+            $ctrl->marcarPago();
+            return;
+        }
         // GET /taxas  |  GET /taxas?competencia=YYYY-MM
         $ctrl->listar();
     }

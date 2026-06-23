@@ -21,6 +21,7 @@ class TaxaCondominial
         public string           $vencimento,    // formato: Y-m-d
         public string           $status         = self::STATUS_PENDENTE,
         public ?string          $dataPagamento  = null,
+        public ?string          $formaPagamento = null,
         public ?string          $comprovante    = null,
         public ?string          $observacao     = null,
         public ?string          $criadoEm      = null,
@@ -37,7 +38,8 @@ class TaxaCondominial
             valor:                (float) $dados['valor'],
             vencimento:           $dados['vencimento'],
             status:               $dados['status'] ?? self::STATUS_PENDENTE,
-            dataPagamento:        $dados['data_pagamento'] ?? null,
+            dataPagamento:        $dados['data_pagamento']   ?? null,
+            formaPagamento:       $dados['forma_pagamento']  ?? null,
             comprovante:          $dados['comprovante'] ?? null,
             observacao:           $dados['observacao'] ?? null,
             criadoEm:             $dados['criado_em'] ?? null,
@@ -53,10 +55,11 @@ class TaxaCondominial
             'competencia'    => $this->competencia,
             'valor'          => $this->valor,
             'vencimento'     => $this->vencimento,
-            'status'         => $this->status,
-            'data_pagamento' => $this->dataPagamento,
-            'comprovante'    => $this->comprovante,
-            'observacao'     => $this->observacao,
+            'status'          => $this->status,
+            'data_pagamento'  => $this->dataPagamento,
+            'forma_pagamento' => $this->formaPagamento,
+            'comprovante'     => $this->comprovante,
+            'observacao'      => $this->observacao,
         ];
     }
 
