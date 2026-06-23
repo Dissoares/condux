@@ -40,6 +40,26 @@ class TaxaCondominialService
         return $this->taxaRepository->resumoMesAtual();
     }
 
+    public function resumoPorCompetencia(string $competencia): array
+    {
+        return $this->taxaRepository->resumoPorCompetencia($competencia);
+    }
+
+    public function listarCompetencias(): array
+    {
+        return $this->taxaRepository->listarCompetencias();
+    }
+
+    public function listarUnidadesComStatusPorCompetencia(string $competencia): array
+    {
+        return $this->taxaRepository->listarUnidadesComStatusPorCompetencia($competencia);
+    }
+
+    public function buscarPorUnidadeECompetencia(int $unidadeId, string $competencia): ?TaxaCondominial
+    {
+        return $this->taxaRepository->buscarPorUnidadeECompetencia($unidadeId, $competencia);
+    }
+
     /**
      * Gera (ou atualiza) taxas condominiais em lote para todas as unidades ativas.
      * Unidades sem taxa no período recebem uma nova; as que já têm taxa pendente/atrasada

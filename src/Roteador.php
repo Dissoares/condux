@@ -165,13 +165,19 @@ class Roteador
             $metodo === 'POST' ? $ctrl->gerarEmLote() : $ctrl->formularioGerarLote();
             return;
         }
+        // GET /taxas/unidade/{id}
+        if ($seg[1] === 'unidade' && is_numeric($seg[2] ?? '')) {
+            $_GET['id'] = (int) $seg[2];
+            $ctrl->detalheUnidade();
+            return;
+        }
         // GET /taxas/{id}/aprovar
         if ($seg[2] === 'aprovar') {
             $_GET['id'] = (int) $seg[1];
             $ctrl->aprovarComprovante();
             return;
         }
-        // GET /taxas
+        // GET /taxas  |  GET /taxas?competencia=YYYY-MM
         $ctrl->listar();
     }
 

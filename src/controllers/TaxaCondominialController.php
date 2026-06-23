@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../services/TaxaCondominialService.php';
 require_once __DIR__ . '/../repository/TaxaCondominialRepository.php';
+require_once __DIR__ . '/../repository/TaxaExtraRepository.php';
 require_once __DIR__ . '/../repository/UnidadeRepository.php';
 require_once __DIR__ . '/../repository/MoradorRepository.php';
 require_once __DIR__ . '/../repository/ConfigRepository.php';
@@ -11,6 +12,8 @@ require_once __DIR__ . '/../repository/ConfigRepository.php';
 class TaxaCondominialController
 {
     private TaxaCondominialService $taxaService;
+    private TaxaExtraRepository    $extraRepo;
+    private UnidadeRepository      $unidadeRepo;
     private MoradorRepository      $moradorRepository;
     private ConfigRepository       $configRepo;
 
@@ -21,18 +24,38 @@ class TaxaCondominialController
             new TaxaCondominialRepository($conexao),
             new UnidadeRepository($conexao),
         );
+        $this->extraRepo         = new TaxaExtraRepository($conexao);
+        $this->unidadeRepo       = new UnidadeRepository($conexao);
         $this->moradorRepository = new MoradorRepository($conexao);
         $this->configRepo        = new ConfigRepository($conexao);
     }
 
     public function listar(): void
     {
-        $competencia  = $_GET['competencia'] ?? date('Y-m');
-        $taxas        = $this->taxaService->listarPorCompetencia($competencia);
-        $resumo       = $this->taxaService->resumoMesAtual();
         $mensagem     = Sessao::lerFlash('sucesso');
         $erroMensagem = Sessao::lerFlash('erro');
-        require_once RAIZ . '/views/admin/taxas/lista.php';
+
+        if (isset($_GET['competencia']) && $_GET['competencia'] !== '') {
+            $competencia = $_GET['competencia'];
+            $unidades    = $this->taxaService->listarUnidadesComStatusPorCompetencia($competencia);
+            $resumo      = $this->taxaService->resumoPorCompetencia($competencia);
+            require_once RAIZ . '/views/admin/taxas/por-competencia.php';
+        } else {
+            $competencias = $this->taxaService->listarCompetencias();
+            require_once RAIZ . '/views/admin/taxas/lista.php';
+        }
+    }
+
+    public function detalheUnidade(): void
+    {
+        $unidadeId    = (int) ($_GET['id'] ?? 0);
+        $competencia  = $_GET['competencia'] ?? date('Y-m');
+        $unidade      = $this->unidadeRepo->buscarPorId($unidadeId);
+        $taxaCond     = $this->taxaService->buscarPorUnidadeECompetencia($unidadeId, $competencia);
+        $extrasDoMes  = $this->extraRepo->listarPorUnidadeECompetencia($unidadeId, $competencia);
+        $mensagem     = Sessao::lerFlash('sucesso');
+        $erroMensagem = Sessao::lerFlash('erro');
+        require_once RAIZ . '/views/admin/taxas/detalhe-unidade.php';
     }
 
     public function formularioGerarLote(): void
@@ -65,7 +88,8 @@ class TaxaCondominialController
 
     public function aprovarComprovante(): void
     {
-        $taxaId = (int) ($_GET['id'] ?? 0);
+        $taxaId    = (int) ($_GET['id'] ?? 0);
+        $unidadeId = (int) ($_GET['unidade_id'] ?? 0);
 
         try {
             $this->taxaService->aprovarComprovante($taxaId);
@@ -75,7 +99,11 @@ class TaxaCondominialController
         }
 
         $competencia = $_GET['competencia'] ?? date('Y-m');
-        Roteador::redirecionar('/taxas?competencia=' . $competencia);
+        if ($unidadeId) {
+            Roteador::redirecionar("/taxas/unidade/{$unidadeId}?competencia={$competencia}");
+        } else {
+            Roteador::redirecionar('/taxas?competencia=' . $competencia);
+        }
     }
 
     public function listarMinhasTaxas(): void

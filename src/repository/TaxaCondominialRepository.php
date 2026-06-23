@@ -186,4 +186,79 @@ class TaxaCondominialRepository
         );
         return $stmt->fetch() ?: [];
     }
+
+    /** Resumo de uma competência específica */
+    public function resumoPorCompetencia(string $competencia): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT
+                COUNT(*) AS total,
+                SUM(status = "pago") AS total_pagas,
+                SUM(status = "pago" OR status = "isento") AS total_quitadas,
+                SUM(status = "vencido" OR (status = "pendente" AND vencimento < CURDATE())) AS total_atrasadas,
+                SUM(status = "pendente" AND vencimento >= CURDATE()) AS total_pendentes,
+                SUM(CASE WHEN status = "pago" THEN valor ELSE 0 END) AS valor_arrecadado
+             FROM taxas_condominiais
+             WHERE competencia = :competencia'
+        );
+        $stmt->execute([':competencia' => $competencia]);
+        return $stmt->fetch() ?: [];
+    }
+
+    /** Retorna uma linha por competência com totais — para o grid de meses */
+    public function listarCompetencias(): array
+    {
+        $stmt = $this->conexao->query(
+            'SELECT
+                competencia,
+                COUNT(*) AS total,
+                SUM(status = "pago") AS total_pagas,
+                SUM(status = "vencido" OR (status = "pendente" AND vencimento < CURDATE())) AS total_atrasadas,
+                SUM(status = "pendente" AND vencimento >= CURDATE()) AS total_pendentes,
+                SUM(CASE WHEN status = "pago" THEN valor ELSE 0 END) AS valor_arrecadado
+             FROM taxas_condominiais
+             GROUP BY competencia
+             ORDER BY competencia DESC'
+        );
+        return $stmt->fetchAll();
+    }
+
+    /** Unidades ativas com status da taxa condominial em uma competência (LEFT JOIN) */
+    public function listarUnidadesComStatusPorCompetencia(string $competencia): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT
+                u.id AS unidade_id,
+                CONCAT("Apto ", u.numero,
+                       IF(u.bloco IS NOT NULL, CONCAT(" — Bloco ", u.bloco), "")) AS identificacao_unidade,
+                tc.id        AS taxa_id,
+                tc.valor,
+                tc.vencimento,
+                tc.status,
+                tc.comprovante,
+                tc.data_pagamento
+             FROM unidades u
+             LEFT JOIN taxas_condominiais tc
+                    ON tc.unidade_id = u.id AND tc.competencia = :competencia
+             WHERE u.ativa = 1
+             ORDER BY u.bloco, u.numero'
+        );
+        $stmt->execute([':competencia' => $competencia]);
+        return $stmt->fetchAll();
+    }
+
+    public function buscarPorUnidadeECompetencia(int $unidadeId, string $competencia): ?TaxaCondominial
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT tc.*,
+                    CONCAT("Apto ", u.numero,
+                           IF(u.bloco IS NOT NULL, CONCAT(" — Bloco ", u.bloco), "")) AS identificacao_unidade
+             FROM taxas_condominiais tc
+             JOIN unidades u ON u.id = tc.unidade_id
+             WHERE tc.unidade_id = :unidade_id AND tc.competencia = :competencia LIMIT 1'
+        );
+        $stmt->execute([':unidade_id' => $unidadeId, ':competencia' => $competencia]);
+        $linha = $stmt->fetch();
+        return $linha ? TaxaCondominial::fromArray($linha) : null;
+    }
 }

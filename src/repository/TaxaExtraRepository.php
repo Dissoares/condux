@@ -82,6 +82,24 @@ class TaxaExtraRepository
         return $stmt->fetchAll();
     }
 
+    /** Taxas extras de uma unidade cujo vencimento cai no mês da competência */
+    public function listarPorUnidadeECompetencia(int $unidadeId, string $competencia): array
+    {
+        $stmt = $this->conexao->prepare(
+            'SELECT teu.*, te.nome, te.descricao, te.valor AS valor_original,
+                    te.vencimento, te.parcela, te.total_parcelas, te.projeto_id,
+                    p.nome AS nome_projeto
+             FROM taxas_extras_unidades teu
+             JOIN taxas_extras te ON te.id = teu.taxa_extra_id
+             LEFT JOIN projetos p ON p.id = te.projeto_id
+             WHERE teu.unidade_id = :unidade_id
+               AND DATE_FORMAT(te.vencimento, "%Y-%m") = :competencia
+             ORDER BY te.vencimento'
+        );
+        $stmt->execute([':unidade_id' => $unidadeId, ':competencia' => $competencia]);
+        return $stmt->fetchAll();
+    }
+
     /** @return array<int, array[]> indexado por unidade_id */
     public function listarTodasPorUnidadesAgrupadas(): array
     {
