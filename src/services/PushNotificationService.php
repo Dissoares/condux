@@ -26,7 +26,11 @@ class PushNotificationService
     {
         require_once RAIZ . '/vendor/autoload.php';
 
-        $keys = VAPID::createVapidKeys();
+        $keys = self::tentarGerarChaves();
+
+        if ($keys === null) {
+            throw new \RuntimeException('Não foi possível gerar as chaves VAPID. Verifique se o OpenSSL está instalado no servidor.');
+        }
 
         $conteudo = "<?php\nreturn [\n"
             . "    'public_key'  => '" . $keys['publicKey']  . "',\n"
@@ -36,6 +40,83 @@ class PushNotificationService
 
         file_put_contents(RAIZ . '/config/vapid.php', $conteudo);
         return $keys;
+    }
+
+    /** Tenta gerar VAPID via biblioteca e, se falhar, via CLI openssl (fallback para Windows/Laragon). */
+    private static function tentarGerarChaves(): ?array
+    {
+        // Tentativa 1: biblioteca (funciona em Linux/macOS/hosting padrão)
+        try {
+            return VAPID::createVapidKeys();
+        } catch (\Throwable $e) {
+            // Ignora — tenta via CLI abaixo
+        }
+
+        // Tentativa 2: openssl CLI (funciona no Windows/Laragon onde openssl_pkey_new() falha para EC)
+        return self::gerarChavesViaCli();
+    }
+
+    private static function gerarChavesViaCli(): ?array
+    {
+        $candidatos = [
+            'C:/laragon/bin/git/mingw64/bin/openssl.exe',
+            'C:/laragon/bin/git/usr/bin/openssl.exe',
+            '/usr/bin/openssl',
+            '/usr/local/bin/openssl',
+            'openssl',
+        ];
+
+        $opensslBin = null;
+        foreach ($candidatos as $bin) {
+            if ($bin === 'openssl' || (file_exists($bin) && is_executable($bin))) {
+                $opensslBin = $bin;
+                break;
+            }
+        }
+
+        if (!$opensslBin) {
+            return null;
+        }
+
+        $tmpdir  = rtrim(sys_get_temp_dir(), '/\\');
+        $privPem = $tmpdir . '/condux_vapid_' . uniqid() . '.pem';
+
+        try {
+            $cmd = '"' . $opensslBin . '" ecparam -name prime256v1 -genkey -noout -out "' . $privPem . '" 2>&1';
+            exec($cmd, $out, $code);
+
+            if ($code !== 0 || !file_exists($privPem)) {
+                return null;
+            }
+
+            $privKey = openssl_pkey_get_private(file_get_contents($privPem));
+            if (!$privKey) {
+                return null;
+            }
+
+            $details = openssl_pkey_get_details($privKey);
+            if (!$details || !isset($details['ec']['d'], $details['ec']['x'], $details['ec']['y'])) {
+                return null;
+            }
+
+            $d = str_pad($details['ec']['d'], 32, "\0", STR_PAD_LEFT);
+            $x = str_pad($details['ec']['x'], 32, "\0", STR_PAD_LEFT);
+            $y = str_pad($details['ec']['y'], 32, "\0", STR_PAD_LEFT);
+
+            return [
+                'publicKey'  => self::base64urlEncode("\x04" . $x . $y),
+                'privateKey' => self::base64urlEncode($d),
+            ];
+        } finally {
+            if (file_exists($privPem)) {
+                @unlink($privPem);
+            }
+        }
+    }
+
+    private static function base64urlEncode(string $data): string
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
     public function getPublicKey(): ?string

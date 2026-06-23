@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * @var bool          $statusConexao
  * @var bool          $statusBanco
@@ -32,151 +32,157 @@ $config = require RAIZ . '/config/banco.php';
 
   <!-- Resultado da última execução -->
   <?php if (!empty($resultadoExec)): ?>
-  <div class="card border-0 shadow-sm mb-4"><div class="card-body">
-    <h6 class="fw-semibold border-bottom pb-2 mb-3">Resultado da execução</h6>
-    <?php foreach ((array) $resultadoExec as $item):
-      if (!is_array($item)) continue;
-      $sucesso = (bool) ($item['sucesso'] ?? false);
-      $nome    = $item['nome'] ?? '—';
-      $erro    = $item['erro'] ?? null;
-    ?>
-      <div class="alert alert-<?= $sucesso ? 'success' : 'danger' ?> py-2 d-flex align-items-start gap-2 mb-2">
-        <i class="bi bi-<?= $sucesso ? 'check-circle-fill' : 'x-circle-fill' ?> flex-shrink-0 mt-1"></i>
-        <div>
-          <strong><?= htmlspecialchars($nome) ?></strong>
-          <?php if ($erro): ?>
-            <br><small><?= htmlspecialchars($erro) ?></small>
-          <?php endif; ?>
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h6 class="fw-semibold border-bottom pb-2 mb-3">Resultado da execução</h6>
+      <?php foreach ((array) $resultadoExec as $item):
+        if (!is_array($item)) continue;
+        $sucesso = (bool) ($item['sucesso'] ?? false);
+        $nome    = $item['nome'] ?? '—';
+        $erro    = $item['erro'] ?? null;
+      ?>
+        <div class="alert alert-<?= $sucesso ? 'success' : 'danger' ?> py-2 d-flex align-items-start gap-2 mb-2">
+          <i class="bi bi-<?= $sucesso ? 'check-circle-fill' : 'x-circle-fill' ?> flex-shrink-0 mt-1"></i>
+          <div>
+            <strong><?= htmlspecialchars($nome) ?></strong>
+            <?php if ($erro): ?>
+              <br><small><?= htmlspecialchars($erro) ?></small>
+            <?php endif; ?>
+          </div>
         </div>
-      </div>
-    <?php endforeach; ?>
+      <?php endforeach; ?>
+    </div>
   </div>
   <?php endif; ?>
 
   <!-- 1. Conexão MySQL -->
-  <div class="card border-0 shadow-sm mb-4"><div class="card-body">
-    <h6 class="fw-semibold border-bottom pb-2 mb-3">
-      <i class="bi bi-<?= $statusConexao ? 'check-circle-fill' : 'x-circle-fill' ?>"
-         style="color:<?= $statusConexao ? '#198754' : '#dc3545' ?>"></i>
-      Conexão MySQL
-    </h6>
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h6 class="fw-semibold border-bottom pb-2 mb-3">
+        <i class="bi bi-<?= $statusConexao ? 'check-circle-fill' : 'x-circle-fill' ?>"
+           style="color:<?= $statusConexao ? '#198754' : '#dc3545' ?>"></i>
+        Conexão MySQL
+      </h6>
 
-    <table style="width:100%; font-size:.875rem; border-collapse:collapse;">
-      <?php foreach (['host' => 'Host', 'porta' => 'Porta', 'usuario' => 'Usuário', 'banco' => 'Banco'] as $chave => $rotulo): ?>
-      <tr style="border-bottom:1px solid #f0f0f0;">
-        <td style="padding:.4rem .5rem; color:#6b7280; width:120px;"><?= $rotulo ?></td>
-        <td style="padding:.4rem .5rem; font-family:monospace;"><?= htmlspecialchars($config[$chave]) ?></td>
-      </tr>
-      <?php endforeach; ?>
-    </table>
+      <table style="width:100%; font-size:.875rem; border-collapse:collapse;">
+        <?php foreach (['host' => 'Host', 'porta' => 'Porta', 'usuario' => 'Usuário', 'banco' => 'Banco'] as $chave => $rotulo): ?>
+        <tr style="border-bottom:1px solid #f0f0f0;">
+          <td style="padding:.4rem .5rem; color:#6b7280; width:120px;"><?= $rotulo ?></td>
+          <td style="padding:.4rem .5rem; font-family:monospace;"><?= htmlspecialchars($config[$chave]) ?></td>
+        </tr>
+        <?php endforeach; ?>
+      </table>
 
-    <?php if (!$statusConexao): ?>
-      <div class="alert alert-danger d-flex align-items-center gap-2" style="margin-top:1rem;">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        Não foi possível conectar ao MySQL. Verifique as credenciais em <code>config/banco.php</code>.
-      </div>
-    <?php endif; ?>
+      <?php if (!$statusConexao): ?>
+        <div class="alert alert-danger d-flex align-items-center gap-2 mt-3">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          Não foi possível conectar ao MySQL. Verifique as credenciais em <code>config/banco.php</code>.
+        </div>
+      <?php endif; ?>
+    </div>
   </div>
 
   <!-- 2. Banco de dados -->
   <?php if ($statusConexao): ?>
-  <div class="card border-0 shadow-sm mb-4"><div class="card-body">
-    <h6 class="fw-semibold border-bottom pb-2 mb-3">
-      <i class="bi bi-<?= $statusBanco ? 'check-circle-fill' : 'x-circle-fill' ?>"
-         style="color:<?= $statusBanco ? '#198754' : '#dc3545' ?>"></i>
-      Banco de dados: <code><?= htmlspecialchars($config['banco']) ?></code>
-    </h6>
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h6 class="fw-semibold border-bottom pb-2 mb-3">
+        <i class="bi bi-<?= $statusBanco ? 'check-circle-fill' : 'x-circle-fill' ?>"
+           style="color:<?= $statusBanco ? '#198754' : '#dc3545' ?>"></i>
+        Banco de dados: <code><?= htmlspecialchars($config['banco']) ?></code>
+      </h6>
 
-    <?php if (!$statusBanco): ?>
-      <p style="color:#6b7280; font-size:.9rem; margin-bottom:1rem;">
-        O banco <strong><?= htmlspecialchars($config['banco']) ?></strong> não existe ainda.
-      </p>
-      <form action="<?= url('setup/criar-banco') ?>" method="POST">
-        <button type="submit" class="btn btn-primary">
-          <i class="bi bi-database-add"></i> Criar banco de dados
-        </button>
-      </form>
-    <?php else: ?>
-      <p style="color:#198754; font-size:.9rem;">
-        <i class="bi bi-check2"></i> Banco encontrado.
-      </p>
-    <?php endif; ?>
+      <?php if (!$statusBanco): ?>
+        <p style="color:#6b7280; font-size:.9rem; margin-bottom:1rem;">
+          O banco <strong><?= htmlspecialchars($config['banco']) ?></strong> não existe ainda.
+        </p>
+        <form action="<?= url('setup/criar-banco') ?>" method="POST">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-database-add"></i> Criar banco de dados
+          </button>
+        </form>
+      <?php else: ?>
+        <p class="mb-0" style="color:#198754; font-size:.9rem;">
+          <i class="bi bi-check2"></i> Banco encontrado.
+        </p>
+      <?php endif; ?>
+    </div>
   </div>
   <?php endif; ?>
 
   <!-- 3. Migrations -->
   <?php if ($statusBanco): ?>
-  <div class="card border-0 shadow-sm mb-4"><div class="card-body">
-    <div style="display:flex; justify-content:space-between; align-items:center;" class="fw-semibold border-bottom pb-2 mb-3">
-      <span>
-        <i class="bi bi-layers"></i> Migrations
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center fw-semibold border-bottom pb-2 mb-3">
+        <span>
+          <i class="bi bi-layers"></i> Migrations
+          <?php if ($temPendentes): ?>
+            <span class="badge rounded-pill badge-vencido ms-2">Pendentes</span>
+          <?php else: ?>
+            <span class="badge rounded-pill badge-pago ms-2">Em dia</span>
+          <?php endif; ?>
+        </span>
         <?php if ($temPendentes): ?>
-          <span class="badge rounded-pill badge-vencido" style="margin-left:.5rem;">Pendentes</span>
-        <?php else: ?>
-          <span class="badge rounded-pill badge-pago" style="margin-left:.5rem;">Em dia</span>
+        <form action="<?= url('setup/executar') ?>" method="POST" class="mb-0">
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-play-fill"></i> Executar pendentes
+          </button>
+        </form>
         <?php endif; ?>
-      </span>
+      </div>
 
-      <?php if ($temPendentes): ?>
-      <form action="<?= url('setup/executar') ?>" method="POST">
-        <button type="submit" class="btn btn-primary" style="font-size:.85rem;">
-          <i class="bi bi-play-fill"></i> Executar pendentes
-        </button>
-      </form>
+      <?php if (empty($migrations)): ?>
+        <p style="color:#6b7280; font-size:.9rem;">Nenhuma migration encontrada.</p>
+      <?php else: ?>
+        <table style="width:100%; font-size:.875rem; border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f8fafc;">
+              <th style="padding:.5rem .75rem; text-align:left; font-weight:600; color:#374151;">Arquivo</th>
+              <th style="padding:.5rem .75rem; text-align:left; font-weight:600; color:#374151;">Status</th>
+              <th style="padding:.5rem .75rem; text-align:left; font-weight:600; color:#374151;">Executada em</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($migrations as $m): ?>
+            <tr style="border-bottom:1px solid #f0f0f0;">
+              <td style="padding:.5rem .75rem; font-family:monospace; font-size:.82rem;">
+                <?= htmlspecialchars($m['nome']) ?>
+              </td>
+              <td style="padding:.5rem .75rem;">
+                <?php if ($m['executada']): ?>
+                  <span class="badge rounded-pill badge-pago">Executada</span>
+                <?php else: ?>
+                  <span class="badge rounded-pill badge-pendente">Pendente</span>
+                <?php endif; ?>
+              </td>
+              <td style="padding:.5rem .75rem; color:#6b7280; font-size:.82rem;">
+                <?= $m['executada_em'] ? date('d/m/Y H:i', strtotime($m['executada_em'])) : '—' ?>
+              </td>
+            </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
       <?php endif; ?>
     </div>
-
-    <?php if (empty($migrations)): ?>
-      <p style="color:#6b7280; font-size:.9rem;">Nenhuma migration encontrada.</p>
-    <?php else: ?>
-      <table style="width:100%; font-size:.875rem; border-collapse:collapse;">
-        <thead>
-          <tr style="background:#f8fafc;">
-            <th style="padding:.5rem .75rem; text-align:left; font-weight:600; color:#374151;">Arquivo</th>
-            <th style="padding:.5rem .75rem; text-align:left; font-weight:600; color:#374151;">Status</th>
-            <th style="padding:.5rem .75rem; text-align:left; font-weight:600; color:#374151;">Executada em</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($migrations as $m): ?>
-          <tr style="border-bottom:1px solid #f0f0f0;">
-            <td style="padding:.5rem .75rem; font-family:monospace; font-size:.82rem;">
-              <?= htmlspecialchars($m['nome']) ?>
-            </td>
-            <td style="padding:.5rem .75rem;">
-              <?php if ($m['executada']): ?>
-                <span class="badge rounded-pill badge-pago">Executada</span>
-              <?php else: ?>
-                <span class="badge rounded-pill badge-pendente">Pendente</span>
-              <?php endif; ?>
-            </td>
-            <td style="padding:.5rem .75rem; color:#6b7280; font-size:.82rem;">
-              <?= $m['executada_em'] ? date('d/m/Y H:i', strtotime($m['executada_em'])) : '—' ?>
-            </td>
-          </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-    <?php endif; ?>
   </div>
 
   <!-- Chaves VAPID para notificações push -->
   <?php if (!$temPendentes): ?>
-  <div style="border:1px solid #374151; border-radius:.75rem; padding:1.25rem; margin-bottom:1rem;">
-    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem;">
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body d-flex align-items-center justify-content-between gap-3 flex-wrap">
       <div>
-        <div style="color:#f9fafb; font-weight:600; font-size:.9rem;"><i class="bi bi-bell"></i> Notificações Push (PWA)</div>
-        <div style="color:#9ca3af; font-size:.78rem; margin-top:.2rem;">
+        <div class="fw-semibold mb-1"><i class="bi bi-bell"></i> Notificações Push (PWA)</div>
+        <div style="font-size:.85rem; color:#6b7280;">
           <?php if (file_exists(RAIZ . '/config/vapid.php')): ?>
-            <span style="color:#4ade80;">&#10003; Chaves VAPID geradas</span>
+            <span style="color:#198754;"><i class="bi bi-check-circle-fill"></i> Chaves VAPID geradas</span>
           <?php else: ?>
-            Gere as chaves VAPID para habilitar push notifications
+            Gere as chaves VAPID para habilitar push notifications.
           <?php endif; ?>
         </div>
       </div>
-      <form action="<?= url('setup/gerar-vapid') ?>" method="POST">
-        <button type="submit" class="btn btn-sm"
-                style="background:#374151; color:#f9fafb; font-size:.78rem;"
+      <form action="<?= url('setup/gerar-vapid') ?>" method="POST" class="mb-0">
+        <button type="submit" class="btn btn-secondary btn-sm"
                 onclick="return confirm('Regenerar chaves VAPID? Subscribers existentes precisarão se inscrever novamente.')">
           <i class="bi bi-key"></i>
           <?= file_exists(RAIZ . '/config/vapid.php') ? 'Regenerar chaves' : 'Gerar chaves VAPID' ?>
@@ -184,11 +190,9 @@ $config = require RAIZ . '/config/banco.php';
       </form>
     </div>
   </div>
-  <?php endif; ?>
 
   <!-- Link para o sistema após tudo ok -->
-  <?php if (!$temPendentes): ?>
-  <div style="text-align:center; padding:1.5rem;">
+  <div class="text-center py-3">
     <a href="<?= url('login') ?>" class="btn btn-primary" style="font-size:1rem; padding:.75rem 2rem;">
       <i class="bi bi-box-arrow-in-right"></i> Acessar o sistema
     </a>
