@@ -2,6 +2,13 @@
 /** @var Gestao[] $gestoes */
 $tituloPagina = 'Gestões';
 require_once RAIZ . '/views/layouts/cabecalho.php';
+
+$cargoCor = [
+    'sindico'     => ['border' => 'var(--bs-primary)',  'bg' => 'rgba(var(--bs-primary-rgb),.07)',  'label' => 'primary'],
+    'subsindico'  => ['border' => 'var(--bs-secondary)','bg' => 'rgba(var(--bs-secondary-rgb),.07)','label' => 'secondary'],
+    'conselheiro' => ['border' => '#6366f1',             'bg' => 'rgba(99,102,241,.07)',             'label' => 'info'],
+    'suplente'    => ['border' => 'var(--bs-warning)',   'bg' => 'rgba(var(--bs-warning-rgb),.07)', 'label' => 'warning'],
+];
 ?>
 
 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -35,8 +42,8 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
 <?php else: ?>
 
 <?php
-$ativas      = array_filter($gestoes, fn($g) => $g->ativa());
-$encerradas  = array_filter($gestoes, fn($g) => !$g->ativa());
+$ativas     = array_filter($gestoes, fn($g) => $g->ativa());
+$encerradas = array_filter($gestoes, fn($g) => !$g->ativa());
 ?>
 
 <?php if (!empty($ativas)): ?>
@@ -44,58 +51,39 @@ $encerradas  = array_filter($gestoes, fn($g) => !$g->ativa());
   Gestão atual
 </h6>
 <?php foreach ($ativas as $g): ?>
-<?php
-  $orgNiveis = [];
-  $oSindico  = $g->sindico();
-  $oSub      = $g->subsindico();
-  $oCons     = $g->conselheiros();
-  $oSupl     = $g->suplentes();
-  if ($oSindico) $orgNiveis[] = ['key' => 'sindico',     'list' => [$oSindico]];
-  if ($oSub)     $orgNiveis[] = ['key' => 'subsindico',  'list' => [$oSub]];
-  if ($oCons)    $orgNiveis[] = ['key' => 'conselheiro', 'list' => $oCons];
-  if ($oSupl)    $orgNiveis[] = ['key' => 'suplente',    'list' => $oSupl];
-?>
-  <div class="card border-0 shadow-sm mb-4" style="border-left:4px solid var(--condux-acento) !important;">
-    <div class="card-body">
+<div class="card border-0 shadow-sm mb-4" style="border-left:4px solid var(--condux-acento) !important;">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-1 flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <span class="fw-bold fs-6"><?= htmlspecialchars($g->descricao) ?></span>
+        <span class="badge bg-success bg-opacity-10 text-success fw-semibold" style="font-size:.7rem;">Ativa</span>
+      </div>
+      <a href="<?= url("gestoes/{$g->id}") ?>" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-pencil"></i> Editar
+      </a>
+    </div>
+    <p class="text-body-secondary mb-4" style="font-size:.82rem;">
+      <i class="bi bi-calendar3 me-1"></i><?= $g->periodo() ?>
+    </p>
 
-      <div class="d-flex align-items-center justify-content-between mb-1 flex-wrap gap-2">
-        <div class="d-flex align-items-center gap-2">
-          <span class="fw-bold fs-6"><?= htmlspecialchars($g->descricao) ?></span>
-          <span class="badge bg-success bg-opacity-10 text-success fw-semibold" style="font-size:.7rem;">Ativa</span>
+    <div class="gestao-grid">
+      <?php foreach ($g->membros as $m):
+        $c = $cargoCor[$m['cargo']] ?? $cargoCor['conselheiro'];
+        $rotulo = Gestao::$cargosRotulo[$m['cargo']] ?? $m['cargo'];
+        $inicial = strtoupper(mb_substr($m['nome'], 0, 1));
+      ?>
+      <div class="gestao-card" style="border-top:3px solid <?= $c['border'] ?>; background:<?= $c['bg'] ?>;">
+        <div class="gestao-avatar" style="border-color:<?= $c['border'] ?>; color:<?= $c['border'] ?>;">
+          <?= $inicial ?>
         </div>
-        <a href="<?= url("gestoes/{$g->id}") ?>" class="btn btn-outline-primary btn-sm">
-          <i class="bi bi-pencil"></i> Editar
-        </a>
+        <div class="gestao-cargo" style="color:<?= $c['border'] ?>;"><?= $rotulo ?></div>
+        <div class="gestao-nome"><?= htmlspecialchars($m['nome']) ?></div>
+        <div class="gestao-email"><?= htmlspecialchars($m['email']) ?></div>
       </div>
-      <p class="text-body-secondary mb-4" style="font-size:.82rem;">
-        <i class="bi bi-calendar3 me-1"></i><?= $g->periodo() ?>
-      </p>
-
-      <!-- Org chart -->
-      <div class="org-chart">
-        <?php foreach ($orgNiveis as $idx => $nivel): ?>
-
-          <?php if ($idx > 0): ?>
-          <div class="org-vline"></div>
-          <?php endif; ?>
-
-          <div class="org-row <?= count($nivel['list']) > 1 ? 'org-multi' : 'org-single' ?>">
-            <?php foreach ($nivel['list'] as $m): ?>
-            <div class="org-node org-node-<?= $nivel['key'] ?>">
-              <div class="org-card">
-                <span class="org-cargo"><?= Gestao::$cargosRotulo[$nivel['key']] ?></span>
-                <div class="org-nome"><?= htmlspecialchars($m['nome']) ?></div>
-                <div class="org-email"><?= htmlspecialchars($m['email']) ?></div>
-              </div>
-            </div>
-            <?php endforeach; ?>
-          </div>
-
-        <?php endforeach; ?>
-      </div>
-
+      <?php endforeach; ?>
     </div>
   </div>
+</div>
 <?php endforeach; ?>
 <?php endif; ?>
 
@@ -104,8 +92,9 @@ $encerradas  = array_filter($gestoes, fn($g) => !$g->ativa());
   Gestões anteriores
 </h6>
 <div class="d-flex flex-column gap-3">
-  <?php foreach ($encerradas as $g): ?>
-  <?php $sindico = $g->sindico(); ?>
+  <?php foreach ($encerradas as $g):
+    $sindico = $g->sindico();
+  ?>
   <div class="card border-0 shadow-sm">
     <div class="card-body py-3">
       <div class="d-flex align-items-center gap-3">
@@ -136,90 +125,42 @@ $encerradas  = array_filter($gestoes, fn($g) => !$g->ativa());
 <?php endif; ?>
 
 <style>
-/* ── Org Chart ─────────────────────────────────────────── */
-.org-chart {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-x: auto;
-  padding: 4px 0 8px;
+.gestao-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
 }
-
-.org-vline {
-  width: 2px;
-  height: 28px;
-  background: var(--bs-border-color);
-  flex-shrink: 0;
-}
-
-.org-row {
-  display: flex;
-  justify-content: center;
-}
-
-.org-node {
-  padding: 0 10px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.org-multi .org-node {
-  padding-top: 28px;
-}
-
-.org-multi .org-node::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: 28px;
-  background: var(--bs-border-color);
-}
-
-.org-multi .org-node:not(:only-child)::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  height: 2px;
-  background: var(--bs-border-color);
-}
-.org-multi .org-node:first-child:not(:only-child)::after { left: 50%;  right: -10px; }
-.org-multi .org-node:last-child:not(:only-child)::after  { left: -10px; right: 50%;  }
-.org-multi .org-node:not(:first-child):not(:last-child)::after { left: -10px; right: -10px; }
-
-.org-card {
-  border-radius: 10px;
-  padding: 10px 16px;
-  min-width: 138px;
-  max-width: 200px;
+.gestao-card {
+  border-radius: 12px;
+  padding: 20px 16px;
   text-align: center;
-  border: 1.5px solid var(--bs-border-color);
-  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
-.org-node-sindico    .org-card { border-color: var(--bs-primary);   background: rgba(var(--bs-primary-rgb),.07);   }
-.org-node-subsindico .org-card { border-color: var(--bs-secondary); background: rgba(var(--bs-secondary-rgb),.06); }
-.org-node-conselheiro .org-card { border-color: #6366f1;            background: rgba(99,102,241,.06);              }
-.org-node-suplente   .org-card { border-color: var(--bs-info);      background: rgba(var(--bs-info-rgb),.06);      }
-
-.org-cargo {
-  display: block;
-  font-size: .63rem;
+.gestao-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  background: var(--bs-body-bg);
+  margin-bottom: 4px;
+}
+.gestao-cargo {
+  font-size: .62rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .08em;
-  margin-bottom: 5px;
 }
-.org-node-sindico    .org-cargo { color: var(--bs-primary);          }
-.org-node-subsindico .org-cargo { color: var(--bs-secondary-emphasis);}
-.org-node-conselheiro .org-cargo { color: #6366f1;                   }
-.org-node-suplente   .org-cargo { color: var(--bs-info-emphasis);    }
-
-.org-nome  { font-weight: 600; font-size: .86rem; line-height: 1.3; }
-.org-email { font-size: .71rem; color: var(--bs-body-secondary); margin-top: 3px; }
+.gestao-nome  { font-weight: 600; font-size: .88rem; line-height: 1.3; color: var(--bs-body-color); }
+.gestao-email { font-size: .72rem; color: var(--bs-secondary-color); }
 </style>
 
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>
