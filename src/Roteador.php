@@ -423,6 +423,7 @@ class Roteador
         if ($seg[1] === 'pagar'  && $metodo === 'POST') { $ctrl->marcarPago(); return; }
 
         $id = (int) ($seg[1] ?? 0);
+        if ($id > 0 && $seg[2] === null)      { $_GET['id'] = $id; $ctrl->detalhe(); return; }
         if ($id > 0 && $seg[2] === 'excluir') {
             $_GET['id']   = $id;
             $_GET['comp'] = $_GET['comp'] ?? date('Y-m');

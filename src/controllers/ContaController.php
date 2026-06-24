@@ -29,6 +29,16 @@ class ContaController
         require RAIZ . '/views/admin/contas/lista.php';
     }
 
+    public function detalhe(): void
+    {
+        $id    = (int) ($_GET['id'] ?? 0);
+        $conta = $this->repo->buscarPorId($id);
+        if (!$conta) { http_response_code(404); echo 'Conta não encontrada.'; exit; }
+        $mensagem     = Sessao::lerFlash('sucesso');
+        $erroMensagem = Sessao::lerFlash('erro');
+        require RAIZ . '/views/admin/contas/detalhe.php';
+    }
+
     public function salvar(): void
     {
         $id         = (int) ($_POST['id'] ?? 0);

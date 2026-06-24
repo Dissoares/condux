@@ -183,7 +183,9 @@ $qtdAtrasadas  = (int)   ($totais['total_atrasadas'] ?? 0);
 <div class="d-md-none card border-0 shadow-sm overflow-hidden">
   <?php foreach ($contas as $i => $c): ?>
   <?php $atrasada = $c->estaAtrasada(); ?>
-  <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?> <?= $atrasada ? 'border-start border-danger border-3' : ($c->status === 'pago' ? 'border-start border-success border-3' : 'border-start border-warning border-3') ?>">
+  <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?> <?= $atrasada ? 'border-start border-danger border-3' : ($c->status === 'pago' ? 'border-start border-success border-3' : 'border-start border-warning border-3') ?>"
+       style="cursor:pointer;" onclick="window.location='<?= url('contas/' . $c->id) ?>'"
+       onmouseover="this.style.background='var(--bs-tertiary-bg)'" onmouseout="this.style.background=''">
     <div class="d-flex align-items-center gap-3">
 
       <!-- Ícone -->
@@ -219,7 +221,7 @@ $qtdAtrasadas  = (int)   ($totais['total_atrasadas'] ?? 0);
     </div>
 
     <!-- Ações -->
-    <div class="d-flex gap-2 mt-2 justify-content-end">
+    <div class="d-flex gap-2 mt-2 justify-content-end" onclick="event.stopPropagation()">
       <?php if ($c->anexo): ?>
         <a href="<?= url('uploads/' . $c->anexo) ?>" target="_blank"
            class="btn btn-outline-secondary btn-sm py-0 px-2" title="Comprovante">
@@ -271,7 +273,7 @@ $qtdAtrasadas  = (int)   ($totais['total_atrasadas'] ?? 0);
       <tbody>
         <?php foreach ($contas as $c): ?>
         <?php $atrasada = $c->estaAtrasada(); ?>
-        <tr class="conta-row">
+        <tr class="conta-row" style="cursor:pointer;" onclick="window.location='<?= url('contas/' . $c->id) ?>'"
           <td>
             <div class="cat-icon bg-<?= $c->corCategoria() ?>-subtle text-<?= $c->corCategoria() ?>-emphasis">
               <i class="bi <?= $c->iconeCategoria() ?>"></i>
@@ -308,7 +310,7 @@ $qtdAtrasadas  = (int)   ($totais['total_atrasadas'] ?? 0);
               </a>
             <?php endif; ?>
           </td>
-          <td>
+          <td onclick="event.stopPropagation()">
             <div class="d-flex gap-1 justify-content-end">
               <?php if ($c->status !== 'pago'): ?>
               <form action="<?= url('contas/pagar') ?>" method="POST" class="d-inline">
