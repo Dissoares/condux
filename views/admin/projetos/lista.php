@@ -57,7 +57,9 @@ $iconeStatus = [
 <!-- ── Mobile: cards ──────────────────────────────────── -->
 <div class="d-md-none card border-0 shadow-sm overflow-hidden">
   <?php foreach ($projetos as $i => $projeto): ?>
-  <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?>">
+  <a href="<?= url("projetos/{$projeto->id}") ?>"
+     class="d-block px-3 py-3 text-decoration-none text-body <?= $i > 0 ? 'border-top' : '' ?>"
+     onmouseover="this.style.background='var(--bs-tertiary-bg)'" onmouseout="this.style.background=''">
     <div class="d-flex align-items-start gap-3">
 
       <!-- Ícone de status -->
@@ -96,13 +98,7 @@ $iconeStatus = [
       </div>
     </div>
 
-    <!-- Botão ver -->
-    <div class="mt-2 d-flex justify-content-end">
-      <a href="<?= url("projetos/{$projeto->id}") ?>" class="btn btn-outline-secondary btn-sm py-1 px-3">
-        <i class="bi bi-eye me-1"></i> Ver detalhes
-      </a>
-    </div>
-  </div>
+  </a>
   <?php endforeach; ?>
 </div>
 
@@ -122,7 +118,7 @@ $iconeStatus = [
       </thead>
       <tbody>
         <?php foreach ($projetos as $projeto): ?>
-        <tr>
+        <tr style="cursor:pointer;" onclick="window.location='<?= url("projetos/{$projeto->id}") ?>'">
           <td>
             <span class="fw-semibold"><?= htmlspecialchars($projeto->nome) ?></span>
             <?php if ($projeto->idealizador): ?>
@@ -137,7 +133,7 @@ $iconeStatus = [
               <?= htmlspecialchars($projeto->rotuloStatus()) ?>
             </span>
           </td>
-          <td>
+          <td class="text-end" onclick="event.stopPropagation()">
             <a href="<?= url("projetos/{$projeto->id}") ?>" class="btn btn-outline-secondary btn-sm">
               <i class="bi bi-eye"></i> Ver
             </a>
