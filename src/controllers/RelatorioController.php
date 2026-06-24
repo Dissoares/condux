@@ -105,8 +105,8 @@ class RelatorioController
                 $r['total_unidades'],
                 $r['total_pagas'],
                 $r['total_inadimplentes'],
-                number_format($r['total_cobrado'], 2, ',', '.'),
-                number_format($r['total_pago'], 2, ',', '.'),
+                number_format((float)$r['total_cobrado'], 2, ',', '.'),
+                number_format((float)$r['total_pago'], 2, ',', '.'),
                 $pct . '%',
             ];
         }
@@ -124,10 +124,10 @@ class RelatorioController
             [$a, $m] = explode('-', $r['competencia']);
             $linhas[] = [
                 ($meses[(int)$m] ?? $m) . '/' . $a,
-                number_format($r['arrecadado'], 2, ',', '.'),
-                number_format($r['despesas'],   2, ',', '.'),
-                number_format($r['folha'],       2, ',', '.'),
-                number_format($r['saldo'],       2, ',', '.'),
+                number_format((float)$r['arrecadado'], 2, ',', '.'),
+                number_format((float)$r['despesas'],   2, ',', '.'),
+                number_format((float)$r['folha'],       2, ',', '.'),
+                number_format((float)$r['saldo'],       2, ',', '.'),
             ];
         }
         return [$cab, $linhas, "balancete_{$ano}.csv"];
@@ -142,7 +142,7 @@ class RelatorioController
             $linhas[] = [
                 $r['unidade'],
                 $r['responsavel'] ?? '',
-                number_format($r['valor'], 2, ',', '.'),
+                number_format((float)$r['valor'], 2, ',', '.'),
                 $r['vencimento'] ? date('d/m/Y', strtotime($r['vencimento'])) : '',
                 $r['dias_atraso'] > 0 ? $r['dias_atraso'] : 0,
                 ucfirst($r['status']),
@@ -162,7 +162,7 @@ class RelatorioController
                 $r['descricao'],
                 $r['categoria'],
                 $r['fornecedor'] ?? '',
-                number_format($r['valor'], 2, ',', '.'),
+                number_format((float)$r['valor'], 2, ',', '.'),
                 $r['data_vencimento'] ? date('d/m/Y', strtotime($r['data_vencimento'])) : '',
                 $r['data_pagamento']  ? date('d/m/Y', strtotime($r['data_pagamento']))  : '',
                 ucfirst($r['status']),
@@ -181,7 +181,7 @@ class RelatorioController
                 $r['competencia'],
                 $r['nome'],
                 $r['cargo'],
-                number_format($r['valor'], 2, ',', '.'),
+                number_format((float)$r['valor'], 2, ',', '.'),
                 ucfirst($r['status']),
                 $r['data_pagamento'] ? date('d/m/Y', strtotime($r['data_pagamento'])) : '',
             ];
@@ -197,7 +197,7 @@ class RelatorioController
         foreach ($dados as $r) {
             $linhas[] = [
                 $r['competencia'],
-                number_format($r['valor'], 2, ',', '.'),
+                number_format((float)$r['valor'], 2, ',', '.'),
                 $r['vencimento']     ? date('d/m/Y', strtotime($r['vencimento']))     : '',
                 $r['data_pagamento'] ? date('d/m/Y', strtotime($r['data_pagamento'])) : '',
                 ucfirst($r['status']),
