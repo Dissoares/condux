@@ -197,6 +197,11 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
           <i class="bi bi-speedometer2"></i> Painel
         </a>
       </li>
+      <li class="nav-item">
+        <a href="<?= url('comunicados') ?>" class="nav-link <?= $segAtivo === 'comunicados' ? 'ativo' : '' ?>">
+          <i class="bi bi-megaphone"></i> Comunicados
+        </a>
+      </li>
       <?php if ($ehAdmin): ?>
       <li class="nav-item">
         <a href="<?= url('tickets') ?>" class="nav-link <?= $segAtivo === 'tickets' ? 'ativo' : '' ?>">
@@ -204,11 +209,6 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
         </a>
       </li>
       <?php endif; ?>
-      <li class="nav-item">
-        <a href="<?= url('comunicados') ?>" class="nav-link <?= $segAtivo === 'comunicados' ? 'ativo' : '' ?>">
-          <i class="bi bi-megaphone"></i> Comunicados
-        </a>
-      </li>
 
       <?php if ($ehAdmin): ?>
 
