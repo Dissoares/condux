@@ -225,7 +225,7 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
       </li>
       <li class="nav-item">
         <a href="<?= url('gestoes') ?>" class="nav-link <?= $segAtivo === 'gestoes' ? 'ativo' : '' ?>">
-          <i class="bi bi-person-badge"></i> Gestões
+          <i class="bi bi-person-badge"></i> Administração
         </a>
       </li>
       <li class="nav-item">
