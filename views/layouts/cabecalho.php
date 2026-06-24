@@ -228,6 +228,11 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
           <i class="bi bi-person-badge"></i> Gestões
         </a>
       </li>
+      <li class="nav-item">
+        <a href="<?= url('funcionarios') ?>" class="nav-link <?= $segAtivo === 'funcionarios' ? 'ativo' : '' ?>">
+          <i class="bi bi-person-badge"></i> Funcionários
+        </a>
+      </li>
 
       <p class="condux-nav-label">Financeiro</p>
       <li class="nav-item">
@@ -260,11 +265,6 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
       <li class="nav-item">
         <a href="<?= url('prestadoras') ?>" class="nav-link <?= $segAtivo === 'prestadoras' ? 'ativo' : '' ?>">
           <i class="bi bi-building"></i> Prestadoras
-        </a>
-      </li>
-      <li class="nav-item">
-        <a href="<?= url('funcionarios') ?>" class="nav-link <?= $segAtivo === 'funcionarios' ? 'ativo' : '' ?>">
-          <i class="bi bi-person-badge"></i> Funcionários
         </a>
       </li>
       <li class="nav-item">
