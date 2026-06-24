@@ -238,7 +238,7 @@ class TaxaCondominialRepository
         return $stmt->fetchAll();
     }
 
-    /** @return array<int, TaxaCondominial[]> indexado por unidade_id */
+    /** @return array<int, TaxaCondominial[]> indexado por unidade_id — últimos 24 meses */
     public function listarTodasAgrupadasPorUnidade(): array
     {
         $stmt = $this->conexao->query(
@@ -246,6 +246,7 @@ class TaxaCondominialRepository
                     CONCAT("Apto ", u.numero, IF(u.bloco IS NOT NULL, CONCAT(" — Bloco ", u.bloco), "")) AS identificacao_unidade
              FROM taxas_condominiais tc
              JOIN unidades u ON u.id = tc.unidade_id
+             WHERE tc.competencia >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 24 MONTH), \'%Y-%m\')
              ORDER BY tc.competencia DESC'
         );
         $agrupadas = [];

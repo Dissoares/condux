@@ -100,7 +100,7 @@ class TaxaExtraRepository
         return $stmt->fetchAll();
     }
 
-    /** @return array<int, array[]> indexado por unidade_id */
+    /** @return array<int, array[]> indexado por unidade_id — últimos 24 meses */
     public function listarTodasPorUnidadesAgrupadas(): array
     {
         $stmt = $this->conexao->query(
@@ -110,6 +110,7 @@ class TaxaExtraRepository
              FROM taxas_extras_unidades teu
              JOIN taxas_extras te ON te.id = teu.taxa_extra_id
              LEFT JOIN projetos p ON p.id = te.projeto_id
+             WHERE te.vencimento >= DATE_SUB(NOW(), INTERVAL 24 MONTH)
              ORDER BY te.vencimento DESC'
         );
         $agrupadas = [];

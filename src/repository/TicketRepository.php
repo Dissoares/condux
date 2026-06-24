@@ -19,16 +19,27 @@ class TicketRepository
         $sql = 'SELECT t.*,
                        u.nome AS nome_usuario, u.foto AS foto_usuario,
                        r.nome AS nome_responsavel,
-                       (SELECT COUNT(*) FROM ticket_mensagens WHERE ticket_id = t.id) AS total_mensagens,
-                       (SELECT u2.perfil
-                        FROM ticket_mensagens tm2
-                        JOIN usuarios u2 ON u2.id = tm2.usuario_id
-                        WHERE tm2.ticket_id = t.id AND tm2.interno = 0
-                        ORDER BY tm2.criado_em DESC LIMIT 1
-                       ) AS perfil_ultima_msg
+                       COALESCE(msg_count.total, 0) AS total_mensagens,
+                       ultima_msg.perfil AS perfil_ultima_msg
                 FROM tickets t
                 JOIN usuarios u ON u.id = t.usuario_id
                 LEFT JOIN usuarios r ON r.id = t.responsavel_id
+                LEFT JOIN (
+                    SELECT ticket_id, COUNT(*) AS total
+                    FROM ticket_mensagens
+                    GROUP BY ticket_id
+                ) AS msg_count ON msg_count.ticket_id = t.id
+                LEFT JOIN (
+                    SELECT tm.ticket_id, u2.perfil
+                    FROM ticket_mensagens tm
+                    JOIN usuarios u2 ON u2.id = tm.usuario_id
+                    JOIN (
+                        SELECT ticket_id, MAX(id) AS max_id
+                        FROM ticket_mensagens
+                        WHERE interno = 0
+                        GROUP BY ticket_id
+                    ) AS last_pub ON last_pub.ticket_id = tm.ticket_id AND last_pub.max_id = tm.id
+                ) AS ultima_msg ON ultima_msg.ticket_id = t.id
                 WHERE ' . implode(' AND ', $where) . '
                 ORDER BY
                   FIELD(t.status,"aberto","em_andamento","resolvido","fechado"),
@@ -46,16 +57,27 @@ class TicketRepository
             'SELECT t.*,
                     u.nome AS nome_usuario, u.foto AS foto_usuario,
                     r.nome AS nome_responsavel,
-                    (SELECT COUNT(*) FROM ticket_mensagens WHERE ticket_id = t.id) AS total_mensagens,
-                    (SELECT u2.perfil
-                     FROM ticket_mensagens tm2
-                     JOIN usuarios u2 ON u2.id = tm2.usuario_id
-                     WHERE tm2.ticket_id = t.id AND tm2.interno = 0
-                     ORDER BY tm2.criado_em DESC LIMIT 1
-                    ) AS perfil_ultima_msg
+                    COALESCE(msg_count.total, 0) AS total_mensagens,
+                    ultima_msg.perfil AS perfil_ultima_msg
              FROM tickets t
              JOIN usuarios u ON u.id = t.usuario_id
              LEFT JOIN usuarios r ON r.id = t.responsavel_id
+             LEFT JOIN (
+                 SELECT ticket_id, COUNT(*) AS total
+                 FROM ticket_mensagens
+                 GROUP BY ticket_id
+             ) AS msg_count ON msg_count.ticket_id = t.id
+             LEFT JOIN (
+                 SELECT tm.ticket_id, u2.perfil
+                 FROM ticket_mensagens tm
+                 JOIN usuarios u2 ON u2.id = tm.usuario_id
+                 JOIN (
+                     SELECT ticket_id, MAX(id) AS max_id
+                     FROM ticket_mensagens
+                     WHERE interno = 0
+                     GROUP BY ticket_id
+                 ) AS last_pub ON last_pub.ticket_id = tm.ticket_id AND last_pub.max_id = tm.id
+             ) AS ultima_msg ON ultima_msg.ticket_id = t.id
              WHERE t.usuario_id = :uid
              ORDER BY t.atualizado_em DESC'
         );
