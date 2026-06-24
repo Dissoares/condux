@@ -106,7 +106,7 @@ function rotuloBadgeStatus(string $status): string {
         </div>
         <div>
           <div class="fw-black" style="font-size:1.45rem;line-height:1;"><?= $totalMoradores ?></div>
-          <div class="text-body-secondary" style="font-size:.75rem;">Moradore<?= $totalMoradores !== 1 ? 's' : '' ?></div>
+          <div class="text-body-secondary" style="font-size:.75rem;">Morador<?= $totalMoradores !== 1 ? 'es' : '' ?></div>
         </div>
       </div>
     </div>
