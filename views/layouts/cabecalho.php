@@ -252,7 +252,7 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
       </li>
       <li class="nav-item">
         <a href="<?= url('contas') ?>" class="nav-link <?= $segAtivo === 'contas' ? 'ativo' : '' ?>">
-          <i class="bi bi-receipt"></i> Contas
+          <i class="bi bi-receipt"></i> Despesas
         </a>
       </li>
 
