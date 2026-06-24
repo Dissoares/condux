@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 require_once RAIZ . '/src/repository/PrestadoraRepository.php';
+require_once RAIZ . '/src/repository/ProjetoRepository.php';
+require_once RAIZ . '/src/repository/VistoriaRepository.php';
 
 class PrestadoraController
 {
@@ -21,6 +23,19 @@ class PrestadoraController
         $mensagem     = Sessao::lerFlash('sucesso');
         $erroMensagem = Sessao::lerFlash('erro');
         require RAIZ . '/views/admin/prestadoras/lista.php';
+    }
+
+    public function detalhe(): void
+    {
+        $id         = (int) ($_GET['id'] ?? 0);
+        $prestadora = $this->repo->buscarPorId($id);
+        if (!$prestadora) { http_response_code(404); echo 'Prestadora não encontrada.'; exit; }
+
+        $projetos  = (new ProjetoRepository(Conexao::obter()))->listarPorPrestadora($id);
+        $vistorias = (new VistoriaRepository(Conexao::obter()))->listarPorPrestadora($id);
+        $mensagem     = Sessao::lerFlash('sucesso');
+        $erroMensagem = Sessao::lerFlash('erro');
+        require RAIZ . '/views/admin/prestadoras/detalhe.php';
     }
 
     public function formulario(): void

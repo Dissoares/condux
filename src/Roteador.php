@@ -346,6 +346,7 @@ class Roteador
         if ($seg[1] === 'salvar' && $metodo === 'POST')    { $ctrl->salvar();    return; }
 
         $id = (int) $seg[1];
+        if ($seg[2] === null)      { $_GET['id'] = $id; $ctrl->detalhe();    return; }
         if ($seg[2] === 'editar')  { $_GET['id'] = $id; $ctrl->formulario(); return; }
         if ($seg[2] === 'excluir') { $_GET['id'] = $id; $ctrl->excluir();    return; }
         self::naoEncontrado();
