@@ -273,7 +273,7 @@ $qtdAtrasadas  = (int)   ($totais['total_atrasadas'] ?? 0);
       <tbody>
         <?php foreach ($contas as $c): ?>
         <?php $atrasada = $c->estaAtrasada(); ?>
-        <tr class="conta-row" style="cursor:pointer;" onclick="window.location='<?= url('contas/' . $c->id) ?>'"
+        <tr class="conta-row" style="cursor:pointer;" onclick="window.location='<?= url('contas/' . $c->id) ?>'">
           <td>
             <div class="cat-icon bg-<?= $c->corCategoria() ?>-subtle text-<?= $c->corCategoria() ?>-emphasis">
               <i class="bi <?= $c->iconeCategoria() ?>"></i>

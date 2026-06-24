@@ -19,17 +19,24 @@ else                               { $badgeClass = 'badge-pendente';$badgeLabel 
 
 $isImg = $conta->anexo && preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $conta->anexo);
 $isPdf = $conta->anexo && preg_match('/\.pdf$/i', $conta->anexo);
+$temAnexo = (bool) $conta->anexo;
 ?>
 
-<div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
+<!-- Header -->
+<div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
   <a href="<?= url('contas?comp=' . $conta->competencia) ?>" class="btn btn-outline-secondary btn-sm py-1 px-2">
     <i class="bi bi-chevron-left"></i>
   </a>
-  <div class="flex-grow-1">
-    <h4 class="fw-semibold mb-0"><?= htmlspecialchars($conta->descricao) ?></h4>
-    <span class="text-body-secondary" style="font-size:.82rem;"><?= $nomeComp ?></span>
+  <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0">
+    <div class="cat-icon bg-<?= $conta->corCategoria() ?>-subtle text-<?= $conta->corCategoria() ?>-emphasis flex-shrink-0">
+      <i class="bi <?= $conta->iconeCategoria() ?>"></i>
+    </div>
+    <div class="min-w-0">
+      <h4 class="fw-semibold mb-0 text-truncate"><?= htmlspecialchars($conta->descricao) ?></h4>
+      <span class="text-body-secondary" style="font-size:.82rem;"><?= $nomeComp ?></span>
+    </div>
   </div>
-  <span class="badge rounded-pill <?= $badgeClass ?>"><?= $badgeLabel ?></span>
+  <span class="badge rounded-pill <?= $badgeClass ?> flex-shrink-0"><?= $badgeLabel ?></span>
 </div>
 
 <?php if ($mensagem): ?>
@@ -45,17 +52,10 @@ $isPdf = $conta->anexo && preg_match('/\.pdf$/i', $conta->anexo);
 
 <div class="row g-4">
 
-  <!-- ── Coluna esquerda: dados + ações ── -->
-  <div class="col-lg-5">
+  <!-- ── Coluna de dados ── -->
+  <div class="<?= $temAnexo ? 'col-lg-5' : 'col-md-8 col-xl-6' ?>">
 
-    <!-- Card de dados -->
     <div class="card border-0 shadow-sm mb-3">
-      <div class="card-header bg-transparent fw-semibold py-3 d-flex align-items-center gap-2">
-        <div class="cat-icon bg-<?= $conta->corCategoria() ?>-subtle text-<?= $conta->corCategoria() ?>-emphasis">
-          <i class="bi <?= $conta->iconeCategoria() ?>"></i>
-        </div>
-        <?= $conta->rotuloCategoria() ?>
-      </div>
       <div class="card-body p-0">
         <?php
         $linhas = [
@@ -74,7 +74,7 @@ $isPdf = $conta->anexo && preg_match('/\.pdf$/i', $conta->anexo);
         ?>
         <?php foreach ($linhas as [$label, $valor]): ?>
         <div class="d-flex border-bottom px-3 py-2" style="font-size:.875rem;">
-          <dt class="fw-normal text-body-secondary me-3" style="min-width:110px;"><?= $label ?></dt>
+          <dt class="fw-normal text-body-secondary me-3 flex-shrink-0" style="min-width:110px;"><?= $label ?></dt>
           <dd class="mb-0"><?= $valor ?></dd>
         </div>
         <?php endforeach; ?>
@@ -95,7 +95,7 @@ $isPdf = $conta->anexo && preg_match('/\.pdf$/i', $conta->anexo);
       </form>
       <?php endif; ?>
 
-      <?php if (!$conta->anexo): ?>
+      <?php if (!$temAnexo): ?>
       <form action="<?= url('contas/salvar') ?>" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="id"          value="<?= $conta->id ?>">
         <input type="hidden" name="descricao"   value="<?= htmlspecialchars($conta->descricao) ?>">
@@ -124,9 +124,9 @@ $isPdf = $conta->anexo && preg_match('/\.pdf$/i', $conta->anexo);
     </div>
   </div>
 
-  <!-- ── Coluna direita: anexo ── -->
+  <!-- ── Coluna de anexo (só quando existe) ── -->
+  <?php if ($temAnexo): ?>
   <div class="col-lg-7">
-    <?php if ($conta->anexo): ?>
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-transparent fw-semibold py-3 d-flex align-items-center justify-content-between">
         <span><i class="bi bi-paperclip me-1"></i> Comprovante</span>
@@ -154,16 +154,8 @@ $isPdf = $conta->anexo && preg_match('/\.pdf$/i', $conta->anexo);
         <?php endif; ?>
       </div>
     </div>
-    <?php else: ?>
-    <div class="card border-0 shadow-sm">
-      <div class="card-body text-center py-5 text-body-secondary">
-        <i class="bi bi-paperclip fs-1 opacity-25 d-block mb-2"></i>
-        <p class="mb-0">Nenhum comprovante anexado.</p>
-        <p class="mb-0" style="font-size:.82rem;">Use o campo ao lado para adicionar.</p>
-      </div>
-    </div>
-    <?php endif; ?>
   </div>
+  <?php endif; ?>
 
 </div>
 

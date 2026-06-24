@@ -37,6 +37,13 @@ foreach (array_keys($porBloco) as $nb) {
         : $paletaBlocos[$indiceCor++ % count($paletaBlocos)];
 }
 
+// Totalizadores
+$totalBlocos        = count(array_filter(array_unique(array_map(fn($u) => $u->bloco, $unidades))));
+$totalMoradores     = array_sum(array_map(fn($list) => count($list), $moradoresPorUnidade));
+$totalAlugadas      = count(array_filter($unidades, fn($u) => $u->estaAlugada()));
+$totalProprias      = count($unidades) - $totalAlugadas;
+$totalInadimplentes = count(array_filter($unidades, fn($u) => ($u->qtdAtrasadas ?? 0) > 0));
+
 function rotuloBadgeStatus(string $status): string {
     return match($status) {
         'pago'    => 'Pago',
@@ -49,16 +56,97 @@ function rotuloBadgeStatus(string $status): string {
 ?>
 
 <div class="d-flex align-items-center justify-content-between mb-4">
-  <div>
-    <h4 class="fw-semibold mb-0"><i class="bi bi-building text-primary"></i> Unidades</h4>
-    <p class="text-body-secondary mb-0 mt-1" style="font-size:.85rem;">
-      <?= count($unidades) ?> unidade<?= count($unidades) !== 1 ? 's' : '' ?> cadastrada<?= count($unidades) !== 1 ? 's' : '' ?>
-    </p>
-  </div>
+  <h4 class="fw-semibold mb-0"><i class="bi bi-building text-primary"></i> Unidades</h4>
   <a href="<?= url('unidades/nova') ?>" class="btn btn-primary">
     <i class="bi bi-plus-lg"></i> Nova unidade
   </a>
 </div>
+
+<?php if (!empty($unidades)): ?>
+<div class="row g-3 mb-4">
+
+  <div class="col-6 col-md">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body py-3 px-3 d-flex align-items-center gap-3">
+        <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0 bg-primary bg-opacity-10 text-primary"
+             style="width:40px;height:40px;font-size:1.1rem;">
+          <i class="bi bi-building"></i>
+        </div>
+        <div>
+          <div class="fw-black" style="font-size:1.45rem;line-height:1;"><?= count($unidades) ?></div>
+          <div class="text-body-secondary" style="font-size:.75rem;">Unidades</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <?php if ($totalBlocos > 0): ?>
+  <div class="col-6 col-md">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body py-3 px-3 d-flex align-items-center gap-3">
+        <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0 bg-primary bg-opacity-10 text-primary"
+             style="width:40px;height:40px;font-size:1.1rem;">
+          <i class="bi bi-grid-3x3-gap"></i>
+        </div>
+        <div>
+          <div class="fw-black" style="font-size:1.45rem;line-height:1;"><?= $totalBlocos ?></div>
+          <div class="text-body-secondary" style="font-size:.75rem;">Bloco<?= $totalBlocos !== 1 ? 's' : '' ?></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
+
+  <div class="col-6 col-md">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body py-3 px-3 d-flex align-items-center gap-3">
+        <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0 bg-success bg-opacity-10 text-success"
+             style="width:40px;height:40px;font-size:1.1rem;">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div>
+          <div class="fw-black" style="font-size:1.45rem;line-height:1;"><?= $totalMoradores ?></div>
+          <div class="text-body-secondary" style="font-size:.75rem;">Moradore<?= $totalMoradores !== 1 ? 's' : '' ?></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body py-3 px-3 d-flex align-items-center gap-3">
+        <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0 bg-warning bg-opacity-10 text-warning-emphasis"
+             style="width:40px;height:40px;font-size:1.1rem;">
+          <i class="bi bi-key-fill"></i>
+        </div>
+        <div>
+          <div class="fw-black" style="font-size:1.45rem;line-height:1;"><?= $totalAlugadas ?></div>
+          <div class="text-body-secondary" style="font-size:.75rem;">Alugada<?= $totalAlugadas !== 1 ? 's' : '' ?></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md">
+    <div class="card border-0 shadow-sm h-100"
+         style="<?= $totalInadimplentes > 0 ? 'border-left:3px solid var(--bs-danger)!important;' : '' ?>">
+      <div class="card-body py-3 px-3 d-flex align-items-center gap-3">
+        <div class="rounded-2 d-flex align-items-center justify-content-center flex-shrink-0
+                    <?= $totalInadimplentes > 0 ? 'bg-danger bg-opacity-10 text-danger' : 'bg-secondary bg-opacity-10 text-secondary' ?>"
+             style="width:40px;height:40px;font-size:1.1rem;">
+          <i class="bi bi-exclamation-triangle<?= $totalInadimplentes > 0 ? '-fill' : '' ?>"></i>
+        </div>
+        <div>
+          <div class="fw-black <?= $totalInadimplentes > 0 ? 'text-danger' : '' ?>"
+               style="font-size:1.45rem;line-height:1;"><?= $totalInadimplentes ?></div>
+          <div class="text-body-secondary" style="font-size:.75rem;">Inadimplente<?= $totalInadimplentes !== 1 ? 's' : '' ?></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<?php endif; ?>
 
 <?php if ($mensagem): ?>
   <div class="alert alert-success d-flex align-items-center gap-2">

@@ -305,11 +305,13 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
           <i class="bi bi-megaphone"></i> Comunicados
         </a>
       </li>
+      <?php /* Transparência — desativado temporariamente
       <li class="nav-item">
         <a href="<?= url('transparencia') ?>" class="nav-link <?= $segAtivo === 'transparencia' ? 'ativo' : '' ?>">
           <i class="bi bi-eye"></i> Transparência
         </a>
       </li>
+      */ ?>
       <li class="nav-item">
         <a href="<?= url('tickets') ?>" class="nav-link <?= $segAtivo === 'tickets' ? 'ativo' : '' ?>">
           <i class="bi bi-ticket-perforated"></i> Tickets
@@ -422,10 +424,12 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
     <i class="bi bi-receipt"></i>
     <span>Taxas</span>
   </a>
+  <?php /* Transparência — desativado temporariamente
   <a href="<?= url('transparencia') ?>" class="condux-bnav-item <?= $segAtivo === 'transparencia' ? 'ativo' : '' ?>">
     <i class="bi bi-eye"></i>
     <span>Transparência</span>
   </a>
+  */ ?>
   <button class="condux-bnav-item" id="conduxMaisBtn" aria-label="Mais opções">
     <i class="bi bi-grid"></i>
     <span>Mais</span>
