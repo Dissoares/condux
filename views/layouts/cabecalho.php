@@ -272,11 +272,6 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
           <i class="bi bi-ticket-perforated"></i> Tickets
         </a>
       </li>
-      <li class="nav-item">
-        <a href="<?= url('configuracoes') ?>" class="nav-link <?= $segAtivo === 'configuracoes' ? 'ativo' : '' ?>">
-          <i class="bi bi-gear"></i> Configurações
-        </a>
-      </li>
 
       <p class="condux-nav-label">Análises</p>
       <li class="nav-item">
@@ -380,6 +375,12 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
       <?php if ($_badgeTicket > 0): ?>
         <span class="condux-badge-sino"><?= $_badgeTicket > 9 ? '9+' : $_badgeTicket ?></span>
       <?php endif; ?>
+    </a>
+    <?php endif; ?>
+    <?php if ($ehAdmin): ?>
+    <a href="<?= url('configuracoes') ?>" title="Configurações"
+       style="color:rgba(255,255,255,.6); font-size:1rem; <?= $segAtivo === 'configuracoes' ? 'color:var(--condux-acento)!important;' : '' ?>">
+      <i class="bi bi-gear<?= $segAtivo === 'configuracoes' ? '-fill' : '' ?>"></i>
     </a>
     <?php endif; ?>
     <a href="<?= url('sair') ?>" title="Sair" style="color:rgba(255,255,255,.6); font-size:1rem;">
