@@ -65,15 +65,16 @@ class PrestadoraController
         if ($prestadora->nome === '') {
             Sessao::flash('erro', 'O nome da empresa é obrigatório.');
             Roteador::redirecionar($id > 0 ? "/prestadoras/{$id}/editar" : '/prestadoras/nova');
+            return;
         }
 
         try {
             $salvoId = $this->repo->salvar($prestadora);
-            Sessao::flash('sucesso', 'Empresa salva com sucesso.');
-            Roteador::redirecionar("/prestadoras/{$salvoId}/editar");
+            Sessao::flash('sucesso', $id > 0 ? 'Empresa atualizada com sucesso.' : 'Empresa cadastrada com sucesso.');
+            Roteador::redirecionar($id > 0 ? "/prestadoras/{$salvoId}/editar" : '/prestadoras');
         } catch (PDOException $e) {
             Sessao::flash('erro', 'Erro ao salvar: ' . $e->getMessage());
-            Roteador::redirecionar('/prestadoras');
+            Roteador::redirecionar($id > 0 ? "/prestadoras/{$id}/editar" : '/prestadoras/nova');
         }
     }
 
