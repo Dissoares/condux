@@ -65,7 +65,16 @@ class ContaController
 
         // Upload de anexo (criação ou edição sem anexo ainda)
         if (!empty($_FILES['anexo']) && $_FILES['anexo']['error'] === UPLOAD_ERR_OK) {
-            $ext  = strtolower(pathinfo($_FILES['anexo']['name'], PATHINFO_EXTENSION));
+            $ext         = strtolower(pathinfo($_FILES['anexo']['name'], PATHINFO_EXTENSION));
+            $extPermitidas = ['jpg', 'jpeg', 'png', 'webp', 'pdf'];
+            if (!in_array($ext, $extPermitidas, true)) {
+                Sessao::flash('erro', 'Tipo de arquivo não permitido. Use JPG, PNG, WEBP ou PDF.');
+                Roteador::redirecionar($id > 0 ? '/contas/' . $id : '/contas');
+            }
+            if ($_FILES['anexo']['size'] > 10 * 1024 * 1024) {
+                Sessao::flash('erro', 'Arquivo muito grande. O limite é 10 MB.');
+                Roteador::redirecionar($id > 0 ? '/contas/' . $id : '/contas');
+            }
             $nome = 'contas/' . date('Y-m') . '/' . uniqid() . '.' . $ext;
             $dest = RAIZ . '/public/uploads/' . $nome;
             @mkdir(dirname($dest), 0755, true);

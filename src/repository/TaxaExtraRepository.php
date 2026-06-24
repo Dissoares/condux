@@ -223,7 +223,7 @@ class TaxaExtraRepository
                     te.nome AS nome_parcela,
                     u.nome AS nome_morador, u.email AS email_morador,
                     DATEDIFF(CURDATE(), teu.vencimento) AS dias_atraso
-             FROM taxa_extra_unidade teu
+             FROM taxas_extras_unidades teu
              JOIN taxas_extras te ON te.id = teu.taxa_extra_id
              JOIN unidades un ON un.id = teu.unidade_id
              JOIN moradores m  ON m.unidade_id = un.id AND m.ativo = 1 AND m.responsavel = 1
@@ -239,7 +239,7 @@ class TaxaExtraRepository
     public function marcarAvisoVencidaEnviado(int $id): void
     {
         $this->conexao->prepare(
-            'UPDATE taxa_extra_unidade SET aviso_vencida_em = NOW() WHERE id = :id'
+            'UPDATE taxas_extras_unidades SET aviso_vencida_em = NOW() WHERE id = :id'
         )->execute([':id' => $id]);
     }
 }

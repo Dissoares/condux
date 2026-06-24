@@ -99,14 +99,13 @@ class ContaRepository
     /** Resumo por competência para o painel */
     public function resumoPorCompetencia(): array
     {
-        $hoje = date('Y-m-d');
         return $this->conexao->query(
             "SELECT competencia,
                     COUNT(*)                                           AS total,
                     SUM(valor)                                         AS valor_total,
                     SUM(status = 'pago')                              AS total_pagas,
                     SUM(status = 'pendente')                          AS total_pendentes,
-                    SUM(status = 'pendente' AND data_vencimento < '{$hoje}') AS total_atrasadas
+                    SUM(status = 'pendente' AND data_vencimento < CURDATE()) AS total_atrasadas
              FROM contas
              GROUP BY competencia
              ORDER BY competencia DESC"
