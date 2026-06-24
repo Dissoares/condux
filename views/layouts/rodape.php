@@ -211,11 +211,13 @@
     function abrirDrawer()  {
       sidebar.classList.add('aberta');
       overlay.classList.add('visivel');
+      document.body.style.overflow = 'hidden';
       if (maisBtn) maisBtn.classList.add('ativo');
     }
     function fecharDrawer() {
       sidebar.classList.remove('aberta');
       overlay.classList.remove('visivel');
+      document.body.style.overflow = '';
       if (maisBtn) maisBtn.classList.remove('ativo');
     }
 

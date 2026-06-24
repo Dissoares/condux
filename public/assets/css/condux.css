@@ -33,9 +33,13 @@
 }
 
 /* ── Fundo da página ────────────────────────────────── */
+html {
+  overflow-x: hidden;
+}
 body {
   background-color: #f0f4f8;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
 }
 [data-bs-theme="dark"] body { background-color: #1e2130; }
 
@@ -579,8 +583,12 @@ body {
   background: rgba(0,0,0,.5);
   z-index: 1029;
   backdrop-filter: blur(2px);
+  touch-action: none; /* impede scroll do body por baixo no iOS */
 }
 .condux-overlay.visivel { display: block; }
+
+/* ── Modais: impede scroll do conteúdo por baixo ───── */
+.modal { overscroll-behavior: contain; }
 
 /* ── Mobile: top header ─────────────────────────────── */
 .condux-top-bar {
@@ -837,6 +845,11 @@ body {
   }
   [data-bs-theme="dark"] .condux-bnav-item.ativo::after {
     background: #60a5fa;
+  }
+
+  /* iOS Safari faz zoom automático em inputs com font-size < 16px */
+  .form-control, .form-select, textarea {
+    font-size: 16px !important;
   }
 }
 
