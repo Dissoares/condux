@@ -324,21 +324,24 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
 
   <!-- Usuário + toggle de tema (desktop) -->
   <div class="condux-usuario">
-    <div class="condux-avatar overflow-hidden">
-      <?php if ($_fotoUsuario): ?>
-        <img src="<?= $_fotoUsuario ?>" alt="" style="width:100%;height:100%;object-fit:cover;">
-      <?php else: ?>
-        <?= $inicialNome ?>
-      <?php endif; ?>
-    </div>
-    <div class="flex-grow-1 overflow-hidden">
-      <div class="text-white fw-semibold" style="font-size:.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-        <?= htmlspecialchars($usuarioAtual['nome'] ?? '') ?>
+    <a href="<?= url('perfil') ?>" class="d-flex align-items-center gap-2 flex-grow-1 overflow-hidden text-decoration-none min-width-0"
+       title="Meu perfil" style="min-width:0;">
+      <div class="condux-avatar overflow-hidden flex-shrink-0">
+        <?php if ($_fotoUsuario): ?>
+          <img src="<?= $_fotoUsuario ?>" alt="" style="width:100%;height:100%;object-fit:cover;">
+        <?php else: ?>
+          <?= $inicialNome ?>
+        <?php endif; ?>
       </div>
-      <div style="color:rgba(255,255,255,.55); font-size:.72rem; text-transform:capitalize;">
-        <?= htmlspecialchars($usuarioAtual['perfil'] ?? '') ?>
+      <div class="flex-grow-1 overflow-hidden">
+        <div class="text-white fw-semibold" style="font-size:.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          <?= htmlspecialchars($usuarioAtual['nome'] ?? '') ?>
+        </div>
+        <div style="color:rgba(255,255,255,.55); font-size:.72rem; text-transform:capitalize;">
+          <?= htmlspecialchars($usuarioAtual['perfil'] ?? '') ?>
+        </div>
       </div>
-    </div>
+    </a>
     <button class="btn btn-link p-0 border-0 condux-btn-tema" onclick="conduxToggleTema()" title="Alternar tema"
             style="color:rgba(255,255,255,.6); font-size:1rem;">
       <i class="bi bi-moon-fill condux-tema-icone"></i>
