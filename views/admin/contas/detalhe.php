@@ -3,8 +3,8 @@
 $tituloPagina = $conta->descricao;
 require_once RAIZ . '/views/layouts/cabecalho.php';
 
-$fmtData = fn(?string $d) => $d ? date('d/m/Y', strtotime($d)) : null;
-$fmtVal  = fn(float $v)   => 'R$ ' . number_format($v, 2, ',', '.');
+$fmtData  = fn(?string $d) => $d ? date('d/m/Y', strtotime($d)) : null;
+$fmtVal   = fn(float $v)   => 'R$ ' . number_format($v, 2, ',', '.');
 $atrasada = $conta->estaAtrasada();
 $hoje     = date('Y-m-d');
 
@@ -17,9 +17,11 @@ if ($conta->status === 'pago')     { $badgeClass = 'badge-pago';    $badgeLabel 
 elseif ($atrasada)                 { $badgeClass = 'badge-vencido'; $badgeLabel = 'Atrasada'; }
 else                               { $badgeClass = 'badge-pendente';$badgeLabel = 'Pendente'; }
 
-$isImg = $conta->anexo && preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $conta->anexo);
-$isPdf = $conta->anexo && preg_match('/\.pdf$/i', $conta->anexo);
+$isImg    = $conta->anexo && preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $conta->anexo);
+$isPdf    = $conta->anexo && preg_match('/\.pdf$/i', $conta->anexo);
 $temAnexo = (bool) $conta->anexo;
+
+$valorFormatado = number_format($conta->valor, 2, ',', '.');
 ?>
 
 <!-- Header -->
@@ -52,88 +54,109 @@ $temAnexo = (bool) $conta->anexo;
 
 <div class="row g-4">
 
-  <!-- ── Coluna de dados ── -->
+  <!-- ── Coluna do formulário ── -->
   <div class="<?= $temAnexo ? 'col-lg-5' : 'col-md-8 col-xl-6' ?>">
 
-    <div class="card border-0 shadow-sm mb-3">
-      <div class="card-body p-0">
-        <?php
-        $linhas = [
-          ['Valor',        '<span class="fw-bold fs-5">' . $fmtVal($conta->valor) . '</span>'],
-          ['Competência',  $nomeComp],
-          ['Fornecedor',   $conta->fornecedor ? htmlspecialchars($conta->fornecedor) : '<span class="text-body-secondary">—</span>'],
-          ['Vencimento',   $conta->dataVencimento
-              ? '<span class="' . ($atrasada ? 'text-danger fw-semibold' : '') . '">' . $fmtData($conta->dataVencimento) . ($atrasada ? ' <i class="bi bi-exclamation-triangle-fill ms-1"></i>' : '') . '</span>'
-              : '<span class="text-body-secondary">—</span>'],
-          ['Pagamento',    $conta->dataPagamento
-              ? '<span class="text-success"><i class="bi bi-check2 me-1"></i>' . $fmtData($conta->dataPagamento) . '</span>'
-              : '<span class="text-body-secondary">—</span>'],
-          ['Observações',  $conta->observacoes ? htmlspecialchars($conta->observacoes) : '<span class="text-body-secondary">—</span>'],
-          ['Registrada em', $conta->criadoEm ? $fmtData($conta->criadoEm) : '<span class="text-body-secondary">—</span>'],
-        ];
-        ?>
-        <?php foreach ($linhas as [$label, $valor]): ?>
-        <div class="d-flex border-bottom px-3 py-2" style="font-size:.875rem;">
-          <dt class="fw-normal text-body-secondary me-3 flex-shrink-0" style="min-width:110px;"><?= $label ?></dt>
-          <dd class="mb-0"><?= $valor ?></dd>
+    <form action="<?= url('contas/salvar') ?>" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="id" value="<?= $conta->id ?>">
+
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body d-flex flex-column gap-3 py-3">
+
+          <div>
+            <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">Descrição</label>
+            <input type="text" name="descricao" class="form-control" required
+                   value="<?= htmlspecialchars($conta->descricao) ?>">
+          </div>
+
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">Categoria</label>
+              <select name="categoria" class="form-select">
+                <?php foreach (Conta::$categorias as $val => [$rot]): ?>
+                  <option value="<?= $val ?>" <?= $conta->categoria === $val ? 'selected' : '' ?>>
+                    <?= $rot ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">Competência</label>
+              <input type="month" name="competencia" class="form-control"
+                     value="<?= htmlspecialchars($conta->competencia) ?>">
+            </div>
+          </div>
+
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">Valor (R$)</label>
+              <input type="text" name="valor" class="form-control" required
+                     value="<?= $valorFormatado ?>">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">Fornecedor</label>
+              <input type="text" name="fornecedor" class="form-control"
+                     value="<?= htmlspecialchars($conta->fornecedor ?? '') ?>"
+                     placeholder="Opcional">
+            </div>
+          </div>
+
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">Vencimento</label>
+              <input type="date" name="data_vencimento" class="form-control"
+                     value="<?= $conta->dataVencimento ?? '' ?>">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">Data de pagamento</label>
+              <input type="date" name="data_pagamento" class="form-control"
+                     value="<?= $conta->dataPagamento ?? '' ?>">
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">Observações</label>
+            <input type="text" name="observacoes" class="form-control"
+                   value="<?= htmlspecialchars($conta->observacoes ?? '') ?>"
+                   placeholder="Opcional">
+          </div>
+
+          <?php if (!$temAnexo): ?>
+          <div>
+            <label class="form-label fw-semibold mb-1" style="font-size:.82rem;">Comprovante</label>
+            <input type="file" name="anexo" class="form-control form-control-sm" accept="image/*,.pdf">
+          </div>
+          <?php endif; ?>
+
         </div>
-        <?php endforeach; ?>
       </div>
-    </div>
 
-    <!-- Ações -->
-    <div class="d-flex flex-column gap-2">
-      <?php if ($conta->status !== 'pago'): ?>
-      <form action="<?= url('contas/pagar') ?>" method="POST">
-        <input type="hidden" name="id"             value="<?= $conta->id ?>">
-        <input type="hidden" name="comp"           value="<?= htmlspecialchars($conta->competencia) ?>">
-        <input type="hidden" name="data_pagamento" value="<?= $hoje ?>">
-        <button type="submit" class="btn btn-success w-100"
-                onclick="return confirm('Marcar como pago hoje?')">
-          <i class="bi bi-check2-circle me-1"></i> Confirmar pagamento
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-grow-1">
+          <i class="bi bi-floppy me-1"></i> Salvar alterações
         </button>
-      </form>
-      <?php endif; ?>
+        <a href="<?= url('contas/' . $conta->id . '/excluir?comp=' . urlencode($conta->competencia)) ?>"
+           onclick="return confirm('Remover esta conta permanentemente?')"
+           class="btn btn-outline-danger">
+          <i class="bi bi-trash"></i>
+        </a>
+      </div>
+    </form>
 
-      <?php if (!$temAnexo): ?>
-      <form action="<?= url('contas/salvar') ?>" method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="id"          value="<?= $conta->id ?>">
-        <input type="hidden" name="descricao"   value="<?= htmlspecialchars($conta->descricao) ?>">
-        <input type="hidden" name="categoria"   value="<?= htmlspecialchars($conta->categoria) ?>">
-        <input type="hidden" name="competencia" value="<?= htmlspecialchars($conta->competencia) ?>">
-        <input type="hidden" name="fornecedor"  value="<?= htmlspecialchars($conta->fornecedor ?? '') ?>">
-        <input type="hidden" name="valor"       value="<?= number_format($conta->valor, 2, ',', '.') ?>">
-        <input type="hidden" name="data_vencimento" value="<?= $conta->dataVencimento ?? '' ?>">
-        <input type="hidden" name="data_pagamento"  value="<?= $conta->dataPagamento ?? '' ?>">
-        <input type="hidden" name="observacoes" value="<?= htmlspecialchars($conta->observacoes ?? '') ?>">
-        <div class="input-group">
-          <input type="file" name="anexo" class="form-control form-control-sm"
-                 accept="image/*,.pdf" required>
-          <button type="submit" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-paperclip"></i> Anexar
-          </button>
-        </div>
-      </form>
-      <?php endif; ?>
-
-      <a href="<?= url('contas/' . $conta->id . '/excluir?comp=' . urlencode($conta->competencia)) ?>"
-         onclick="return confirm('Remover esta conta permanentemente?')"
-         class="btn btn-outline-danger btn-sm">
-        <i class="bi bi-trash me-1"></i> Remover conta
-      </a>
-    </div>
   </div>
 
-  <!-- ── Coluna de anexo (só quando existe) ── -->
+  <!-- ── Coluna do anexo ── -->
   <?php if ($temAnexo): ?>
   <div class="col-lg-7">
     <div class="card border-0 shadow-sm">
       <div class="card-header bg-transparent fw-semibold py-3 d-flex align-items-center justify-content-between">
         <span><i class="bi bi-paperclip me-1"></i> Comprovante</span>
-        <a href="<?= url('uploads/' . $conta->anexo) ?>" target="_blank"
-           class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-box-arrow-up-right me-1"></i> Abrir
-        </a>
+        <div class="d-flex gap-2">
+          <a href="<?= url('uploads/' . $conta->anexo) ?>" target="_blank"
+             class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-box-arrow-up-right me-1"></i> Abrir
+          </a>
+        </div>
       </div>
       <div class="card-body p-0">
         <?php if ($isImg): ?>
@@ -141,8 +164,7 @@ $temAnexo = (bool) $conta->anexo;
                class="w-100 rounded-bottom" style="max-height:520px; object-fit:contain; background:#f8f9fa;">
         <?php elseif ($isPdf): ?>
           <iframe src="<?= url('uploads/' . $conta->anexo) ?>"
-                  class="w-100 rounded-bottom border-0"
-                  style="height:520px;"></iframe>
+                  class="w-100 rounded-bottom border-0" style="height:520px;"></iframe>
         <?php else: ?>
           <div class="p-4 text-center text-body-secondary">
             <i class="bi bi-file-earmark fs-1 opacity-25 d-block mb-2"></i>

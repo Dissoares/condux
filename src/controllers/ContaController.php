@@ -63,8 +63,8 @@ class ContaController
             Roteador::redirecionar('/contas?comp=' . $conta->competencia);
         }
 
-        // Upload de anexo (apenas em criação)
-        if ($id === 0 && !empty($_FILES['anexo']) && $_FILES['anexo']['error'] === UPLOAD_ERR_OK) {
+        // Upload de anexo (criação ou edição sem anexo ainda)
+        if (!empty($_FILES['anexo']) && $_FILES['anexo']['error'] === UPLOAD_ERR_OK) {
             $ext  = strtolower(pathinfo($_FILES['anexo']['name'], PATHINFO_EXTENSION));
             $nome = 'contas/' . date('Y-m') . '/' . uniqid() . '.' . $ext;
             $dest = RAIZ . '/public/uploads/' . $nome;
@@ -81,9 +81,13 @@ class ContaController
             }
         }
 
-        $this->repo->salvar($conta);
+        $savedId = $this->repo->salvar($conta);
         Sessao::flash('sucesso', $id > 0 ? 'Conta atualizada.' : 'Conta adicionada.');
-        Roteador::redirecionar('/contas?comp=' . $conta->competencia);
+        if ($id > 0) {
+            Roteador::redirecionar('/contas/' . $id);
+        } else {
+            Roteador::redirecionar('/contas/' . $savedId);
+        }
     }
 
     public function marcarPago(): void
@@ -93,7 +97,7 @@ class ContaController
         $data = trim($_POST['data_pagamento'] ?? date('Y-m-d'));
         $this->repo->marcarPago($id, $data);
         Sessao::flash('sucesso', 'Conta marcada como paga.');
-        Roteador::redirecionar('/contas?comp=' . $comp);
+        Roteador::redirecionar($id > 0 ? '/contas/' . $id : '/contas?comp=' . $comp);
     }
 
     public function excluir(): void

@@ -43,7 +43,9 @@ class ContaRepository
                  descricao = :desc, categoria = :cat, competencia = :comp,
                  fornecedor = :forn, valor = :valor,
                  data_vencimento = :venc, data_pagamento = :pago,
-                 status = :status, observacoes = :obs
+                 status = :status, observacoes = :obs,
+                 anexo = COALESCE(:anexo, anexo),
+                 nome_original = COALESCE(:nome, nome_original)
                  WHERE id = :id'
             );
         }
@@ -58,12 +60,11 @@ class ContaRepository
             ':pago'   => $c->dataPagamento,
             ':status' => $c->status,
             ':obs'    => $c->observacoes,
+            ':anexo'  => $c->anexo,
+            ':nome'   => $c->nomeOriginal,
         ];
 
-        if ($c->id === null) {
-            $params[':anexo'] = $c->anexo;
-            $params[':nome']  = $c->nomeOriginal;
-        } else {
+        if ($c->id !== null) {
             $params[':id'] = $c->id;
         }
 
