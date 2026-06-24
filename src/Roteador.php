@@ -573,12 +573,12 @@ class Roteador
     private static function naoEncontrado(): void
     {
         http_response_code(404);
-        echo '<h1 style="font-family:sans-serif">404 — Página não encontrada.</h1>';
+        require_once RAIZ . '/views/errors/404.php';
     }
 
     private static function naoAutorizado(): void
     {
         http_response_code(403);
-        echo '<h1 style="font-family:sans-serif">403 — Acesso não autorizado.</h1>';
+        require_once RAIZ . '/views/errors/403.php';
     }
 }
