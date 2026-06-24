@@ -49,7 +49,11 @@ $inativos = array_filter($funcionarios, fn($f) => !$f->ativo);
 <!-- ── Mobile: cards ──────────────────────────────────── -->
 <div class="d-md-none card border-0 shadow-sm overflow-hidden">
   <?php foreach ($funcionarios as $i => $f): ?>
-  <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?> <?= !$f->ativo ? 'opacity-60' : '' ?>">
+  <div class="px-3 py-3 <?= $i > 0 ? 'border-top' : '' ?> <?= !$f->ativo ? 'opacity-60' : '' ?>"
+       style="cursor:pointer;" onclick="window.location='<?= url("funcionarios/{$f->id}") ?>'"
+       role="link" tabindex="0" onkeydown="if(event.key==='Enter')window.location='<?= url("funcionarios/{$f->id}") ?>'"
+       onmouseover="this.style.background='var(--bs-tertiary-bg)'" onmouseout="this.style.background=''"
+  >
     <div class="d-flex align-items-center gap-3">
 
       <!-- Avatar -->
@@ -94,7 +98,7 @@ $inativos = array_filter($funcionarios, fn($f) => !$f->ativo);
     </div>
 
     <!-- Ações -->
-    <div class="d-flex gap-2 mt-2 justify-content-end">
+    <div class="d-flex gap-2 mt-2 justify-content-end" onclick="event.stopPropagation()">
       <a href="<?= url("funcionarios/{$f->id}") ?>"
          class="btn btn-outline-secondary btn-sm py-1 px-3">
         <i class="bi bi-eye me-1"></i> Ver
@@ -130,7 +134,9 @@ $inativos = array_filter($funcionarios, fn($f) => !$f->ativo);
       </thead>
       <tbody>
         <?php foreach ($funcionarios as $f): ?>
-        <tr class="<?= !$f->ativo ? 'text-body-tertiary' : '' ?>">
+        <tr class="<?= !$f->ativo ? 'text-body-tertiary' : '' ?>"
+            style="cursor:pointer;" onclick="window.location='<?= url("funcionarios/{$f->id}") ?>'"
+        >
           <td>
             <div class="d-flex align-items-center gap-2">
               <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0
@@ -178,7 +184,7 @@ $inativos = array_filter($funcionarios, fn($f) => !$f->ativo);
               <?php endif; ?>
             <?php endif; ?>
           </td>
-          <td>
+          <td onclick="event.stopPropagation()">
             <div class="d-flex gap-1">
               <a href="<?= url("funcionarios/{$f->id}") ?>"
                  class="btn btn-outline-secondary btn-sm py-0 px-2" title="Ver detalhe">
