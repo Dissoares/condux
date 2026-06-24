@@ -83,7 +83,8 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
       };
       $alertaValidade = $v->validadeVencida() ? 'danger' : ($v->validadeProxima() ? 'warning' : null);
     ?>
-    <div class="card border-0 shadow-sm <?= $alertaValidade ? "card-acento-{$alertaValidade}" : '' ?>">
+    <a href="<?= url("vistorias/{$v->id}") ?>"
+       class="card border-0 shadow-sm text-decoration-none text-body card-hover <?= $alertaValidade ? "card-acento-{$alertaValidade}" : '' ?>">
       <div class="card-body py-3">
         <div class="d-flex align-items-start gap-3">
 
@@ -130,15 +131,17 @@ require_once RAIZ . '/views/layouts/cabecalho.php';
             </div>
           </div>
 
-          <!-- Ação -->
-          <a href="<?= url("vistorias/{$v->id}") ?>" class="btn btn-outline-secondary btn-sm flex-shrink-0">
-            <i class="bi bi-eye"></i>
-          </a>
+          <i class="bi bi-chevron-right text-body-tertiary flex-shrink-0 align-self-center"></i>
         </div>
       </div>
-    </div>
+    </a>
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
+
+<style>
+.card-hover { transition: transform .12s, box-shadow .12s; }
+.card-hover:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.1) !important; }
+</style>
 
 <?php require_once RAIZ . '/views/layouts/rodape.php'; ?>
