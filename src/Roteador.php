@@ -238,11 +238,17 @@ class Roteador
         require_once RAIZ . '/src/controllers/TaxaExtraController.php';
         $ctrl = new TaxaExtraController();
 
-        if ($seg[1] === null)                              { $ctrl->listar(); return; }
-        if ($seg[1] === 'nova')                            { $ctrl->formulario(); return; }
-        if ($seg[1] === 'gerar' && $metodo === 'POST')     { $ctrl->gerar(); return; }
+        if ($seg[1] === null)                                  { $ctrl->listar();     return; }
+        if ($seg[1] === 'nova')                                { $ctrl->formulario(); return; }
+        if ($seg[1] === 'gerar'       && $metodo === 'POST')   { $ctrl->gerar();      return; }
+        if ($seg[1] === 'marcar-pago' && $metodo === 'POST')   { $ctrl->marcarPago(); return; }
 
         $id = (int) $seg[1];
+        if ($id > 0 && $seg[2] === 'aprovar' && $metodo === 'POST') {
+            $_GET['id'] = $id;
+            $ctrl->aprovarComprovante();
+            return;
+        }
         if ($id > 0) { $_GET['id'] = $id; $ctrl->ver(); return; }
 
         self::naoEncontrado();
@@ -491,10 +497,8 @@ class Roteador
         require_once RAIZ . '/src/controllers/TaxaCondominialController.php';
         $ctrl = new TaxaCondominialController();
 
-        if ($seg[1] === 'comprovante' && $metodo === 'POST') {
-            $ctrl->enviarComprovante();
-            return;
-        }
+        if ($seg[1] === 'comprovante'       && $metodo === 'POST') { $ctrl->enviarComprovante();      return; }
+        if ($seg[1] === 'comprovante-extra' && $metodo === 'POST') { $ctrl->enviarComprovanteExtra(); return; }
         $ctrl->listarMinhasTaxas();
     }
 

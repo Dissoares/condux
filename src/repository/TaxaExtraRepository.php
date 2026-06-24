@@ -52,7 +52,8 @@ class TaxaExtraRepository
     public function listarCobrancasPorTaxa(int $taxaExtraId): array
     {
         $stmt = $this->conexao->prepare(
-            'SELECT teu.*,
+            'SELECT teu.id, teu.unidade_id, teu.status, teu.data_pagamento,
+                    teu.comprovante, teu.forma_pagamento,
                     CONCAT("Bloco ", u.bloco, " — Apto ", u.numero) AS identificacao_unidade,
                     us.nome AS nome_responsavel
              FROM taxas_extras_unidades teu
@@ -69,7 +70,9 @@ class TaxaExtraRepository
     public function listarPorUnidade(int $unidadeId): array
     {
         $stmt = $this->conexao->prepare(
-            'SELECT teu.*, te.nome, te.descricao, te.valor AS valor_original,
+            'SELECT teu.id, teu.unidade_id, teu.status, teu.data_pagamento,
+                    teu.comprovante, teu.forma_pagamento,
+                    te.id AS taxa_extra_id, te.nome, te.descricao, te.valor AS valor_original,
                     te.vencimento, te.parcela, te.total_parcelas, te.projeto_id,
                     p.nome AS nome_projeto
              FROM taxas_extras_unidades teu
@@ -186,18 +189,43 @@ class TaxaExtraRepository
         }
     }
 
-    public function registrarPagamento(int $cobrancaId, string $dataPagamento, ?string $comprovante): void
+    public function registrarPagamento(int $cobrancaId, string $dataPagamento, ?string $comprovante, ?string $formaPagamento = null): void
     {
         $stmt = $this->conexao->prepare(
             'UPDATE taxas_extras_unidades
-             SET status = "pago", data_pagamento = :data_pagamento, comprovante = :comprovante
+             SET status = "pago", data_pagamento = :data_pagamento,
+                 comprovante = :comprovante, forma_pagamento = :forma_pagamento
              WHERE id = :id'
         );
         $stmt->execute([
-            ':data_pagamento' => $dataPagamento,
-            ':comprovante'    => $comprovante,
-            ':id'             => $cobrancaId,
+            ':data_pagamento'  => $dataPagamento,
+            ':comprovante'     => $comprovante,
+            ':forma_pagamento' => $formaPagamento,
+            ':id'              => $cobrancaId,
         ]);
+    }
+
+    public function marcarAguardando(int $cobrancaId, int $unidadeId, ?string $comprovante, ?string $formaPagamento): void
+    {
+        $this->conexao->prepare(
+            'UPDATE taxas_extras_unidades
+             SET status = "aguardando", comprovante = :comprovante, forma_pagamento = :forma_pagamento
+             WHERE id = :id AND unidade_id = :unidade_id'
+        )->execute([
+            ':comprovante'     => $comprovante,
+            ':forma_pagamento' => $formaPagamento,
+            ':id'              => $cobrancaId,
+            ':unidade_id'      => $unidadeId,
+        ]);
+    }
+
+    public function aprovarComprovante(int $cobrancaId, string $dataPagamento): void
+    {
+        $this->conexao->prepare(
+            'UPDATE taxas_extras_unidades
+             SET status = "pago", data_pagamento = :data
+             WHERE id = :id'
+        )->execute([':data' => $dataPagamento, ':id' => $cobrancaId]);
     }
 
     /** Quantidade de unidades pagas/pendentes numa taxa extra */

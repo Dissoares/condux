@@ -119,7 +119,63 @@ class TaxaExtraController
         $parcelas      = $taxaExtra->projetoId
             ? $this->repo->listarPorProjeto($taxaExtra->projetoId)
             : [];
+        $mensagem     = Sessao::lerFlash('sucesso');
+        $erroMensagem = Sessao::lerFlash('erro');
 
         require_once RAIZ . '/views/admin/taxas-extra/detalhe.php';
+    }
+
+    /** POST /taxas-extra/marcar-pago — admin registra pagamento direto */
+    public function marcarPago(): void
+    {
+        $cobrancaId     = (int)   ($_POST['cobranca_id']     ?? 0);
+        $taxaExtraId    = (int)   ($_POST['taxa_extra_id']   ?? 0);
+        $dataPagamento  = trim($_POST['data_pagamento']       ?? date('Y-m-d')) ?: date('Y-m-d');
+        $formaPagamento = trim($_POST['forma_pagamento']      ?? '') ?: null;
+
+        $comprovante = null;
+        if (!empty($_FILES['comprovante']) && $_FILES['comprovante']['error'] === UPLOAD_ERR_OK) {
+            try {
+                $comprovante = $this->salvarComprovante($_FILES['comprovante']);
+            } catch (RuntimeException $e) {
+                Sessao::flash('erro', $e->getMessage());
+                Roteador::redirecionar("taxas-extra/{$taxaExtraId}");
+                return;
+            }
+        }
+
+        $this->repo->registrarPagamento($cobrancaId, $dataPagamento, $comprovante, $formaPagamento);
+        Sessao::flash('sucesso', 'Pagamento registrado com sucesso.');
+        Roteador::redirecionar("taxas-extra/{$taxaExtraId}");
+    }
+
+    /** POST /taxas-extra/{id}/aprovar — admin aprova comprovante enviado pelo morador */
+    public function aprovarComprovante(): void
+    {
+        $taxaExtraId   = (int) ($_GET['id']          ?? 0);
+        $cobrancaId    = (int) ($_POST['cobranca_id'] ?? 0);
+        $dataPagamento = trim($_POST['data_pagamento'] ?? date('Y-m-d')) ?: date('Y-m-d');
+
+        $this->repo->aprovarComprovante($cobrancaId, $dataPagamento);
+        Sessao::flash('sucesso', 'Comprovante aprovado.');
+        Roteador::redirecionar("taxas-extra/{$taxaExtraId}");
+    }
+
+    private function salvarComprovante(array $arquivo): string
+    {
+        $ext = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'pdf'], true)) {
+            throw new RuntimeException('Tipo de arquivo não permitido. Use JPG, PNG, WEBP ou PDF.');
+        }
+        if ($arquivo['size'] > 10 * 1024 * 1024) {
+            throw new RuntimeException('Arquivo muito grande. O limite é 10 MB.');
+        }
+        $nome = 'taxas-extra/' . date('Y-m') . '/' . uniqid() . '.' . $ext;
+        $dest = RAIZ . '/public/uploads/' . $nome;
+        @mkdir(dirname($dest), 0755, true);
+        if (!move_uploaded_file($arquivo['tmp_name'], $dest)) {
+            throw new RuntimeException('Falha ao salvar o arquivo. Tente novamente.');
+        }
+        return $nome;
     }
 }

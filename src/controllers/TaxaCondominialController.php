@@ -277,16 +277,18 @@ class TaxaCondominialController
 
         if ($unidadeId === null) {
             $tituloPagina = 'Minhas Taxas';
-            $anos      = [];
-            $taxas     = null;
-            $anoFiltro = null;
+            $anos        = [];
+            $taxas       = null;
+            $taxasExtras = [];
+            $anoFiltro   = null;
             $erroMensagem = $erroMensagem ?: 'Você ainda não está vinculado a nenhuma unidade. Entre em contato com o síndico.';
             require_once RAIZ . '/views/morador/minhas-taxas.php';
             return;
         }
 
-        $anoFiltro = isset($_GET['ano']) && preg_match('/^\d{4}$/', $_GET['ano'])
+        $anoFiltro   = isset($_GET['ano']) && preg_match('/^\d{4}$/', $_GET['ano'])
             ? $_GET['ano'] : null;
+        $taxasExtras = $this->extraRepo->listarPorUnidade($unidadeId);
 
         if ($anoFiltro) {
             $tituloPagina = 'Minhas Taxas — ' . $anoFiltro;
@@ -299,6 +301,70 @@ class TaxaCondominialController
         }
 
         require_once RAIZ . '/views/morador/minhas-taxas.php';
+    }
+
+    public function enviarComprovanteExtra(): void
+    {
+        $cobrancaId     = (int)   ($_POST['cobranca_id']    ?? 0);
+        $formaPagamento = trim($_POST['forma_pagamento']     ?? '');
+        $unidadeId      = $this->obterUnidadeDoMoradorLogado();
+
+        if (!$unidadeId || !$cobrancaId) {
+            Sessao::flash('erro', 'Dados inválidos.');
+            Roteador::redirecionar('/minhas-taxas');
+            return;
+        }
+
+        if (!$formaPagamento) {
+            Sessao::flash('erro', 'Selecione a forma de pagamento.');
+            Roteador::redirecionar('/minhas-taxas');
+            return;
+        }
+
+        if (empty($_FILES['comprovante']) || $_FILES['comprovante']['error'] !== UPLOAD_ERR_OK) {
+            Sessao::flash('erro', 'Selecione um arquivo de comprovante válido.');
+            Roteador::redirecionar('/minhas-taxas');
+            return;
+        }
+
+        $arquivo = $_FILES['comprovante'];
+        $ext = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'pdf'], true)) {
+            Sessao::flash('erro', 'Tipo de arquivo não permitido. Use JPG, PNG, WEBP ou PDF.');
+            Roteador::redirecionar('/minhas-taxas');
+            return;
+        }
+        if ($arquivo['size'] > 10 * 1024 * 1024) {
+            Sessao::flash('erro', 'Arquivo muito grande. O limite é 10 MB.');
+            Roteador::redirecionar('/minhas-taxas');
+            return;
+        }
+
+        $nome = 'taxas-extra/' . date('Y-m') . '/' . uniqid() . '.' . $ext;
+        $dest = RAIZ . '/public/uploads/' . $nome;
+        @mkdir(dirname($dest), 0755, true);
+        if (!move_uploaded_file($arquivo['tmp_name'], $dest)) {
+            Sessao::flash('erro', 'Falha ao salvar o arquivo. Tente novamente.');
+            Roteador::redirecionar('/minhas-taxas');
+            return;
+        }
+
+        $this->extraRepo->marcarAguardando($cobrancaId, $unidadeId, $nome, $formaPagamento);
+        Sessao::flash('sucesso', 'Comprovante enviado! Aguarde a aprovação do síndico.');
+
+        try {
+            require_once RAIZ . '/src/services/PushNotificationService.php';
+            require_once RAIZ . '/src/repository/PushSubscriptionRepository.php';
+            $push = new PushNotificationService(new PushSubscriptionRepository(Conexao::obter()));
+            $push->enviarParaPerfil('admin', [
+                'title' => '📋 Comprovante de taxa extra para aprovar',
+                'body'  => 'Um condômino enviou comprovante de taxa extra. Toque para revisar.',
+                'url'   => url('taxas-extra'),
+                'tag'   => 'comprovante-extra-' . $cobrancaId,
+            ]);
+        } catch (\Throwable) {}
+
+        Roteador::redirecionar('/minhas-taxas');
     }
 
     public function enviarComprovante(): void
