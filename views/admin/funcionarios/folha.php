@@ -119,7 +119,10 @@ foreach ($funcionarios as $f) {
   ?>
   <div class="col-md-6 col-lg-4">
     <div class="card border-0 shadow-sm func-card h-100"
-         style="border-left:3px solid var(--bs-<?= $corBorda ?>)!important;">
+         style="border-left:3px solid var(--bs-<?= $corBorda ?>)!important;cursor:pointer;"
+         onclick="window.location='<?= url("funcionarios/{$f->id}?aba=pagamentos") ?>'"
+         role="link" tabindex="0"
+         onkeydown="if(event.key==='Enter')window.location='<?= url("funcionarios/{$f->id}?aba=pagamentos") ?>'">
       <div class="card-body p-3">
 
         <!-- Linha superior: avatar + nome + status -->
@@ -170,7 +173,7 @@ foreach ($funcionarios as $f) {
         <?php endif; ?>
 
         <!-- Ações -->
-        <div class="d-flex gap-2 mt-3">
+        <div class="d-flex gap-2 mt-3" onclick="event.stopPropagation()">
           <?php if (!$pago): ?>
           <form action="<?= url("funcionarios/{$f->id}/pagamentos") ?>" method="POST" class="d-flex gap-1 flex-grow-1">
             <input type="hidden" name="competencia"    value="<?= htmlspecialchars($compFiltro) ?>">
