@@ -256,7 +256,7 @@ $_logoUrl     = !empty($_cfg['app_logo']) ? url('uploads/' . $_cfg['app_logo']) 
         </a>
       </li>
 
-      <p class="condux-nav-label">Obras</p>
+      <p class="condux-nav-label">Serviços</p>
       <li class="nav-item">
         <a href="<?= url('projetos') ?>" class="nav-link <?= $segAtivo === 'projetos' ? 'ativo' : '' ?>">
           <i class="bi bi-kanban"></i> Projetos
